@@ -337,7 +337,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$axios);
     let _this = this;
 
     // Create a Stripe client.
