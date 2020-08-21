@@ -159,11 +159,11 @@
                       v-for="plan in plans"
                       :key="plan.id"
                       v-bind:class="{ 'package-selected': plan.checked }"
+                      v-if="
+                        renderPlanforPaymentPeriod(plan) &&
+                          coreIds.includes(plan.id)
+                      "
                     >
-                      <!-- v-if="
-                    renderPlanforPaymentPeriod(plan) &&
-                      coreIds.includes(plan.id)
-                  " -->
                       <td>
                         <div class="checkbox checkbox-success">
                           <input
@@ -212,11 +212,11 @@
                       v-for="plan in plans"
                       :key="plan.id"
                       v-bind:class="{ 'package-selected': plan.checked }"
+                      v-if="
+                        renderPlanforPaymentPeriod(plan) &&
+                          coreIds.includes(plan.id) != true
+                      "
                     >
-                      <!-- v-if="
-                    renderPlanforPaymentPeriod(plan) &&
-                      coreIds.includes(plan.id) != true
-                  " -->
                       <td>
                         <div class="checkbox checkbox-success">
                           <input
