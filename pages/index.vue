@@ -1,6 +1,6 @@
 <template>
   <div class="row myRow col-12 mt-3">
-    <div class="col-md-6">
+    <div class="col-md-5">
       <div class="card myPad">
         <h2 class="mb-0">Card Information</h2>
 
@@ -107,7 +107,7 @@
       </div>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-7">
       <div class="card myPad">
         <h2 class="mb-0">Select Plan</h2>
 
@@ -142,169 +142,167 @@
                 </div>
               </div>
 
-              <div class="overflow-auto">
-                <table class="table table-striped table-hover">
-                  <thead>
-                    <tr>
-                      <th>Package</th>
-                      <th class="text-center">User(s)</th>
-                      <th class="text-right">Price</th>
-                      <th class="text-right">Discount</th>
-                      <th class="text-right">Total</th>
-                    </tr>
-                  </thead>
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Package</th>
+                    <th class="text-center">User(s)</th>
+                    <th class="text-right">Price</th>
+                    <th class="text-right">Discount</th>
+                    <th class="text-right">Total</th>
+                  </tr>
+                </thead>
 
-                  <tbody>
-                    <tr
-                      v-for="(plan, index) in show.included"
-                      :key="plan.id"
-                      :class="{ 'package-selected': plan.checked }"
-                    >
-                      <td>
-                        <div class="checkbox checkbox-success">
-                          <input
-                            :id="plan.id"
-                            type="checkbox"
-                            :checked="plan.checked"
-                            @change="
-                              onCheckedPlan({
-                                value: !plan.checked,
-                                included: true,
-                                index,
-                              })
-                            "
-                          />
-                          <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
-                          <label :for="plan.id">
-                            {{ plan.nickname }}
-                          </label>
-                        </div>
-                        <div class="text-success">
-                          <b> Discount:</b> 5% for 12 months
-                        </div>
-                      </td>
-                      <td class="text-center">
+                <tbody>
+                  <tr
+                    v-for="(plan, index) in show.included"
+                    :key="plan.id"
+                    :class="{ 'package-selected': plan.checked }"
+                  >
+                    <td>
+                      <div class="checkbox checkbox-success">
                         <input
-                          class="form-control form-control-sm"
-                          type="number"
-                          maxlength="3"
-                          min="0"
-                          size="3"
-                          :value="plan.users"
+                          :id="plan.id"
+                          type="checkbox"
+                          :checked="plan.checked"
                           @change="
-                            onChangeUsers({
-                              value: Number($event.target.value),
+                            onCheckedPlan({
+                              value: !plan.checked,
                               included: true,
                               index,
                             })
                           "
                         />
                         <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
-                      </td>
-                      <td class="text-right">
-                        {{ '$ ' + plan.amount.toString().slice(0, -2) }}
-                      </td>
-                      <td class="text-right">$ 0</td>
-                      <td class="text-right">
-                        $
-                        {{
-                          (plan.users * plan.amount.toString().slice(0, -2))
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                        }}
-                      </td>
-                    </tr>
+                        <label :for="plan.id">
+                          {{ plan.nickname }}
+                        </label>
+                      </div>
+                      <div class="text-success">
+                        <b> Discount:</b> 5% for 12 months
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <input
+                        class="form-control users-input"
+                        type="number"
+                        maxlength="3"
+                        min="0"
+                        size="3"
+                        :value="plan.users"
+                        @change="
+                          onChangeUsers({
+                            value: Number($event.target.value),
+                            included: true,
+                            index,
+                          })
+                        "
+                      />
+                      <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
+                    </td>
+                    <td class="text-right">
+                      {{ '$ ' + plan.amount.toString().slice(0, -2) }}
+                    </td>
+                    <td class="text-right">$ 0</td>
+                    <td class="text-right">
+                      $
+                      {{
+                        (plan.users * plan.amount.toString().slice(0, -2))
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      }}
+                    </td>
+                  </tr>
 
-                    <tr
-                      v-for="(plan, index) in show.notIncluded"
-                      :key="plan.id"
-                      :class="{ 'package-selected': plan.checked }"
-                    >
-                      <td>
-                        <div class="checkbox checkbox-success">
-                          <input
-                            :id="plan.id"
-                            type="checkbox"
-                            :checked="plan.checked"
-                            @change="
-                              onCheckedPlan({
-                                value: !plan.checked,
-                                included: false,
-                                index,
-                              })
-                            "
-                          />
-                          <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
-                          <label :for="plan.id">
-                            {{ plan.nickname }}
-                          </label>
-                        </div>
-                        <div class="input-group input-group-sm mt-1">
-                          <input
-                            type="text"
-                            class="form-control form-control-sm"
-                            placeholder="Add Coupon"
-                          />
-                          <div class="input-group-append">
-                            <button
-                              class="btn btn-sm btn-outline-secondary"
-                              type="button"
-                            >
-                              Add
-                            </button>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="text-center">
+                  <tr
+                    v-for="(plan, index) in show.notIncluded"
+                    :key="plan.id"
+                    :class="{ 'package-selected': plan.checked }"
+                  >
+                    <td>
+                      <div class="checkbox checkbox-success">
                         <input
-                          class="form-control form-control-sm"
-                          type="number"
-                          maxlength="3"
-                          min="0"
-                          size="3"
-                          :value="plan.users"
+                          :id="plan.id"
+                          type="checkbox"
+                          :checked="plan.checked"
                           @change="
-                            onChangeUsers({
-                              value: Number($event.target.value),
+                            onCheckedPlan({
+                              value: !plan.checked,
                               included: false,
                               index,
                             })
                           "
                         />
                         <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
-                      </td>
-                      <td class="text-right">
-                        {{ '$ ' + plan.amount.toString().slice(0, -2) }}
-                      </td>
-                      <td class="text-right">$ 0</td>
-                      <td class="text-right">
-                        $
+                        <label :for="plan.id">
+                          {{ plan.nickname }}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-sm mt-1">
+                        <input
+                          type="text"
+                          class="form-control form-control-sm"
+                          placeholder="Add Coupon"
+                        />
+                        <div class="input-group-append">
+                          <button
+                            class="btn btn-sm btn-outline-secondary"
+                            type="button"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <input
+                        class="form-control users-input"
+                        type="number"
+                        maxlength="3"
+                        min="0"
+                        size="3"
+                        :value="plan.users"
+                        @change="
+                          onChangeUsers({
+                            value: Number($event.target.value),
+                            included: false,
+                            index,
+                          })
+                        "
+                      />
+                      <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
+                    </td>
+                    <td class="text-right">
+                      {{ '$ ' + plan.amount.toString().slice(0, -2) }}
+                    </td>
+                    <td class="text-right">$ 0</td>
+                    <td class="text-right">
+                      $
+                      {{
+                        (plan.users * plan.amount.toString().slice(0, -2))
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      }}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td colspan="4">
+                      <b>Total to pay per {{ paymentPeriod }}</b>
+                    </td>
+                    <td class="text-right">
+                      <b
+                        >$
                         {{
-                          (plan.users * plan.amount.toString().slice(0, -2))
+                          totalPaid
                             .toString()
                             .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                        }}
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td colspan="4">
-                        <b>Total to pay per {{ paymentPeriod }}</b>
-                      </td>
-                      <td class="text-right">
-                        <b
-                          >$
-                          {{
-                            totalPaid
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                          }}</b
-                        >
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                        }}</b
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <div class="text-right mb-3">
@@ -771,5 +769,9 @@ export default {
 .myPad {
   padding-right: 15px;
   padding-left: 15px;
+}
+
+.users-input {
+  max-width: 70px;
 }
 </style>
