@@ -319,7 +319,7 @@ export default {
     paymentPeriod: 'month',
     plans: null,
     token:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiJjMjJmMDFmNy1lMzRiLTQ3NTgtYWU0Zi03YzZlMDNiMzkwMWEiLCJpYXQiOjE1OTgwMjE5NTgsImV4cCI6MTU5ODYyNjc1OH0.UN0ibx49zBlBwuvdz06TQ3bHi4U8WMG3Cwpxz_De0mg',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI0NDRkMWZkMy0wZWIxLTQ4ODUtOWQwMS1lNTZhYjJkNzBkZTYiLCJpYXQiOjE1OTgyMjcyNDQsImV4cCI6MTU5ODgzMjA0NH0.w8Pa4MMrmTvcr1cDnlVLigZfWY22Lq-NwrAePBXxrc4',
     graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
     totalToPaid: 0,
     isProcesing: true,
@@ -327,8 +327,8 @@ export default {
     paymentMethods: null,
     customer: null,
     coreIds: [
-      'price_1Gv7zkEHlNK1KgjMGy4WHzUf',
-      'price_1Gv80DEHlNK1KgjMaPRisapB',
+      'price_1Gv7zkEHlNK1KgjMGy4WHzUf', // month
+      'price_1Gv80DEHlNK1KgjMaPRisapB', //  year
     ],
   }),
   computed: {
@@ -453,6 +453,7 @@ export default {
       this.$axios(config)
         .then(function(response) {
           _this.plans = response.data.data.stripePlans;
+          console.log(JSON.stringify(_this.plans))
           _this.addLocalValuesToPlans();
           _this.isProcesing = false;
         })
