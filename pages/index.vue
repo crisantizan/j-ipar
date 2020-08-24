@@ -168,7 +168,7 @@
                             :checked="plan.checked"
                             @change="
                               onCheckedPlan({
-                                checked: !plan.checked,
+                                value: !plan.checked,
                                 included: true,
                                 index,
                               })
@@ -191,10 +191,16 @@
                           maxlength="3"
                           min="0"
                           size="3"
-                          value="1"
-                          v-model="plan.users"
-                          @change="usersChange(plan)"
+                          :value="plan.users"
+                          @change="
+                            onChangeUsers({
+                              value: Number($event.target.value),
+                              included: true,
+                              index,
+                            })
+                          "
                         />
+                        <!-- @change="usersChange(plan)" -->
                         <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                       </td>
                       <td class="text-right">
@@ -224,7 +230,7 @@
                             :checked="plan.checked"
                             @change="
                               onCheckedPlan({
-                                checked: !plan.checked,
+                                value: !plan.checked,
                                 included: false,
                                 index,
                               })
@@ -259,10 +265,16 @@
                           maxlength="3"
                           min="0"
                           size="3"
-                          value="1"
-                          v-model="plan.users"
-                          @change="usersChange(plan)"
+                          :value="plan.users"
+                          @change="
+                            onChangeUsers({
+                              value: Number($event.target.value),
+                              included: false,
+                              index,
+                            })
+                          "
                         />
+                        <!-- @change="usersChange(plan)" -->
                         <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                       </td>
                       <td class="text-right">
@@ -445,7 +457,11 @@ export default {
     // this.getPaymentMethods();
   },
   methods: {
-    ...mapMutations('plans', ['SET_MONTHLY', 'SET_YEARLY', 'TOGGLE_ACTIVE']),
+    ...mapMutations('plans', [
+      'SET_MONTHLY',
+      'SET_YEARLY',
+      'SET_CHECKED_OR_USERS',
+    ]),
     /** fetch plans */
     async getPlans() {
       // creating Query
@@ -616,8 +632,13 @@ export default {
     },
     /** on checked plan handler */
     onCheckedPlan(data) {
-      // console.log({ checked, included, index });
-      this.TOGGLE_ACTIVE(data);
+      // data { value, included, index });
+      this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
+    },
+    /** on change users handler */
+    onChangeUsers(data) {
+      // data { value, included, index });
+      this.SET_CHECKED_OR_USERS({ prop: 'users', ...data });
     },
     checkedChange(plan) {
       this.updateReactivity();

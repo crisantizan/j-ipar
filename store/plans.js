@@ -1,3 +1,5 @@
+const helpers = {};
+
 export const state = () => ({
   period: 'month',
   month: {
@@ -20,17 +22,22 @@ export const mutations = {
   SET_PERIOD(state, period) {
     state.period = period;
   },
-  TOGGLE_ACTIVE(state, { checked, included, index }) {
+  /** update "checked" and "users" plan properties */
+  SET_CHECKED_OR_USERS(state, { prop, value, included, index }) {
     const includedStr = included ? 'included' : 'notIncluded';
+    // current plan
     const current = state[state.period][includedStr][index];
 
-    // get other period
-    const otherPeriod = state.period === 'month' ? 'year' : 'month';
-    const other = state[otherPeriod][includedStr][index];
+    // set new value
+    current[prop] = value;
 
-    // set new status
-    current.checked = checked;
-    other.checked = checked;
+    // update in both list only with "checked" property
+    if (prop === 'checked') {
+      // get other period
+      const otherPeriod = state.period === 'month' ? 'year' : 'month';
+      const other = state[otherPeriod][includedStr][index];
+      other[prop] = value;
+    }
   },
 };
 
