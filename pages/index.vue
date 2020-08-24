@@ -174,7 +174,6 @@
                               })
                             "
                           />
-                          <!-- @change="checkedChange(plan)" -->
                           <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                           <label :for="plan.id">
                             {{ plan.nickname }}
@@ -200,7 +199,6 @@
                             })
                           "
                         />
-                        <!-- @change="usersChange(plan)" -->
                         <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                       </td>
                       <td class="text-right">
@@ -236,7 +234,6 @@
                               })
                             "
                           />
-                          <!-- @change="checkedChange(plan)" -->
                           <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                           <label :for="plan.id">
                             {{ plan.nickname }}
@@ -274,7 +271,6 @@
                             })
                           "
                         />
-                        <!-- @change="usersChange(plan)" -->
                         <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                       </td>
                       <td class="text-right">
@@ -335,11 +331,9 @@ import { mapMutations, mapGetters } from 'vuex';
 
 export default {
   data: () => ({
-    message: 'La vida loca',
     token:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI1YzZmMDg0ZC05YjA2LTQ5MDYtODhkYy1iMDJlOWZhMzZjMzUiLCJpYXQiOjE1OTgyNzU3NDksImV4cCI6MTU5ODg4MDU0OX0.XZe-CKEhiDSTS46Qtwp_50JJ9PAib0tlb-DJa3X4GSQ',
     graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
-    // totalToPaid: 0,
     isProcesing: true,
     iAmCreating: true,
     paymentMethods: null,
@@ -364,6 +358,7 @@ export default {
     },
   },
   async created() {
+    // fetch data
     await Promise.all([this.getPlans(), this.getPaymentMethods()]);
   },
   mounted() {
@@ -631,7 +626,7 @@ export default {
         }
       });
 
-      console.log(productsToSwitch);
+      // console.log(productsToSwitch);
     },
     changeDefaultPaymentMethod(paymentMethodId) {
       let _this = this;

@@ -1,4 +1,12 @@
-const helpers = {};
+const helpers = {
+  calcTotalPaid(acc, plan) {
+    if (!plan.checked) {
+      return acc;
+    }
+    const totalPlan = (plan.amount * plan.users) / 100;
+    return acc + totalPlan;
+  },
+};
 
 export const state = () => ({
   all: [],
@@ -53,12 +61,9 @@ export const getters = {
     return state[state.period];
   },
   totalPaid(state) {
-    return state.all.reduce((acc, plan) => {
-      if (!plan.checked) {
-        return acc;
-      }
-      const totalPlan = (plan.amount * plan.users) / 100;
-      return acc + totalPlan;
-    }, 0);
+    const t1 = state[state.period].included.reduce(helpers.calcTotalPaid, 0);
+    const t2 = state[state.period].notIncluded.reduce(helpers.calcTotalPaid, 0);
+
+    return t1 + t2;
   },
 };
