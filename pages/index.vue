@@ -491,7 +491,7 @@ export default {
 
         const { month, year } = this.getFilteredPlans();
         this.SET_MONTHLY(month);
-        this.SET_YEARLY(this.setYearlyActiveItems(month, year));
+        this.SET_YEARLY(this.copyMonthlyValues(month, year));
       } catch (error) {
         console.error(error);
       } finally {
@@ -552,16 +552,16 @@ export default {
         },
       );
     },
-    /** set yearly active items */
-    setYearlyActiveItems(monthly, yearly) {
+    /** copy monthly values to yearly */
+    copyMonthlyValues(monthly, yearly) {
       const included = yearly.included.map((plan, index) => {
-        const checked = monthly.included[index].checked;
-        return { ...plan, checked };
+        const { checked, users } = monthly.included[index];
+        return { ...plan, checked, users };
       });
 
       const notIncluded = yearly.notIncluded.map((plan, index) => {
-        const checked = monthly.notIncluded[index].checked;
-        return { ...plan, checked };
+        const { checked, users } = monthly.notIncluded[index];
+        return { ...plan, checked, users };
       });
 
       return { included, notIncluded };

@@ -32,16 +32,13 @@ export const mutations = {
     // current plan
     const current = state[state.period][includedStr][index];
 
+    // get other period
+    const otherPeriod = state.period === 'month' ? 'year' : 'month';
+    const other = state[otherPeriod][includedStr][index];
+
     // set new value
     current[prop] = value;
-
-    // update in both list only with "checked" property
-    if (prop === 'checked') {
-      // get other period
-      const otherPeriod = state.period === 'month' ? 'year' : 'month';
-      const other = state[otherPeriod][includedStr][index];
-      other[prop] = value;
-    }
+    other[prop] = value;
   },
 };
 
