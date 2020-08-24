@@ -156,7 +156,7 @@
 
                   <tbody>
                     <tr
-                      v-for="plan in show.included"
+                      v-for="(plan, index) in show.included"
                       :key="plan.id"
                       :class="{ 'package-selected': plan.checked }"
                     >
@@ -165,9 +165,16 @@
                           <input
                             :id="plan.id"
                             type="checkbox"
-                            v-model="plan.checked"
-                            @change="checkedChange(plan)"
+                            :checked="plan.checked"
+                            @change="
+                              onCheckedPlan({
+                                checked: !plan.checked,
+                                included: true,
+                                index,
+                              })
+                            "
                           />
+                          <!-- @change="checkedChange(plan)" -->
                           <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                           <label :for="plan.id">
                             {{ plan.nickname }}
@@ -205,7 +212,7 @@
                     </tr>
 
                     <tr
-                      v-for="plan in show.notIncluded"
+                      v-for="(plan, index) in show.notIncluded"
                       :key="plan.id"
                       :class="{ 'package-selected': plan.checked }"
                     >
@@ -214,9 +221,16 @@
                           <input
                             :id="plan.id"
                             type="checkbox"
-                            v-model="plan.checked"
-                            @change="checkedChange(plan)"
+                            :checked="plan.checked"
+                            @change="
+                              onCheckedPlan({
+                                checked: !plan.checked,
+                                included: false,
+                                index,
+                              })
+                            "
                           />
+                          <!-- @change="checkedChange(plan)" -->
                           <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                           <label :for="plan.id">
                             {{ plan.nickname }}
@@ -599,6 +613,11 @@ export default {
       });
 
       this.updateReactivity();
+    },
+    /** on checked plan handler */
+    onCheckedPlan(data) {
+      // console.log({ checked, included, index });
+      this.TOGGLE_ACTIVE(data);
     },
     checkedChange(plan) {
       this.updateReactivity();

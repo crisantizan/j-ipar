@@ -20,17 +20,17 @@ export const mutations = {
   SET_PERIOD(state, period) {
     state.period = period;
   },
-  TOGGLE_ACTIVE(state, index) {
-    const other = state.period === 'month' ? 'year' : 'month';
-    const currentPlan = state[state.period][index];
-    const otherPlan = state[other][index];
+  TOGGLE_ACTIVE(state, { checked, included, index }) {
+    const includedStr = included ? 'included' : 'notIncluded';
+    const current = state[state.period][includedStr][index];
 
-    if (!currentPlan || !otherPlan) {
-      return;
-    }
+    // get other period
+    const otherPeriod = state.period === 'month' ? 'year' : 'month';
+    const other = state[otherPeriod][includedStr][index];
 
-    currentPlan.checked = !currentPlan.checked;
-    otherPlan.checked = !otherPlan.checked;
+    // set new status
+    current.checked = checked;
+    other.checked = checked;
   },
 };
 
