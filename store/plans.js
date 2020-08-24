@@ -1,6 +1,7 @@
 const helpers = {};
 
 export const state = () => ({
+  all: [],
   period: 'month',
   month: {
     included: [],
@@ -13,6 +14,9 @@ export const state = () => ({
 });
 
 export const mutations = {
+  SET_ALL(state, plans) {
+    state.all = plans;
+  },
   SET_MONTHLY(state, plans) {
     state.month = plans;
   },
@@ -42,10 +46,22 @@ export const mutations = {
 };
 
 export const getters = {
+  plans(state) {
+    return state.all;
+  },
   period(state) {
     return state.period;
   },
   show(state) {
     return state[state.period];
+  },
+  totalPaid(state) {
+    return state.all.reduce((acc, plan) => {
+      if (!plan.checked) {
+        return acc;
+      }
+      const totalPlan = (plan.amount * plan.users) / 100;
+      return acc + totalPlan;
+    }, 0);
   },
 };

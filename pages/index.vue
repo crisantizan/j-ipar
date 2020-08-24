@@ -299,7 +299,7 @@
                         <b
                           >$
                           {{
-                            totalToPaid
+                            totalPaid
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                           }}</b
@@ -336,11 +336,10 @@ import { mapMutations, mapGetters } from 'vuex';
 export default {
   data: () => ({
     message: 'La vida loca',
-    plans: [],
     token:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI1YzZmMDg0ZC05YjA2LTQ5MDYtODhkYy1iMDJlOWZhMzZjMzUiLCJpYXQiOjE1OTgyNzU3NDksImV4cCI6MTU5ODg4MDU0OX0.XZe-CKEhiDSTS46Qtwp_50JJ9PAib0tlb-DJa3X4GSQ',
     graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
-    totalToPaid: 0,
+    // totalToPaid: 0,
     isProcesing: true,
     iAmCreating: true,
     paymentMethods: null,
@@ -351,7 +350,7 @@ export default {
     ],
   }),
   computed: {
-    ...mapGetters('plans', ['show']),
+    ...mapGetters('plans', ['show', 'plans', 'totalPaid']),
     paymentPeriod: {
       get() {
         return this.$store.getters['plans/period'];
@@ -458,6 +457,7 @@ export default {
   },
   methods: {
     ...mapMutations('plans', [
+      'SET_ALL',
       'SET_MONTHLY',
       'SET_YEARLY',
       'SET_CHECKED_OR_USERS',
@@ -486,8 +486,8 @@ export default {
         this.isProcesing = true;
         const res = await this.$axios(config);
 
-        this.plans = res.data.data.stripePlans;
-        this.addLocalValuesToPlans();
+        this.SET_ALL(res.data.data.stripePlans);
+        // this.addLocalValuesToPlans();
 
         const { month, year } = this.getFilteredPlans();
         this.SET_MONTHLY(month);
@@ -610,26 +610,6 @@ export default {
           console.log(error);
         });
     },
-    addLocalValuesToPlans() {
-      let _this = this;
-
-      _this.plans.forEach(plan => {
-        // plan.users = 0;
-        // plan.checked = false;
-      });
-    },
-    usersChange(plan) {
-      const users = plan.users;
-      const product = plan.product;
-
-      this.plans.forEach(forEachplan => {
-        if (forEachplan.product === product) {
-          forEachplan.users = users;
-        }
-      });
-
-      this.updateReactivity();
-    },
     /** on checked plan handler */
     onCheckedPlan(data) {
       // data { value, included, index });
@@ -639,9 +619,6 @@ export default {
     onChangeUsers(data) {
       // data { value, included, index });
       this.SET_CHECKED_OR_USERS({ prop: 'users', ...data });
-    },
-    checkedChange(plan) {
-      this.updateReactivity();
     },
     periodChange() {
       let productsToSwitch = [];
@@ -654,24 +631,7 @@ export default {
         }
       });
 
-      this.updateReactivity();
       console.log(productsToSwitch);
-    },
-    updateReactivity() {
-      this.$forceUpdate();
-      this.totalToPaidCalc();
-    },
-    totalToPaidCalc() {
-      let total = 0;
-
-      this.plans.forEach(plan => {
-        if (plan.checked === true) {
-          let totalPlan = (plan.amount * plan.users) / 100;
-          total = total + totalPlan;
-        }
-      });
-
-      this.totalToPaid = total;
     },
     changeDefaultPaymentMethod(paymentMethodId) {
       let _this = this;
@@ -782,6 +742,12 @@ export default {
       });
       console.log('A subscribirse papa');
     },
+    // addLocalValuesToPlans() {
+    //   this.plans.forEach(plan => {
+    //     // plan.users = 0;
+    //     // plan.checked = false;
+    //   });
+    // },
   },
 };
 </script>
