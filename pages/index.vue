@@ -603,7 +603,7 @@ export default {
           //   "card": null
           // },
           _this.customer = response.data.data.stripeCustomer;
-          _this.addLocalValuesToPlans();
+          // _this.addLocalValuesToPlans();
           _this.isProcesing = false;
         })
         .catch(function(error) {
