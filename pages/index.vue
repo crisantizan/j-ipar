@@ -124,7 +124,7 @@
                     value="month"
                     @change="periodChange()"
                   />
-                    <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
+                  <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                   <label for="payment-period-month">Month</label>
                 </div>
 
@@ -137,7 +137,7 @@
                     value="year"
                     @change="periodChange()"
                   />
-                    <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
+                  <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                   <label for="payment-period-year">Year</label>
                 </div>
               </div>
@@ -156,13 +156,9 @@
 
                   <tbody>
                     <tr
-                      v-for="plan in plans"
+                      v-for="plan in showPlans.included"
                       :key="plan.id"
-                      v-bind:class="{ 'package-selected': plan.checked }"
-                      v-if="
-                        renderPlanforPaymentPeriod(plan) &&
-                          coreIds.includes(plan.id)
-                      "
+                      :class="{ 'package-selected': plan.checked }"
                     >
                       <td>
                         <div class="checkbox checkbox-success">
@@ -172,7 +168,7 @@
                             v-model="plan.checked"
                             @change="checkedChange(plan)"
                           />
-                            <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
+                          <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                           <label :for="plan.id">
                             {{ plan.nickname }}
                           </label>
@@ -192,7 +188,7 @@
                           v-model="plan.users"
                           @change="usersChange(plan)"
                         />
-                          <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
+                        <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                       </td>
                       <td class="text-right">
                         {{ '$ ' + plan.amount.toString().slice(0, -2) }}
@@ -209,13 +205,9 @@
                     </tr>
 
                     <tr
-                      v-for="plan in plans"
+                      v-for="plan in showPlans.notIncluded"
                       :key="plan.id"
-                      v-bind:class="{ 'package-selected': plan.checked }"
-                      v-if="
-                        renderPlanforPaymentPeriod(plan) &&
-                          coreIds.includes(plan.id) != true
-                      "
+                      :class="{ 'package-selected': plan.checked }"
                     >
                       <td>
                         <div class="checkbox checkbox-success">
@@ -225,7 +217,7 @@
                             v-model="plan.checked"
                             @change="checkedChange(plan)"
                           />
-                            <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
+                          <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                           <label :for="plan.id">
                             {{ plan.nickname }}
                           </label>
@@ -257,7 +249,7 @@
                           v-model="plan.users"
                           @change="usersChange(plan)"
                         />
-                          <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
+                        <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                       </td>
                       <td class="text-right">
                         {{ '$ ' + plan.amount.toString().slice(0, -2) }}
@@ -335,6 +327,37 @@ export default {
     url() {
       return `${this.graphqlUrl}?token=${this.token}`;
     },
+    /** show plans according to payment period selected */
+    showPlansByCurrentInterval() {
+      return this.plans.filter(plan => plan.interval === this.paymentPeriod);
+    },
+    /** filter plans according it's included in "coreIds" array */
+    showPlans() {
+      if (!this.showPlansByCurrentInterval.length) {
+        return {
+          included: [],
+          notIncluded: [],
+        };
+      }
+
+      return this.showPlansByCurrentInterval.reduce(
+        (obj, current) => {
+          // plans included
+          if (this.coreIds.includes(current.id)) {
+            return { included: [...obj.included, current], ...obj };
+          }
+          // plans not-included
+          return { ...obj, notIncluded: [...obj.notIncluded, current] };
+        },
+        {
+          included: [],
+          notIncluded: [],
+        },
+      );
+    },
+  },
+  async created() {
+    await Promise.all([this.getPlans(), this.getPaymentMethods()]);
   },
   mounted() {
     let _this = this;
@@ -422,8 +445,8 @@ export default {
         });
     }
 
-    this.getPlans();
-    this.getPaymentMethods();
+    // this.getPlans();
+    // this.getPaymentMethods();
   },
   methods: {
     getPlans() {
@@ -503,15 +526,6 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
-    },
-    renderPlanforPaymentPeriod(plan) {
-      // return true;
-
-      if (plan.interval == this.paymentPeriod) {
-        return true;
-      } else {
-        return false;
-      }
     },
     addLocalValuesToPlans() {
       let _this = this;
