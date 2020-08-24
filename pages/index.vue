@@ -461,7 +461,7 @@ export default {
 
         const { month, year } = this.getFilteredPlans();
         this.SET_MONTHLY(month);
-        this.SET_YEARLY(year);
+        this.SET_YEARLY(this.setYearlyActiveItems(month, year));
       } catch (error) {
         console.error(error);
       } finally {
@@ -521,6 +521,20 @@ export default {
           year: { included: [], notIncluded: [] },
         },
       );
+    },
+    /** set yearly active items */
+    setYearlyActiveItems(monthly, yearly) {
+      const included = yearly.included.map((plan, index) => {
+        const checked = monthly.included[index].checked;
+        return { ...plan, checked };
+      });
+
+      const notIncluded = yearly.notIncluded.map((plan, index) => {
+        const checked = monthly.notIncluded[index].checked;
+        return { ...plan, checked };
+      });
+
+      return { included, notIncluded };
     },
     getPaymentMethods() {
       let _this = this;
