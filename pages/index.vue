@@ -156,7 +156,7 @@
 
                   <tbody>
                     <tr
-                      v-for="plan in showPlans.included"
+                      v-for="plan in show.included"
                       :key="plan.id"
                       :class="{ 'package-selected': plan.checked }"
                     >
@@ -205,7 +205,7 @@
                     </tr>
 
                     <tr
-                      v-for="plan in showPlans.notIncluded"
+                      v-for="plan in show.notIncluded"
                       :key="plan.id"
                       :class="{ 'package-selected': plan.checked }"
                     >
@@ -305,11 +305,12 @@
 </template>
 
 <script>
+import { mapMutations, mapGetters } from 'vuex';
+
 export default {
   data: () => ({
     message: 'La vida loca',
-    paymentPeriod: 'month',
-    plans: null,
+    plans: [],
     token:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI1YzZmMDg0ZC05YjA2LTQ5MDYtODhkYy1iMDJlOWZhMzZjMzUiLCJpYXQiOjE1OTgyNzU3NDksImV4cCI6MTU5ODg4MDU0OX0.XZe-CKEhiDSTS46Qtwp_50JJ9PAib0tlb-DJa3X4GSQ',
     graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
@@ -324,36 +325,17 @@ export default {
     ],
   }),
   computed: {
+    ...mapGetters('plans', ['show']),
+    paymentPeriod: {
+      get() {
+        return this.$store.getters['plans/period'];
+      },
+      set(period) {
+        this.$store.commit('plans/SET_PERIOD', period);
+      },
+    },
     url() {
       return `${this.graphqlUrl}?token=${this.token}`;
-    },
-    /** show plans according to payment period selected */
-    showPlansByCurrentInterval() {
-      return this.plans.filter(plan => plan.interval === this.paymentPeriod);
-    },
-    /** filter plans according it's included in "coreIds" array */
-    showPlans() {
-      if (!this.showPlansByCurrentInterval.length) {
-        return {
-          included: [],
-          notIncluded: [],
-        };
-      }
-
-      return this.showPlansByCurrentInterval.reduce(
-        (obj, current) => {
-          // plans included
-          if (this.coreIds.includes(current.id)) {
-            return { included: [...obj.included, current], ...obj };
-          }
-          // plans not-included
-          return { ...obj, notIncluded: [...obj.notIncluded, current] };
-        },
-        {
-          included: [],
-          notIncluded: [],
-        },
-      );
     },
   },
   async created() {
@@ -449,20 +431,18 @@ export default {
     // this.getPaymentMethods();
   },
   methods: {
-    getPlans() {
-      let _this = this;
-
-      _this.isProcesing = true;
-
-      // Creating Query
-      var data = JSON.stringify({
+    ...mapMutations('plans', ['SET_MONTHLY', 'SET_YEARLY', 'TOGGLE_ACTIVE']),
+    /** fetch plans */
+    async getPlans() {
+      // creating Query
+      const data = JSON.stringify({
         query:
           'query {  \n stripePlans {\n  id\n  object\n  active\n  aggregateUsage\n  amount\n  amountDecimal\n  billingScheme\n  created\n  currency\n  interval\n  intervalCount\n  livemode\n  metadata\n  nickname\n  product\n  tiers\n  tiersMode\n  transformUsage\n  trialPeriodDays\n  usageType\n checked users }\n}',
         variables: {},
       });
 
-      // Config for Axios
-      var config = {
+      // config for Axios
+      const config = {
         method: 'post',
         url: this.url,
         headers: {
@@ -472,16 +452,75 @@ export default {
         data: data,
       };
 
-      // Execute Axios Request
-      this.$axios(config)
-        .then(function(response) {
-          _this.plans = response.data.data.stripePlans;
-          _this.addLocalValuesToPlans();
-          _this.isProcesing = false;
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
+      try {
+        this.isProcesing = true;
+        const res = await this.$axios(config);
+
+        this.plans = res.data.data.stripePlans;
+        this.addLocalValuesToPlans();
+
+        const { month, year } = this.getFilteredPlans();
+        this.SET_MONTHLY(month);
+        this.SET_YEARLY(year);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isProcesing = false;
+      }
+    },
+    /** show plans filtered */
+    getFilteredPlans() {
+      return this.plans.reduce(
+        (filtered, plan) => {
+          switch (plan.interval) {
+            case 'month':
+              // included in "coreIds" array
+              if (this.coreIds.includes(plan.id)) {
+                return {
+                  ...filtered,
+                  month: {
+                    ...filtered.month,
+                    included: [...filtered.month.included, plan],
+                  },
+                };
+              }
+
+              // add to not-included
+              return {
+                ...filtered,
+                month: {
+                  ...filtered.month,
+                  notIncluded: [...filtered.month.notIncluded, plan],
+                },
+              };
+
+            default:
+              // included in "coreIds" array
+              if (this.coreIds.includes(plan.id)) {
+                return {
+                  ...filtered,
+                  year: {
+                    ...filtered.year,
+                    included: [...filtered.year.included, plan],
+                  },
+                };
+              }
+
+              // add to not-included
+              return {
+                ...filtered,
+                year: {
+                  ...filtered.year,
+                  notIncluded: [...filtered.year.notIncluded, plan],
+                },
+              };
+          }
+        },
+        {
+          month: { included: [], notIncluded: [] },
+          year: { included: [], notIncluded: [] },
+        },
+      );
     },
     getPaymentMethods() {
       let _this = this;
