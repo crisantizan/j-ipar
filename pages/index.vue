@@ -123,8 +123,8 @@
                     name="payment-period"
                     value="month"
                     @change="periodChange()"
-                    v-bind:disabled="isProcesing ? '' : disabled"
                   />
+                    <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                   <label for="payment-period-month">Month</label>
                 </div>
 
@@ -136,8 +136,8 @@
                     name="payment-period"
                     value="year"
                     @change="periodChange()"
-                    v-bind:disabled="isProcesing ? '' : disabled"
                   />
+                    <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                   <label for="payment-period-year">Year</label>
                 </div>
               </div>
@@ -171,8 +171,8 @@
                             type="checkbox"
                             v-model="plan.checked"
                             @change="checkedChange(plan)"
-                            v-bind:disabled="isProcesing ? '' : disabled"
                           />
+                            <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                           <label :for="plan.id">
                             {{ plan.nickname }}
                           </label>
@@ -191,8 +191,8 @@
                           value="1"
                           v-model="plan.users"
                           @change="usersChange(plan)"
-                          v-bind:disabled="isProcesing ? '' : disabled"
                         />
+                          <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                       </td>
                       <td class="text-right">
                         {{ '$ ' + plan.amount.toString().slice(0, -2) }}
@@ -224,8 +224,8 @@
                             type="checkbox"
                             v-model="plan.checked"
                             @change="checkedChange(plan)"
-                            v-bind:disabled="isProcesing ? '' : disabled"
                           />
+                            <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                           <label :for="plan.id">
                             {{ plan.nickname }}
                           </label>
@@ -256,8 +256,8 @@
                           value="1"
                           v-model="plan.users"
                           @change="usersChange(plan)"
-                          v-bind:disabled="isProcesing ? '' : disabled"
                         />
+                          <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                       </td>
                       <td class="text-right">
                         {{ '$ ' + plan.amount.toString().slice(0, -2) }}
@@ -319,7 +319,7 @@ export default {
     paymentPeriod: 'month',
     plans: null,
     token:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI0NDRkMWZkMy0wZWIxLTQ4ODUtOWQwMS1lNTZhYjJkNzBkZTYiLCJpYXQiOjE1OTgyMjcyNDQsImV4cCI6MTU5ODgzMjA0NH0.w8Pa4MMrmTvcr1cDnlVLigZfWY22Lq-NwrAePBXxrc4',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI1YzZmMDg0ZC05YjA2LTQ5MDYtODhkYy1iMDJlOWZhMzZjMzUiLCJpYXQiOjE1OTgyNzU3NDksImV4cCI6MTU5ODg4MDU0OX0.XZe-CKEhiDSTS46Qtwp_50JJ9PAib0tlb-DJa3X4GSQ',
     graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
     totalToPaid: 0,
     isProcesing: true,
@@ -327,8 +327,8 @@ export default {
     paymentMethods: null,
     customer: null,
     coreIds: [
-      'price_1Gv7zkEHlNK1KgjMGy4WHzUf', // month
-      'price_1Gv80DEHlNK1KgjMaPRisapB', //  year
+      'price_1Gv7zkEHlNK1KgjMGy4WHzUf',
+      'price_1Gv80DEHlNK1KgjMaPRisapB',
     ],
   }),
   computed: {
@@ -453,7 +453,6 @@ export default {
       this.$axios(config)
         .then(function(response) {
           _this.plans = response.data.data.stripePlans;
-          console.log(JSON.stringify(_this.plans))
           _this.addLocalValuesToPlans();
           _this.isProcesing = false;
         })
@@ -523,12 +522,10 @@ export default {
       });
     },
     usersChange(plan) {
-      _this = this;
-
       const users = plan.users;
       const product = plan.product;
 
-      _this.plans.forEach(forEachplan => {
+      this.plans.forEach(forEachplan => {
         if (forEachplan.product === product) {
           forEachplan.users = users;
         }
