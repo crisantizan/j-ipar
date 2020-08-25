@@ -360,7 +360,7 @@ export default {
     await Promise.all([this.getPlans(), this.getPaymentMethods()]);
   },
   mounted() {
-    let _this = this;
+    // let _this = this;
 
     // Create a Stripe client.
     var stripe = Stripe('pk_test_2AcUtig3rQa3DK0LTJQIGTrm');
@@ -393,22 +393,34 @@ export default {
     }
 
     var form = document.getElementById('subscription-form');
-    form.addEventListener('submit', function(event) {
+
+    form.addEventListener('submit', e => {
       event.preventDefault();
       this.isProcesing = true;
 
       // Create Payment method
-      createPaymentMethod(cardElement);
+      this.createPaymentMethod(stripe, cardElement);
     });
 
-    function createPaymentMethod(cardElement) {
-      _this.isProcesing = true;
+    // this.getPlans();
+    // this.getPaymentMethods();
+  },
+  methods: {
+    ...mapMutations('plans', [
+      'SET_ALL',
+      'SET_MONTHLY',
+      'SET_YEARLY',
+      'SET_CHECKED_OR_USERS',
+    ]),
+    createPaymentMethod(stripe, cardElement) {
+      this.isProcesing = true;
       return stripe
         .createPaymentMethod({
           type: 'card',
           card: cardElement,
         })
         .then(result => {
+          console.log(result);
           let data = {
             query:
               `mutation {
@@ -431,30 +443,18 @@ export default {
             data: data,
           };
 
-          this.$this
-            .$axios(config)
-            .then(function(response) {
-              console.log(JSON.stringify(response.data));
+          this.$axios(config)
+            .then(response => {
+              console.log(response.data);
               cardElement.clear();
-              _this.getPaymentMethods();
-              _this.isProcesing = false;
+              this.getPaymentMethods();
+              this.isProcesing = false;
             })
             .catch(function(error) {
               console.log(error);
             });
         });
-    }
-
-    // this.getPlans();
-    // this.getPaymentMethods();
-  },
-  methods: {
-    ...mapMutations('plans', [
-      'SET_ALL',
-      'SET_MONTHLY',
-      'SET_YEARLY',
-      'SET_CHECKED_OR_USERS',
-    ]),
+    },
     /** fetch plans */
     async getPlans() {
       // creating Query
@@ -560,9 +560,9 @@ export default {
       return { included, notIncluded };
     },
     getPaymentMethods() {
-      let _this = this;
+      // let _this = this;
 
-      _this.isProcesing = true;
+      this.isProcesing = true;
 
       // Creating Query
       var data = JSON.stringify({
@@ -586,7 +586,7 @@ export default {
       this.$axios(config)
         .then(response => {
           // TODO:: doesn't return an array, set to null while
-          _this.paymentMethods = Array.isArray(
+          this.paymentMethods = Array.isArray(
             response.data.data.stripePaymentMethods,
           )
             ? response.data.data.stripePaymentMethods
@@ -595,9 +595,9 @@ export default {
           //   "id": null,
           //   "card": null
           // },
-          _this.customer = response.data.data.stripeCustomer;
+          this.customer = response.data.data.stripeCustomer;
           // _this.addLocalValuesToPlans();
-          _this.isProcesing = false;
+          this.isProcesing = false;
         })
         .catch(function(error) {
           console.log(error);
@@ -777,6 +777,6 @@ export default {
 }
 
 .users-td input {
-    max-width: 70px;
+  max-width: 70px;
 }
 </style>
