@@ -330,7 +330,7 @@ import { mapMutations, mapGetters } from 'vuex';
 export default {
   data: () => ({
     token:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI1YzZmMDg0ZC05YjA2LTQ5MDYtODhkYy1iMDJlOWZhMzZjMzUiLCJpYXQiOjE1OTgyNzU3NDksImV4cCI6MTU5ODg4MDU0OX0.XZe-CKEhiDSTS46Qtwp_50JJ9PAib0tlb-DJa3X4GSQ',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI2YzQwYTU0YS1mOTZmLTRiZmQtOTFmNS1hNGE0Njc1M2RlMDciLCJpYXQiOjE1OTgzODgyNTcsImV4cCI6MTU5ODk5MzA1N30.RCM7XidgeB9NvkOUB9nN2uXIsDlQfd_IGdn7O_JkUWc',
     graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
     isProcesing: true,
     iAmCreating: true,
