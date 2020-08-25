@@ -309,7 +309,7 @@
               <button
                 type="button"
                 class="btn btn-success"
-                v-if="plans != null"
+                v-if="paymentMethods != null"
                 v-on:click="subscribeUpdatePlan()"
               >
                 Subscribe / Update
