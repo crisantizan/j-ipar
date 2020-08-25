@@ -182,9 +182,9 @@
                         <b> Discount:</b> 5% for 12 months
                       </div>
                     </td>
-                    <td class="text-center">
+                    <td class="users-td">
                       <input
-                        class="form-control users-input"
+                        class="form-control form-control-sm"
                         type="number"
                         maxlength="3"
                         min="0"
@@ -254,9 +254,9 @@
                         </div>
                       </div>
                     </td>
-                    <td class="text-center">
+                    <td class="users-td">
                       <input
-                        class="form-control users-input"
+                        class="form-control form-control-sm"
                         type="number"
                         maxlength="3"
                         min="0"
@@ -771,7 +771,12 @@ export default {
   padding-left: 15px;
 }
 
-.users-input {
-  max-width: 70px;
+.users-td {
+  display: flex;
+  justify-content: center;
+}
+
+.users-td input {
+    max-width: 70px;
 }
 </style>
