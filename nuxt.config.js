@@ -67,7 +67,7 @@ export default {
       { src: 'https://js.stripe.com/v3/' },
       { src: 'https://cdn.jsdelivr.net/npm/sweetalert2@9' },
       { src: 'https://cdn.jsdelivr.net/npm/promise-polyfill' },
-      { src: 'js/vendor.min.js' }
+      { src: 'js/vendor.min.js' },
     ],
   },
   /*
@@ -92,15 +92,10 @@ export default {
    ** Nuxt.js modules
    */
   modules: ['@nuxtjs/axios'],
-
-  // apollo: {
-  //   clientConfigs: {
-  //     default: {
-  //       httpEndpoint:
-  //         'https://graph-staging.primafacieapp.com/graphql?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiI5OWJlODllMy0xMzBkLTQ3N2YtOGNhNi05YTg3YTgxNmM3ZmEiLCJpYXQiOjE1OTc5NDIxNjksImV4cCI6MTU5ODU0Njk2OX0.F7Y_qxHMjBHJf3EAJ_T9HemTXCgj98JASFbowmv6GIs',
-  //     },
-  //   },
-  // },
+  router: {
+    // linkActiveClass: 'active',
+    linkExactActiveClass: 'active',
+  },
   /*
    ** Build configuration
    ** See https://nuxtjs.org/api/configuration-build/
