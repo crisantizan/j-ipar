@@ -147,9 +147,9 @@
                   <tr>
                     <th>Package</th>
                     <th class="text-center">User(s)</th>
-                    <th class="text-right">Price</th>
-                    <th class="text-right">Discount</th>
-                    <th class="text-right">Total</th>
+                    <th class="text-center">Price</th>
+                    <th class="text-center">Discount</th>
+                    <th class="text-center">Total</th>
                   </tr>
                 </thead>
 
@@ -200,11 +200,11 @@
                       />
                       <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                     </td>
-                    <td class="text-right">
+                    <td class="text-center">
                       {{ '$ ' + plan.amount.toString().slice(0, -2) }}
                     </td>
-                    <td class="text-right">$ 0</td>
-                    <td class="text-right">
+                    <td class="text-center">$ 0</td>
+                    <td class="text-center">
                       $
                       {{
                         (plan.users * plan.amount.toString().slice(0, -2))
@@ -272,11 +272,11 @@
                       />
                       <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                     </td>
-                    <td class="text-right">
+                    <td class="text-center">
                       {{ '$ ' + plan.amount.toString().slice(0, -2) }}
                     </td>
-                    <td class="text-right">$ 0</td>
-                    <td class="text-right">
+                    <td class="text-center">$ 0</td>
+                    <td class="text-center">
                       $
                       {{
                         (plan.users * plan.amount.toString().slice(0, -2))
