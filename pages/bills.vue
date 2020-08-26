@@ -29,12 +29,12 @@ export default {
         sortable: true,
       },
       {
-        title: 'Download PDF',
+        title: 'PDF',
         field: 'invoicePdf',
         sortable: true,
         align: 'center',
         formatter: data => {
-          return `<a class="btn btn-outline-primary btn-sm" href="${data}" target="_blank">Download PDF</a>`;
+          return `<a class="btn btn-link btn-sm" href="${data}" target="_blank" title="Download PDF"><i class="fas fa-download"></i></a>`;
         },
       },
       {
