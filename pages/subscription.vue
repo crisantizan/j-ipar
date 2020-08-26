@@ -360,8 +360,6 @@ export default {
     await Promise.all([this.getPlans(), this.getPaymentMethods()]);
   },
   mounted() {
-    // let _this = this;
-
     // Create a Stripe client.
     var stripe = Stripe('pk_test_2AcUtig3rQa3DK0LTJQIGTrm');
 

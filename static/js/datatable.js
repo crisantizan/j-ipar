@@ -8,8 +8,4 @@ $(document).ready(() => {
       <i class="fa fa-search"></i>
     </div>`,
   );
-
-  document.querySelector('ul.pagination').addEventListener('click', e => {
-    console.log('Click...')
-  })
 });

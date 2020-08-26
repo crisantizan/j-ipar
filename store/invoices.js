@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+
 export const state = () => ({
   invoices: [],
 });
@@ -11,6 +12,7 @@ export const mutations = {
 
 export const actions = {
   async getInvoices({ commit }) {
+    // apollo client
     let client = this.app.apolloProvider.defaultClient;
 
     try {

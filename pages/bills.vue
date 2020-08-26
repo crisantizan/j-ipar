@@ -1,22 +1,20 @@
 <template>
-  <div class="mt-2">
-    <div class="card-box">
-      <h4>Invoices list</h4>
-      <datatable :headers="headers" :columns="invoices" />
-    </div>
-    <!-- end card-box-->
+  <div class="card-box mt-2">
+    <h4>Invoices list</h4>
+    <datatable :headers="headers" :columns="invoices" />
   </div>
-  <!-- end row-->
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import dayjs from 'dayjs';
+
 export default {
   components: {
     datatable: () => import('~/components/Datatable'),
   },
   data: () => ({
+    // datatable headers
     headers: [
       {
         title: 'Date',
