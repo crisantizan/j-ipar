@@ -41,6 +41,12 @@ export default {
       },
       { rel: 'stylesheet', href: 'css/ubold/bootstrap-creative.min.css' },
       { rel: 'stylesheet', href: 'css/ubold/app-creative.min.css' },
+      {
+        href:
+          'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap',
+        rel: 'stylesheet',
+      },
+      { rel: 'stylesheet', href: 'css/main.css' }
     ],
     script: [
       {
@@ -60,10 +66,10 @@ export default {
           'sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo',
         crossorigin: 'anonymous',
       },
-      {
-        src:
-          'https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js',
-      },
+      // {
+      //   src:
+      //     'https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js',
+      // },
       { src: 'https://js.stripe.com/v3/' },
       { src: 'https://cdn.jsdelivr.net/npm/sweetalert2@9' },
       { src: 'https://cdn.jsdelivr.net/npm/promise-polyfill' },

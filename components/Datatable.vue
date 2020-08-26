@@ -28,6 +28,7 @@ export default {
       paginationNextText: '»',
       paginationPreText: '«',
       theadClasses: 'thead-light',
+      clickToSelect: true,
       classes: 'table table-borderless table-hover',
     },
   }),

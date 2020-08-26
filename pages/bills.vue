@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-12">
       <div class="card-box">
-        <h4 class="header-title">Invoices list</h4>
+        <h4>Invoices list</h4>
         <datatable :headers="headers" :columns="invoices" />
       </div>
       <!-- end card-box-->
@@ -20,15 +20,29 @@ export default {
   },
   data: () => ({
     headers: [
-      { title: 'Date', field: 'created', sortable: true },
-      { title: 'Email', field: 'customerEmail', sortable: true },
+      { title: 'Date', field: 'created', sortable: true, align: 'center' },
+      {
+        title: 'Email',
+        field: 'customerEmail',
+        sortable: true,
+        align: 'center',
+      },
       {
         title: 'Payment Method',
         field: 'defaultPaymentMethod',
         sortable: true,
+        align: 'center',
       },
-      { title: 'Total', field: 'total', sortable: true },
-      { title: 'Download PDF', field: 'invoicePdf', sortable: true },
+      { title: 'Total', field: 'total', sortable: true, align: 'center' },
+      {
+        title: 'Download PDF',
+        field: 'invoicePdf',
+        sortable: true,
+        align: 'center',
+        formatter: data => {
+          return `<a class="btn btn-outline-primary btn-sm" href="${data}" target="_blank">Download PDF</a>`;
+        },
+      },
     ],
   }),
   computed: {
