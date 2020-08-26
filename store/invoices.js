@@ -13,7 +13,7 @@ export const mutations = {
 export const actions = {
   async getInvoices({ commit }) {
     // apollo client
-    let client = this.app.apolloProvider.defaultClient;
+    const client = this.app.apolloProvider.defaultClient;
 
     try {
       const { data } = await client.query({
