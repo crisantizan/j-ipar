@@ -11,13 +11,21 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import dayjs from 'dayjs';
 export default {
   components: {
     datatable: () => import('~/components/Datatable'),
   },
   data: () => ({
     headers: [
-      { title: 'Date', field: 'created', sortable: true },
+      {
+        title: 'Date',
+        field: 'created',
+        sortable: true,
+        formatter(data) {
+          return dayjs(data).format('YYYY/MM/DD');
+        },
+      },
       {
         title: 'Email',
         field: 'customerEmail',
@@ -43,7 +51,7 @@ export default {
         sortable: true,
         align: 'right',
         formatter(data, { currency }) {
-          return `${data} ${currency}`;
+          return `${data} ${currency.toUpperCase()}`;
         },
       },
       { field: 'currency', visible: false },
