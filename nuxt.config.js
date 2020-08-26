@@ -26,11 +26,11 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      {
-        rel: 'stylesheet',
-        href:
-          'https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css',
-      },
+      // {
+      //   rel: 'stylesheet',
+      //   href:
+      //     'https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css',
+      // },
       {
         href:
           'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
@@ -47,12 +47,12 @@ export default {
         src: 'https://kit.fontawesome.com/2d17bb5b4e.js',
         crossorigin: 'anonymous',
       },
-      {
-        src: 'https://code.jquery.com/jquery-3.5.1.slim.min.js',
-        integrity:
-          'sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj',
-        crossorigin: 'anonymous',
-      },
+      // {
+      //   src: 'https://code.jquery.com/jquery-3.5.1.slim.min.js',
+      //   integrity:
+      //     'sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj',
+      //   crossorigin: 'anonymous',
+      // },
       {
         src:
           'https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js',
@@ -78,7 +78,10 @@ export default {
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
    */
-  plugins: [],
+  plugins: [
+    { src: '@/plugins/jquery.js', ssr: false },
+    { src: '@/plugins/bootstrap-table.js', ssr: false },
+  ],
   /*
    ** Auto import components
    ** See https://nuxtjs.org/api/configuration-components
@@ -101,7 +104,6 @@ export default {
     },
   },
   router: {
-    // linkActiveClass: 'active',
     linkExactActiveClass: 'active',
   },
   /*
