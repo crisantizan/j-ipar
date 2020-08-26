@@ -1,10 +1,12 @@
 <template>
   <div>
     <nav
-      class="navbar navbar-expand-lg navbar-light"
-      style="background-color: rgba(0,0,0,.03)"
+      class="navbar navbar-expand-lg navbar-dark"
+      style="background-color: #2d5f8b"
     >
-      <a class="navbar-brand" href="#">LOGO</a>
+      <a class="navbar-brand" href="#">
+        <img src="~/assets/images/logo.png" style="max-width: 240px;" alt="">
+      </a>
       <button
         class="navbar-toggler"
         type="button"
