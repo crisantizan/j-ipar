@@ -100,7 +100,7 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/axios', '@nuxtjs/apollo'],
+  modules: ['@nuxtjs/apollo'],
   apollo: {
     clientConfigs: {
       default: {

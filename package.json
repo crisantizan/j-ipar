@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@nuxtjs/apollo": "^4.0.1-rc.3",
-    "@nuxtjs/axios": "^5.12.1",
     "bootstrap-table": "^1.17.1",
     "dayjs": "^1.8.34",
     "graphql-tag": "^2.11.0",
