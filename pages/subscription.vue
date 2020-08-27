@@ -334,8 +334,6 @@ export default {
     graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
     isProcesing: true,
     iAmCreating: true,
-    // paymentMethods: null,
-    // customer: null,
     coreIds: [
       'price_1Gv7zkEHlNK1KgjMGy4WHzUf',
       'price_1Gv80DEHlNK1KgjMaPRisapB',
@@ -362,15 +360,12 @@ export default {
     },
   },
   async created() {
-    // set monthly and yearly plans
+    // set monthly and yearly plans, one time
     if (!this.show.included.length && !this.show.notIncluded.length) {
       const { month, year } = this.getFilteredPlans();
       this.SET_MONTHLY(month);
       this.SET_YEARLY(this.copyMonthlyValues(month, year));
     }
-
-    // fetch data
-    // await Promise.all([this.getPlans(), this.getPaymentMethods()]);
   },
   mounted() {
     // Create a Stripe client.
@@ -412,12 +407,8 @@ export default {
       // Create Payment method
       this.createPaymentMethod(stripe, cardElement);
     });
-
-    // this.getPlans();
-    // this.getPaymentMethods();
   },
   methods: {
-    // 'SET_ALL',
     ...mapMutations('plans', [
       'SET_MONTHLY',
       'SET_YEARLY',
@@ -465,42 +456,6 @@ export default {
               console.log(error);
             });
         });
-    },
-    /** fetch plans */
-    async getPlans() {
-      // creating Query
-      const data = JSON.stringify({
-        query:
-          'query {  \n stripePlans {\n  id\n  object\n  active\n  aggregateUsage\n  amount\n  amountDecimal\n  billingScheme\n  created\n  currency\n  interval\n  intervalCount\n  livemode\n  metadata\n  nickname\n  product\n  tiers\n  tiersMode\n  transformUsage\n  trialPeriodDays\n  usageType\n checked users }\n}',
-        variables: {},
-      });
-
-      // config for Axios
-      const config = {
-        method: 'post',
-        url: this.url,
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: '__cfduid=d7b532d41aedc247cf6265a3f7af83cd31591630565',
-        },
-        data: data,
-      };
-
-      try {
-        this.isProcesing = true;
-        const res = await this.$axios(config);
-
-        this.SET_ALL(res.data.data.stripePlans);
-        // this.addLocalValuesToPlans();
-
-        const { month, year } = this.getFilteredPlans();
-        this.SET_MONTHLY(month);
-        this.SET_YEARLY(this.copyMonthlyValues(month, year));
-      } catch (error) {
-        console.error(error);
-      } finally {
-        this.isProcesing = false;
-      }
     },
     /** show plans filtered */
     getFilteredPlans() {
@@ -569,50 +524,6 @@ export default {
       });
 
       return { included, notIncluded };
-    },
-    getPaymentMethods() {
-      // let _this = this;
-
-      this.isProcesing = true;
-
-      // Creating Query
-      var data = JSON.stringify({
-        query:
-          'query {stripePaymentMethods {id, card}, stripeCustomer {  id, invoiceSettings} }',
-        variables: {},
-      });
-
-      // Config for Axios
-      var config = {
-        method: 'post',
-        url: this.url,
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: '__cfduid=d7b532d41aedc247cf6265a3f7af83cd31591630565',
-        },
-        data: data,
-      };
-
-      // Execute Axios Request
-      this.$axios(config)
-        .then(response => {
-          // TODO:: doesn't return an array, set to null while
-          this.paymentMethods = Array.isArray(
-            response.data.data.stripePaymentMethods,
-          )
-            ? response.data.data.stripePaymentMethods
-            : null;
-          // "stripePaymentMethods": {
-          //   "id": null,
-          //   "card": null
-          // },
-          this.customer = response.data.data.stripeCustomer;
-          // _this.addLocalValuesToPlans();
-          this.isProcesing = false;
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
     },
     /** on checked plan handler */
     onCheckedPlan(data) {
