@@ -155,7 +155,7 @@
 
                 <tbody>
                   <tr
-                    v-for="(plan, index) in show.included"
+                    v-for="(plan, index) in show"
                     :key="plan.id"
                     :class="{ 'package-selected': plan.checked }"
                   >
@@ -168,77 +168,20 @@
                           @change="
                             onCheckedPlan({
                               value: !plan.checked,
-                              included: true,
                               index,
                             })
                           "
                         />
-                        <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                         <label :for="plan.id">
                           {{ plan.nickname }}
                         </label>
                       </div>
-                      <div class="text-success">
+
+                      <div class="text-success" v-if="isIncluded(plan)">
                         <b> Discount:</b> 5% for 12 months
                       </div>
-                    </td>
-                    <td class="users-td">
-                      <input
-                        class="form-control form-control-sm"
-                        type="number"
-                        maxlength="3"
-                        min="0"
-                        size="3"
-                        :value="plan.users"
-                        @change="
-                          onChangeUsers({
-                            value: Number($event.target.value),
-                            included: true,
-                            index,
-                          })
-                        "
-                      />
-                      <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
-                    </td>
-                    <td class="text-center">
-                      {{ '$ ' + plan.amount.toString().slice(0, -2) }}
-                    </td>
-                    <td class="text-center">$ 0</td>
-                    <td class="text-center">
-                      $
-                      {{
-                        (plan.users * plan.amount.toString().slice(0, -2))
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                      }}
-                    </td>
-                  </tr>
 
-                  <tr
-                    v-for="(plan, index) in show.notIncluded"
-                    :key="plan.id"
-                    :class="{ 'package-selected': plan.checked }"
-                  >
-                    <td>
-                      <div class="checkbox checkbox-success">
-                        <input
-                          :id="plan.id"
-                          type="checkbox"
-                          :checked="plan.checked"
-                          @change="
-                            onCheckedPlan({
-                              value: !plan.checked,
-                              included: false,
-                              index,
-                            })
-                          "
-                        />
-                        <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
-                        <label :for="plan.id">
-                          {{ plan.nickname }}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-sm mt-1">
+                      <div v-else class="input-group input-group-sm mt-1">
                         <input
                           type="text"
                           class="form-control form-control-sm"
@@ -265,12 +208,10 @@
                         @change="
                           onChangeUsers({
                             value: Number($event.target.value),
-                            included: false,
                             index,
                           })
                         "
                       />
-                      <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                     </td>
                     <td class="text-center">
                       {{ '$ ' + plan.amount.toString().slice(0, -2) }}
@@ -331,7 +272,6 @@ import gql from 'graphql-tag';
 export default {
   data: () => ({
     isProcesing: true,
-    iAmCreating: true,
     coreIds: [
       'price_1Gv7zkEHlNK1KgjMGy4WHzUf',
       'price_1Gv80DEHlNK1KgjMaPRisapB',
@@ -359,7 +299,7 @@ export default {
   },
   async created() {
     // set monthly and yearly plans, one time
-    if (!this.show.included.length && !this.show.notIncluded.length) {
+    if (!this.show.length) {
       const { month, year } = this.getFilteredPlans();
       this.SET_MONTHLY(month);
       this.SET_YEARLY(this.copyMonthlyValues(month, year));
@@ -411,6 +351,12 @@ export default {
       'SET_YEARLY',
       'SET_CHECKED_OR_USERS',
     ]),
+
+    /** verify if the current plan is included in "coreIds" */
+    isIncluded(plan) {
+      return this.coreIds.includes(plan.id);
+    },
+
     /** create payment method (with apollo) */
     async newCreatePaymentMethod(stripe, card) {
       try {
@@ -493,7 +439,7 @@ export default {
 
     /** show plans filtered */
     getFilteredPlans() {
-      return this.plans.reduce(
+      const data = this.plans.reduce(
         (filtered, plan) => {
           switch (plan.interval) {
             case 'month':
@@ -544,32 +490,32 @@ export default {
           year: { included: [], notIncluded: [] },
         },
       );
+
+      return Object.entries(data).reduce(
+        (acc, [key, values]) => {
+          return { ...acc, [key]: [...values.included, ...values.notIncluded] };
+        },
+        { month: [], year: [] },
+      );
     },
 
     /** copy monthly values to yearly */
     copyMonthlyValues(monthly, yearly) {
-      const included = yearly.included.map((plan, index) => {
-        const { checked, users } = monthly.included[index];
+      return yearly.map((plan, index) => {
+        const { checked, users } = monthly[index];
         return { ...plan, checked, users };
       });
-
-      const notIncluded = yearly.notIncluded.map((plan, index) => {
-        const { checked, users } = monthly.notIncluded[index];
-        return { ...plan, checked, users };
-      });
-
-      return { included, notIncluded };
     },
 
     /** on checked plan handler */
     onCheckedPlan(data) {
-      // data { value, included, index });
+      // data { value, index });
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
     },
 
     /** on change users handler */
     onChangeUsers(data) {
-      // data { value, included, index });
+      // data { value, index });
       this.SET_CHECKED_OR_USERS({ prop: 'users', ...data });
     },
 

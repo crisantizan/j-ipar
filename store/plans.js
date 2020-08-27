@@ -11,14 +11,16 @@ const helpers = {
 export const state = () => ({
   all: [],
   period: 'month',
-  month: {
-    included: [],
-    notIncluded: [],
-  },
-  year: {
-    included: [],
-    notIncluded: [],
-  },
+  month: [],
+  year: [],
+  // month: {
+  //   included: [],
+  //   notIncluded: [],
+  // },
+  // year: {
+  //   included: [],
+  //   notIncluded: [],
+  // },
   paymentMethods: [],
   customer: null,
 });
@@ -41,14 +43,13 @@ export const mutations = {
   },
 
   /** update "checked" and "users" plan properties */
-  SET_CHECKED_OR_USERS(state, { prop, value, included, index }) {
-    const includedStr = included ? 'included' : 'notIncluded';
+  SET_CHECKED_OR_USERS(state, { prop, value, index }) {
     // current plan
-    const current = state[state.period][includedStr][index];
+    const current = state[state.period][index];
 
     // get other period
     const otherPeriod = state.period === 'month' ? 'year' : 'month';
-    const other = state[otherPeriod][includedStr][index];
+    const other = state[otherPeriod][index];
 
     // set new value
     current[prop] = value;
@@ -79,10 +80,7 @@ export const getters = {
   },
 
   totalPaid(state) {
-    const t1 = state[state.period].included.reduce(helpers.calcTotalPaid, 0);
-    const t2 = state[state.period].notIncluded.reduce(helpers.calcTotalPaid, 0);
-
-    return t1 + t2;
+    return state[state.period].reduce(helpers.calcTotalPaid, 0);
   },
 
   customer(state) {
