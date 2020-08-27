@@ -293,9 +293,6 @@ export default {
         this.$store.commit('plans/SET_PERIOD', period);
       },
     },
-    url() {
-      return `${this.graphqlUrl}?token=${this.token}`;
-    },
   },
   async created() {
     // set monthly and yearly plans, one time
