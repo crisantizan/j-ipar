@@ -87,7 +87,7 @@
                         paymentMethod.id !=
                           customer.invoiceSettings.default_payment_method
                       "
-                      v-on:click="changeDefaultPaymentMethod(paymentMethod.id)"
+                      :click="newChangeDefaultPaymentMethod(paymentMethod.id)"
                       >Set Default</a
                     >
                     <a
@@ -326,12 +326,10 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex';
+import gql from 'graphql-tag';
 
 export default {
   data: () => ({
-    token:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiIwODUyYzg0ZC1mODUzLTQ5ZDgtYjZjMy01MmZiNTI1ODkzYzQiLCJpYXQiOjE1OTg1MzgyMzIsImV4cCI6MTU5OTE0MzAzMn0.yRtEtfa0Nbq8GrDoSsJjif9WIAUs-2fg5rS88zaWj3w',
-    graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
     isProcesing: true,
     iAmCreating: true,
     coreIds: [
@@ -401,11 +399,10 @@ export default {
     var form = document.getElementById('subscription-form');
 
     form.addEventListener('submit', e => {
-      event.preventDefault();
-      this.isProcesing = true;
+      e.preventDefault();
 
-      // Create Payment method
-      this.createPaymentMethod(stripe, cardElement);
+      // create payment method
+      this.newCreatePaymentMethod(stripe, cardElement);
     });
   },
   methods: {
@@ -414,6 +411,42 @@ export default {
       'SET_YEARLY',
       'SET_CHECKED_OR_USERS',
     ]),
+    /** create payment method (with apollo) */
+    async newCreatePaymentMethod(stripe, card) {
+      try {
+        this.isProcesing = true;
+
+        // get stripe payment method
+        const paymentMethod = await stripe.createPaymentMethod({
+          type: 'card',
+          card,
+        });
+
+        // TODO: should be "create" instead of "edit"
+        const mutation = gql`
+          mutation paymentEdit($id: String!) {
+            paymentMethodEdit(paymentMethodId: $id) {
+              id
+            }
+          }
+        `;
+
+        // backend result
+        const result = await this.$apollo.mutate({
+          mutation,
+          variables: { id: paymentMethod.id },
+        });
+
+        // TODO: update payment methods list
+        card.clear();
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isProcesing = false;
+      }
+    },
+
     createPaymentMethod(stripe, cardElement) {
       this.isProcesing = true;
       return stripe
@@ -457,6 +490,7 @@ export default {
             });
         });
     },
+
     /** show plans filtered */
     getFilteredPlans() {
       return this.plans.reduce(
@@ -511,6 +545,7 @@ export default {
         },
       );
     },
+
     /** copy monthly values to yearly */
     copyMonthlyValues(monthly, yearly) {
       const included = yearly.included.map((plan, index) => {
@@ -525,16 +560,19 @@ export default {
 
       return { included, notIncluded };
     },
+
     /** on checked plan handler */
     onCheckedPlan(data) {
       // data { value, included, index });
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
     },
+
     /** on change users handler */
     onChangeUsers(data) {
       // data { value, included, index });
       this.SET_CHECKED_OR_USERS({ prop: 'users', ...data });
     },
+
     periodChange() {
       let productsToSwitch = [];
       let planToUncheck = [];
@@ -548,6 +586,51 @@ export default {
 
       // console.log(productsToSwitch);
     },
+
+    /** change default payment method (with apollo) */
+    async newChangeDefaultPaymentMethod(id) {
+      const { isConfirmed } = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'If you accept this card become your default Payment Method',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, do It!',
+      });
+
+      // aborting
+      if (!isConfirmed) {
+        return;
+      }
+
+      // execute request
+      try {
+        this.isProcesing = true;
+
+        const muation = gql`
+          mutation paymentEdit($id: String!) {
+            paymentMethodEdit(paymentMethodId: $id) {
+              id
+            }
+          }
+        `;
+
+        // backend result
+        const result = await this.$apollo.mutate({
+          mutation,
+          variables: { id },
+        });
+
+        // TODO: update payment methods list
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isProcesing = false;
+      }
+    },
+
     changeDefaultPaymentMethod(paymentMethodId) {
       let _this = this;
 
@@ -596,6 +679,7 @@ export default {
         }
       });
     },
+
     deletePaymentMethod(paymentMethodId) {
       let _this = this;
 
@@ -645,6 +729,7 @@ export default {
         }
       });
     },
+
     subscribeUpdatePlan() {
       Swal.fire({
         title: 'Are you sure?',
@@ -657,12 +742,6 @@ export default {
       });
       console.log('A subscribirse papa');
     },
-    // addLocalValuesToPlans() {
-    //   this.plans.forEach(plan => {
-    //     // plan.users = 0;
-    //     // plan.checked = false;
-    //   });
-    // },
   },
 };
 </script>
