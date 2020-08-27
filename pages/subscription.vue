@@ -87,7 +87,7 @@
                         paymentMethod.id !=
                           customer.invoiceSettings.default_payment_method
                       "
-                      :click="newChangeDefaultPaymentMethod(paymentMethod.id)"
+                      :click="changeDefaultPaymentMethod(paymentMethod.id)"
                       >Set Default</a
                     >
                     <a
@@ -339,7 +339,7 @@ export default {
       e.preventDefault();
 
       // create payment method
-      this.newCreatePaymentMethod(stripe, cardElement);
+      this.createPaymentMethod(stripe, cardElement);
     });
   },
   methods: {
@@ -355,20 +355,20 @@ export default {
     },
 
     /** create payment method (with apollo) */
-    async newCreatePaymentMethod(stripe, card) {
+    async createPaymentMethod(stripe, card) {
       try {
         this.isProcesing = true;
 
         // get stripe payment method
-        const paymentMethod = await stripe.createPaymentMethod({
+        const { paymentMethod } = await stripe.createPaymentMethod({
           type: 'card',
           card,
         });
 
         // TODO: should be "create" instead of "edit"
         const mutation = gql`
-          mutation paymentEdit($id: String!) {
-            paymentMethodEdit(paymentMethodId: $id) {
+          mutation($paymentMethodId: String!) {
+            paymentMethodEdit(paymentMethodId: $paymentMethodId) {
               id
             }
           }
@@ -377,7 +377,7 @@ export default {
         // backend result
         const result = await this.$apollo.mutate({
           mutation,
-          variables: { id: paymentMethod.id },
+          variables: { paymentMethodId: paymentMethod.id },
         });
 
         // TODO: update payment methods list
@@ -388,50 +388,6 @@ export default {
       } finally {
         this.isProcesing = false;
       }
-    },
-
-    createPaymentMethod(stripe, cardElement) {
-      this.isProcesing = true;
-      return stripe
-        .createPaymentMethod({
-          type: 'card',
-          card: cardElement,
-        })
-        .then(result => {
-          console.log(result);
-          let data = {
-            query:
-              `mutation {
-                paymentMethodEdit(paymentMethodId: "` +
-              result.paymentMethod.id +
-              `") {
-                  id
-                },
-              }`,
-            variables: {},
-          };
-
-          var config = {
-            method: 'post',
-            url: this.url,
-            headers: {
-              'Content-Type': 'application/json',
-              Cookie: '__cfduid=d786e683ada5a0538598f646cca563d951591798240',
-            },
-            data: data,
-          };
-
-          this.$axios(config)
-            .then(response => {
-              console.log(response.data);
-              cardElement.clear();
-              this.getPaymentMethods();
-              this.isProcesing = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        });
     },
 
     /** show plans filtered */
@@ -531,7 +487,7 @@ export default {
     },
 
     /** change default payment method (with apollo) */
-    async newChangeDefaultPaymentMethod(id) {
+    async changeDefaultPaymentMethod(id) {
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
         text: 'If you accept this card become your default Payment Method',
@@ -551,8 +507,8 @@ export default {
       try {
         this.isProcesing = true;
 
-        const muation = gql`
-          mutation paymentEdit($id: String!) {
+        const mutation = gql`
+          mutation($id: String!) {
             paymentMethodEdit(paymentMethodId: $id) {
               id
             }
@@ -572,55 +528,6 @@ export default {
       } finally {
         this.isProcesing = false;
       }
-    },
-
-    changeDefaultPaymentMethod(paymentMethodId) {
-      let _this = this;
-
-      Swal.fire({
-        title: 'Are you sure?',
-        text: 'If you accept this card become your default Payment Method',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, do It!',
-      }).then(result => {
-        if (result.isConfirmed) {
-          _this.isProcesing = true;
-          let data = {
-            query:
-              `
-              mutation {
-                 paymentMethodEdit(paymentMethodId: "` +
-              paymentMethodId +
-              `") {id},
-              }`,
-            variables: {},
-          };
-
-          var config = {
-            method: 'post',
-            url: this.url,
-            headers: {
-              'Content-Type': 'application/json',
-              Cookie: '__cfduid=d786e683ada5a0538598f646cca563d951591798240',
-            },
-            data: data,
-          };
-
-          this.$axios(config)
-            .then(function(response) {
-              console.log(JSON.stringify(response.data));
-
-              _this.getPaymentMethods();
-              _this.isProcesing = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        }
-      });
     },
 
     deletePaymentMethod(paymentMethodId) {

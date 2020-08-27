@@ -105,7 +105,7 @@ export default {
     clientConfigs: {
       default: {
         httpEndpoint:
-          'https://graph-staging.primafacieapp.com/graphql?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiIwODUyYzg0ZC1mODUzLTQ5ZDgtYjZjMy01MmZiNTI1ODkzYzQiLCJpYXQiOjE1OTg1MzgyMzIsImV4cCI6MTU5OTE0MzAzMn0.yRtEtfa0Nbq8GrDoSsJjif9WIAUs-2fg5rS88zaWj3w',
+          'https://graph-staging.primafacieapp.com/graphql?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6ImphbWVzQGJldHpvbGRsYXcuY29tIiwidXNlcklkIjoxLCJzZXNzaW9uSWQiOiJhZjZiOWM1OS01YmUxLTRjMWMtYjcyOS1hYTQ1YzM5MDg4NTciLCJpYXQiOjE1OTg1NTAwNDMsImV4cCI6MTU5OTE1NDg0M30.F0CiL8whX5bcXMxaVSnEGlB9htoODI_oDh4iaKq3Kjo',
       },
     },
   },
