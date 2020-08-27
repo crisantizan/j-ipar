@@ -334,15 +334,21 @@ export default {
     graphqlUrl: 'https://graph-staging.primafacieapp.com/graphql',
     isProcesing: true,
     iAmCreating: true,
-    paymentMethods: null,
-    customer: null,
+    // paymentMethods: null,
+    // customer: null,
     coreIds: [
       'price_1Gv7zkEHlNK1KgjMGy4WHzUf',
       'price_1Gv80DEHlNK1KgjMaPRisapB',
     ],
   }),
   computed: {
-    ...mapGetters('plans', ['show', 'plans', 'totalPaid']),
+    ...mapGetters('plans', [
+      'show',
+      'plans',
+      'totalPaid',
+      'customer',
+      'paymentMethods',
+    ]),
     paymentPeriod: {
       get() {
         return this.$store.getters['plans/period'];
@@ -356,8 +362,15 @@ export default {
     },
   },
   async created() {
+    // set monthly and yearly plans
+    if (!this.show.included.length && !this.show.notIncluded.length) {
+      const { month, year } = this.getFilteredPlans();
+      this.SET_MONTHLY(month);
+      this.SET_YEARLY(this.copyMonthlyValues(month, year));
+    }
+
     // fetch data
-    await Promise.all([this.getPlans(), this.getPaymentMethods()]);
+    // await Promise.all([this.getPlans(), this.getPaymentMethods()]);
   },
   mounted() {
     // Create a Stripe client.
@@ -404,8 +417,8 @@ export default {
     // this.getPaymentMethods();
   },
   methods: {
+    // 'SET_ALL',
     ...mapMutations('plans', [
-      'SET_ALL',
       'SET_MONTHLY',
       'SET_YEARLY',
       'SET_CHECKED_OR_USERS',

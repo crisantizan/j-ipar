@@ -1,4 +1,6 @@
 import gql from 'graphql-tag';
+// data saved locally
+import data from '../data.json';
 
 export const state = () => ({
   loaded: false,
@@ -18,61 +20,67 @@ export const actions = {
     }
 
     // apollo client
-    const client = this.app.apolloProvider.defaultClient;
+    // const client = this.app.apolloProvider.defaultClient;
 
     try {
-      const { data } = await client.query({
-        query: gql`
-          query {
-            invoices: stripeInvoices {
-              id
-              created
-              customerEmail
-              defaultPaymentMethod
-              currency
-              total
-              invoicePdf
-            }
+      // const { data } = await client.query({
+      //   query: gql`
+      //     query {
+      //       invoices: stripeInvoices {
+      //         id
+      //         created
+      //         customerEmail
+      //         defaultPaymentMethod
+      //         currency
+      //         total
+      //         invoicePdf
+      //       }
 
-            plans: stripePlans {
-              id
-              object
-              active
-              aggregateUsage
-              amount
-              amountDecimal
-              billingScheme
-              created
-              currency
-              interval
-              intervalCount
-              livemode
-              metadata
-              nickname
-              product
-              tiers
-              tiersMode
-              transformUsage
-              trialPeriodDays
-              usageType
-              checked
-              users
-            }
+      //       plans: stripePlans {
+      //         id
+      //         object
+      //         active
+      //         aggregateUsage
+      //         amount
+      //         amountDecimal
+      //         billingScheme
+      //         created
+      //         currency
+      //         interval
+      //         intervalCount
+      //         livemode
+      //         metadata
+      //         nickname
+      //         product
+      //         tiers
+      //         tiersMode
+      //         transformUsage
+      //         trialPeriodDays
+      //         usageType
+      //         checked
+      //         users
+      //       }
 
-            paymentMethods: stripePaymentMethods {
-              id
-              card
-            }
+      //       paymentMethods: stripePaymentMethods {
+      //         id
+      //         card
+      //       }
 
-            customer: stripeCustomer {
-              id
-              invoiceSettings
-            }
-          }
-        `,
-      });
-      console.log({ ...data });
+      //       customer: stripeCustomer {
+      //         id
+      //         invoiceSettings
+      //       }
+      //     }
+      //   `,
+      // });
+
       commit('SET_LOADED', true);
+      // invoices module
+      commit('invoices/SET_INVOICES', data.invoices);
+      // plans module
+      commit('plans/SET_ALL', data.plans);
+      commit('plans/SET_CUSTOMER', data.customer);
+      commit('plans/SET_PAYMENT_METHODS', data.paymentMethods);
     } catch (error) {
       console.error(error);
     }

@@ -58,11 +58,5 @@ export default {
   computed: {
     ...mapGetters('invoices', ['invoices']),
   },
-  created() {
-    this.getInvoices();
-  },
-  methods: {
-    ...mapActions('invoices', ['getInvoices']),
-  },
 };
 </script>

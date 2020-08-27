@@ -10,39 +10,39 @@ export const mutations = {
   },
 };
 
-export const actions = {
-  async getInvoices({ commit, state }) {
-    // load invoices one time
-    if (!!state.invoices.length) {
-      return;
-    }
+// export const actions = {
+//   async getInvoices({ commit, state }) {
+//     // load invoices one time
+//     if (!!state.invoices.length) {
+//       return;
+//     }
 
-    // apollo client
-    const client = this.app.apolloProvider.defaultClient;
+//     // apollo client
+//     const client = this.app.apolloProvider.defaultClient;
 
-    try {
-      const { data } = await client.query({
-        query: gql`
-          query {
-            stripeInvoices {
-              id
-              created
-              customerEmail
-              defaultPaymentMethod
-              currency
-              total
-              invoicePdf
-            }
-          }
-        `,
-      });
+//     try {
+//       const { data } = await client.query({
+//         query: gql`
+//           query {
+//             stripeInvoices {
+//               id
+//               created
+//               customerEmail
+//               defaultPaymentMethod
+//               currency
+//               total
+//               invoicePdf
+//             }
+//           }
+//         `,
+//       });
 
-      commit('SET_INVOICES', data.stripeInvoices);
-    } catch (error) {
-      console.error(error);
-    }
-  },
-};
+//       commit('SET_INVOICES', data.stripeInvoices);
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   },
+// };
 
 export const getters = {
   invoices(state) {
