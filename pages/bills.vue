@@ -59,10 +59,7 @@ export default {
     ...mapGetters('invoices', ['invoices']),
   },
   created() {
-    // fetch data one time
-    if (!this.invoices.length) {
-      this.getInvoices();
-    }
+    this.getInvoices();
   },
   methods: {
     ...mapActions('invoices', ['getInvoices']),

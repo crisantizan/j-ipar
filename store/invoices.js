@@ -11,7 +11,12 @@ export const mutations = {
 };
 
 export const actions = {
-  async getInvoices({ commit }) {
+  async getInvoices({ commit, state }) {
+    // load invoices one time
+    if (!!state.invoices.length) {
+      return;
+    }
+
     // apollo client
     const client = this.app.apolloProvider.defaultClient;
 
