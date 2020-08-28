@@ -8,6 +8,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import dayjs from 'dayjs';
+import { enUsFormatter } from '../helpers/number-format';
 
 export default {
   components: {
@@ -48,11 +49,8 @@ export default {
         field: 'total',
         sortable: true,
         align: 'right',
-        formatter(data, { currency }) {
-          return `${data} ${currency.toUpperCase()}`;
-        },
+        formatter: value => enUsFormatter.format(value),
       },
-      { field: 'currency', visible: false },
     ],
   }),
   computed: {

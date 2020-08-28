@@ -5,7 +5,6 @@
       "created": "1598189680",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 9500,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_Ht5WHDz4tLJL31HKiGN1sAIYfTsvG7y/pdf",
       "__typename": "StripeInvoices"
@@ -15,7 +14,6 @@
       "created": "1598189173",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 95000,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_Ht5NOrjhzVySjGwG4EZI1VAyeV7wQxv/pdf",
       "__typename": "StripeInvoices"
@@ -25,7 +23,6 @@
       "created": "1596820865",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 25000,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_Hn9YJasO6J0UvFxSU87aLLPqmMIcsI6/pdf",
       "__typename": "StripeInvoices"
@@ -35,7 +32,6 @@
       "created": "1595511310",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 9500,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_HhTWssNBv3e3f3d1YFJSjq2y7gzs3wb/pdf",
       "__typename": "StripeInvoices"
@@ -45,7 +41,6 @@
       "created": "1595510778",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 95000,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_HhTNGeIcOf8DJFAsugpz64CcaCzE3RV/pdf",
       "__typename": "StripeInvoices"
@@ -55,7 +50,6 @@
       "created": "1594142468",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 25000,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_HbXYwn6ci1MSOT4YyAlIjSHUvnu61kY/pdf",
       "__typename": "StripeInvoices"
@@ -65,7 +59,6 @@
       "created": "1592919267",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 9500,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_HWEkSlmVkXiX9iUdvy9dBhXVuDD3ocF/pdf",
       "__typename": "StripeInvoices"
@@ -75,7 +68,6 @@
       "created": "1592918772",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 95000,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_HWEbSqRyRihYI7bFFOLCcKEKzWKeLWA/pdf",
       "__typename": "StripeInvoices"
@@ -85,7 +77,6 @@
       "created": "1592846455",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 0,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_HVvAzJTEmKgmhHuytGEnasyt5RQpvNx/pdf",
       "__typename": "StripeInvoices"
@@ -95,7 +86,6 @@
       "created": "1592480637",
       "customerEmail": "james@betzoldlaw.com",
       "defaultPaymentMethod": null,
-      "currency": "usd",
       "total": 0,
       "invoicePdf": "https://pay.stripe.com/invoice/acct_16YIfqEHlNK1KgjM/invst_HUKpxv75mdnSLC5tcgr62y4i63MRq1r/pdf",
       "__typename": "StripeInvoices"

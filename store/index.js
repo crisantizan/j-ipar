@@ -31,7 +31,6 @@ export const actions = {
       //         created
       //         customerEmail
       //         defaultPaymentMethod
-      //         currency
       //         total
       //         invoicePdf
       //       }
