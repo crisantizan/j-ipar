@@ -124,7 +124,6 @@
                     value="month"
                     @change="periodChange()"
                   />
-                  <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                   <label for="payment-period-month">Month</label>
                 </div>
 
@@ -137,7 +136,6 @@
                     value="year"
                     @change="periodChange()"
                   />
-                  <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
                   <label for="payment-period-year">Year</label>
                 </div>
               </div>
@@ -214,15 +212,15 @@
                       />
                     </td>
                     <td class="text-center">
-                      {{ '$ ' + plan.amount.toString().slice(0, -2) }}
+                      {{ plan.amount | slice(0, -2) | enUsFormatter }}
                     </td>
-                    <td class="text-center">$ 0</td>
+                    <td class="text-center">$0</td>
                     <td class="text-center">
-                      $
                       {{
-                        (plan.users * plan.amount.toString().slice(0, -2))
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                        plan.amount
+                          | slice(0, -2)
+                          | multiply(plan.users)
+                          | enUsFormatter
                       }}
                     </td>
                   </tr>
@@ -232,14 +230,7 @@
                       <b>Total to pay per {{ paymentPeriod }}</b>
                     </td>
                     <td class="text-right">
-                      <b
-                        >$
-                        {{
-                          totalPaid
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                        }}</b
-                      >
+                      <b>{{ totalPaid | enUsFormatter }}</b>
                     </td>
                   </tr>
                 </tbody>

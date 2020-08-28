@@ -46,7 +46,7 @@ export default {
           'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap',
         rel: 'stylesheet',
       },
-      { rel: 'stylesheet', href: 'css/main.css' }
+      { rel: 'stylesheet', href: 'css/main.css' },
     ],
     script: [
       {
@@ -85,6 +85,7 @@ export default {
    ** https://nuxtjs.org/guide/plugins
    */
   plugins: [
+    { src: '@/plugins/filters.js' },
     { src: '@/plugins/jquery.js', ssr: false },
     { src: '@/plugins/bootstrap-table.js', ssr: false },
   ],
