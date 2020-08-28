@@ -69,6 +69,19 @@ export const actions = {
       //         id
       //         invoiceSettings
       //       }
+
+      //       users {
+      //         id
+      //         firstName
+      //         middleName
+      //         lastName
+      //         email
+      //         tenantCode
+      //         isAttorney
+      //         admin
+      //         tenantCode
+      //         assignLibraries
+      //       }
       //     }
       //   `,
       // });
@@ -80,6 +93,8 @@ export const actions = {
       commit('plans/SET_ALL', data.plans);
       commit('plans/SET_CUSTOMER', data.customer);
       commit('plans/SET_PAYMENT_METHODS', data.paymentMethods);
+      // users module
+      commit('users/SET_USERS', data.users);
     } catch (error) {
       console.error(error);
     }

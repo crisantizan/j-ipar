@@ -343,6 +343,369 @@
       "__typename": "StripePlans"
     }
   ],
+  "users": [
+    {
+      "id": 1,
+      "firstName": "James",
+      "middleName": "Leo",
+      "lastName": "Betzold",
+      "email": "james@betzoldlaw.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": true,
+      "admin": true,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 2,
+      "firstName": "Patricia",
+      "middleName": null,
+      "lastName": "Mata",
+      "email": "patricia@betzoldlaw.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 3,
+      "firstName": "Maria",
+      "middleName": null,
+      "lastName": "Delgado",
+      "email": "maria@betzoldlaw.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 4,
+      "firstName": "Angela",
+      "middleName": null,
+      "lastName": "Betzold",
+      "email": "Angela@betzoldlaw.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 5,
+      "firstName": "Jimmy ",
+      "middleName": null,
+      "lastName": "Betzold",
+      "email": "james@mirights.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": true,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 6,
+      "firstName": "James",
+      "middleName": "",
+      "lastName": "Betzold",
+      "email": "fernanda@betzoldlaw.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 7,
+      "firstName": "Daniel",
+      "middleName": null,
+      "lastName": "Betzold",
+      "email": "brevortriverstudios1@gmail.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 8,
+      "firstName": "Lori",
+      "middleName": null,
+      "lastName": "Betzold",
+      "email": "brevortriverstudios2@gmail.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 9,
+      "firstName": "Johan",
+      "middleName": "Jimgleheimer",
+      "lastName": "Jacob",
+      "email": "brevortriverstudiosformsteam@gmail.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 10,
+      "firstName": "Oscar",
+      "middleName": null,
+      "lastName": "Narvaez",
+      "email": "brevortpitalito@gmail.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 11,
+      "firstName": "Jake",
+      "middleName": null,
+      "lastName": "Betzold",
+      "email": "jakebetzold@gmail.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 12,
+      "firstName": "Tatiana",
+      "middleName": "",
+      "lastName": "",
+      "email": "tatiana@bella.legal",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 13,
+      "firstName": "Leonardo",
+      "middleName": "",
+      "lastName": "",
+      "email": "leonardo@bella.legal",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 14,
+      "firstName": "Linet",
+      "middleName": "",
+      "lastName": "",
+      "email": "linet@bella.legal",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 15,
+      "firstName": "Fiorella",
+      "middleName": "",
+      "lastName": "",
+      "email": "fiorella@bella.legal",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 16,
+      "firstName": "Yariza",
+      "middleName": "",
+      "lastName": "",
+      "email": "yariza@bella.legal",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 17,
+      "firstName": "Julian",
+      "middleName": "",
+      "lastName": "",
+      "email": "julian@bella.legal",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 18,
+      "firstName": "lenis",
+      "middleName": "",
+      "lastName": "",
+      "email": "lenis@primafacienow.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    },
+    {
+      "id": 19,
+      "firstName": "Jorge",
+      "middleName": null,
+      "lastName": "Diaz",
+      "email": "jorgedg1984@gmail.com",
+      "tenantCode": "B6GLU2160419817",
+      "isAttorney": false,
+      "admin": false,
+      "assignLibraries": {
+        "Immigration": false,
+        "Illinois": false,
+        "CookCountyIl": false,
+        "Michigan": false,
+        "California": false,
+        "Australia": false,
+        "Canada": false
+      }
+    }
+  ],
   "paymentMethods": {
     "id": null,
     "card": null,
