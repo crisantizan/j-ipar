@@ -16,6 +16,40 @@
             <i class="fa fa-search" aria-hidden="true"></i>
           </div>
         </div>
+
+        <div class="dropdown">
+          <button
+            class="btn btn-primary dropdown-toggle"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Dropdown button
+          </button>
+          <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
+            <form @submit.prevent>
+              <div class="dropdown-item px-0">
+                <div class="custom-control custom-checkbox mx-1">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="holi"
+                    v-model="columns[2].hidden"
+                  />
+                  <label
+                    class="custom-control-label d-flex align-items-center"
+                    for="holi"
+                  >
+                    Select
+                  </label>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <vue-good-table
           styleClass="vgt-table striped"
           :columns="columns"
@@ -83,11 +117,12 @@ export default {
       availableLibraries: ['Immigration', 'California'],
       columns: [
         { field: 'id', hidden: true },
-        { field: 'firstName', label: 'Name' },
-        { field: 'email', label: 'Email' },
+        { field: 'firstName', label: 'Name', hidden: false },
+        { field: 'email', label: 'Email', hidden: false },
         {
           field: 'admin',
           label: 'Role',
+          hidden: false,
           formatFn: isAdmin => {
             return isAdmin ? 'Admin' : 'User';
           },

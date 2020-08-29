@@ -16,3 +16,17 @@ h5,
 h6 {
   font-family: 'Roboto', sans-serif;
 }
+
+td[class^='vgt'],
+th[class^='vgt'] {
+  animation: fadeIn ease 300ms;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
