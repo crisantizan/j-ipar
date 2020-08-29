@@ -4,6 +4,18 @@
     <div class="card-box mt-2">
       <!-- <datatable :headers="headers" :columns="users" /> -->
       <client-only>
+        <div class="search btn-group mb-2">
+          <input
+            class="form-control search-input"
+            type="text"
+            placeholder="Search"
+            autocomplete="off"
+            v-model="searchTerm"
+          />
+          <div class="btn btn-primary" style="cursor: default;">
+            <i class="fa fa-search" aria-hidden="true"></i>
+          </div>
+        </div>
         <vue-good-table
           styleClass="vgt-table striped"
           :columns="columns"
@@ -17,6 +29,7 @@
           }"
           :search-options="{
             enabled: true,
+            externalQuery: searchTerm,
           }"
         >
           <template slot="table-row" slot-scope="props">
@@ -66,6 +79,7 @@ export default {
     const self = this;
 
     return {
+      searchTerm: '',
       availableLibraries: ['Immigration', 'California'],
       columns: [
         { field: 'id', hidden: true },
@@ -78,7 +92,7 @@ export default {
             return isAdmin ? 'Admin' : 'User';
           },
         },
-        { field: 'assignLibraries', label: 'Libraries' },
+        { field: 'assignLibraries', label: 'Libraries', sortable: false },
       ],
       /** datatable headers */
       headers: [
