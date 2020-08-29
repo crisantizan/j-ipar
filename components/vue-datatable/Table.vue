@@ -18,8 +18,6 @@
         :pagination-options="{
           enabled: true,
           mode: 'pages',
-          perPage: 5,
-          perPageDropdown: [5, 10, 15, 20],
         }"
         :search-options="{
           enabled: true,
