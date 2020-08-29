@@ -3,122 +3,41 @@
     <h1>Users</h1>
     <div class="card-box mt-2">
       <!-- <datatable :headers="headers" :columns="users" /> -->
-      <client-only>
-        <div class="table-wrapper">
-          <!-- custom header -->
-          <div class="d-flex mb-2">
-            <div class="search btn-group mr-2">
-              <input
-                class="form-control search-input"
-                type="text"
-                placeholder="Search"
-                autocomplete="off"
-                v-model="searchTerm"
-              />
-              <div class="btn btn-primary" style="cursor: default;">
-                <i class="fa fa-search" aria-hidden="true"></i>
-              </div>
-            </div>
-
-            <div class="dropdown">
-              <button
-                class="btn btn-primary dropdown-toggle"
-                type="button"
-                id="dropdownMenuButton"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                <i class="fa fa-th-list" aria-hidden="true"></i>
-              </button>
-
-              <div
-                class="dropdown-menu p-0"
-                aria-labelledby="dropdownMenuButton"
-              >
-                <form @submit.prevent>
-                  <div
-                    v-for="column of toggleColumnList"
-                    :key="column.field"
-                    class="dropdown-item px-0"
-                  >
-                    <div class="custom-control custom-checkbox mx-2">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        :id="`toggle${column.field}`"
-                        :checked="!column.hidden"
-                        @change="e => (column.hidden = !column.hidden)"
-                      />
-                      <!-- v-model="column.hidden" -->
-                      <label
-                        class="custom-control-label d-flex align-items-center"
-                        :for="`toggle${column.field}`"
-                      >
-                        {{ column.label }}
-                      </label>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <!-- end custom header -->
-
-          <!-- styleClass="table my-table table-hover" -->
-          <vue-good-table
-            styleClass="vgt-table my-table table-hover"
-            :columns="columns"
-            :rows="users"
-            compactMode
-            :pagination-options="{
-              enabled: true,
-              mode: 'pages',
-              perPage: 5,
-              perPageDropdown: [5, 10, 15, 20],
-            }"
-            :search-options="{
-              enabled: true,
-              externalQuery: searchTerm,
-            }"
+      <vue-datatable :columns="columns" :rows="users">
+        <template slot="table-row" slot-scope="props">
+          <!-- generate checkboxes in "assignLibraries" field -->
+          <template
+            v-if="printCheckboxes(props.column.field, props.column.hidden)"
           >
-            <template slot="table-row" slot-scope="props">
-              <template
-                v-if="
-                  props.column.field == 'assignLibraries' &&
-                    !props.column.hidden
+            <!-- print only avaibales libraries -->
+            <div
+              v-for="library in availableLibraries"
+              :key="library"
+              class="custom-control custom-checkbox d-flex"
+            >
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                :id="generateCheckboxId(library, props.formattedRow.id)"
+                :value="library"
+                :checked="
+                  isChecked(props.formattedRow.assignLibraries, library)
                 "
+              />
+              <label
+                class="custom-control-label d-flex align-items-center"
+                :for="generateCheckboxId(library, props.formattedRow.id)"
               >
-                <div
-                  v-for="library in availableLibraries"
-                  :key="library"
-                  class="custom-control custom-checkbox d-flex"
-                >
-                  <input
-                    type="checkbox"
-                    class="custom-control-input"
-                    :id="generateCheckboxId(library, props.formattedRow.id)"
-                    :value="library"
-                    :checked="
-                      isChecked(props.formattedRow.assignLibraries, library)
-                    "
-                  />
-                  <label
-                    class="custom-control-label d-flex align-items-center"
-                    :for="generateCheckboxId(library, props.formattedRow.id)"
-                  >
-                    {{ library }}
-                  </label>
-                </div>
-              </template>
-              <span v-else>
-                {{ props.formattedRow[props.column.field] }}
-              </span>
-            </template>
-          </vue-good-table>
-        </div>
-      </client-only>
+                {{ library }}
+              </label>
+            </div>
+          </template>
+          <!-- print default data -->
+          <span v-else>
+            {{ props.formattedRow[props.column.field] }}
+          </span>
+        </template>
+      </vue-datatable>
     </div>
   </div>
 </template>
@@ -129,7 +48,8 @@ import { generateCheckboxHTML } from '../helpers/generate-html';
 
 export default {
   components: {
-    datatable: () => import('~/components/Datatable'),
+    // datatable: () => import('~/components/Datatable'),
+    VueDatatable: () => import('@/components/vue-datatable/Table'),
   },
   data() {
     const self = this;
@@ -228,9 +148,6 @@ export default {
   },
   computed: {
     ...mapGetters('users', ['users']),
-    toggleColumnList() {
-      return this.columns.filter(column => column.toggle);
-    },
   },
   methods: {
     generateCheckboxId(library, id) {
@@ -243,6 +160,10 @@ export default {
     },
     isChecked(assignLibraries, library) {
       return assignLibraries[library];
+    },
+    /** verify if the field is "assignLibraries" and is not hidden */
+    printCheckboxes(field, hidden) {
+      return field === 'assignLibraries' && !hidden;
     },
   },
 };
