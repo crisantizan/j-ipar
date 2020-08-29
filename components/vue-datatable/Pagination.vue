@@ -1,7 +1,8 @@
 <template>
   <div class="Pagination">
     <div class="Pagination__per-page">
-      <span>{{ showing }}</span>
+      <span>{{ showPaginationData }}</span>
+
       <div class="dropdown">
         <button
           class="btn btn-primary dropdown-toggle"
@@ -29,6 +30,7 @@
           </a>
         </div>
       </div>
+
       <span>rows per page</span>
     </div>
 
@@ -102,18 +104,26 @@ export default {
     totalPages() {
       return Math.ceil(this.$props.total / this.perPage);
     },
-    showing() {
+
+    /** show message with pagination data */
+    showPaginationData() {
       const { total } = this.$props;
       const { perPage, page } = this;
 
       const row = page * perPage - (perPage - 1);
-      const endRow = row + perPage - 1;
+      let endRow = row + perPage - 1;
+
+      if (endRow > total) {
+        endRow = total;
+      }
 
       return `Showing ${row} to ${endRow} of ${total} rows`;
     },
+
     nextDisabled() {
       return this.page === this.totalPages;
     },
+
     prevDisabled() {
       return this.page === 1;
     },
@@ -122,12 +132,16 @@ export default {
     this.customPerPageChange(this.perPage);
   },
   methods: {
+    /** updaye "page" value on dtatable */
     customPageChange(customCurrentPage) {
       this.page = customCurrentPage;
       this.pageChanged({ currentPage: customCurrentPage });
     },
+
+    /** update "perPage" value on datatable */
     customPerPageChange(customPerPage) {
       this.perPage = customPerPage;
+      this.page = 1;
       this.perPageChanged({ currentPerPage: customPerPage });
     },
   },
