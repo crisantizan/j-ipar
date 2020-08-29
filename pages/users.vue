@@ -16,7 +16,8 @@ export default {
     datatable: () => import('~/components/Datatable'),
   },
   data() {
-    var self = this;
+    const self = this;
+
     return {
       headers: [
         {
@@ -49,11 +50,15 @@ export default {
               .map(value => {
                 return generateCheckboxHTML(`${value}${id}`, value);
               })
-              .join(' ');
+              .join('');
           },
           events: {
-            'change .custom-control-input': ({ target }, value, row) => {
-              self.clickRow({ checked: target.checked, value, row });
+            'change .custom-control-input': ({ target }, _, row) => {
+              self.onCheckedLibrary({
+                id: row.id,
+                checked: target.checked,
+                library: target.getAttribute('library'),
+              });
             },
           },
         },
@@ -66,8 +71,8 @@ export default {
     ...mapGetters('users', ['users']),
   },
   methods: {
-    clickRow({ checked, value, row }) {
-      console.log({ checked, value, row });
+    onCheckedLibrary({ id, checked, library }) {
+      console.log({ id, checked, library });
     },
   },
 };
