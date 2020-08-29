@@ -3,11 +3,27 @@
     <h1>Users</h1>
     <div class="card-box mt-2">
       <!-- <datatable :headers="headers" :columns="users" /> -->
+
       <vue-datatable :columns="columns" :rows="users">
+        <!-- generate fullname -->
         <template slot="table-row" slot-scope="props">
+          <template
+            v-if="
+              isTheColumn(props.column.field, 'firstName', props.column.hidden)
+            "
+          >
+            <span>{{ generateFullName(props.formattedRow) }}</span>
+          </template>
+
           <!-- generate checkboxes in "assignLibraries" field -->
           <template
-            v-if="printCheckboxes(props.column.field, props.column.hidden)"
+            v-else-if="
+              isTheColumn(
+                props.column.field,
+                'assignLibraries',
+                props.column.hidden,
+              )
+            "
           >
             <!-- print only avaibales libraries -->
             <div
@@ -32,6 +48,7 @@
               </label>
             </div>
           </template>
+
           <!-- print default data -->
           <span v-else>
             {{ props.formattedRow[props.column.field] }}
@@ -63,13 +80,18 @@ export default {
           hidden: true,
         },
         {
+          field: 'lastName',
+          hidden: true,
+        },
+        {
+          field: 'middleName',
+          hidden: true,
+        },
+        {
           field: 'firstName',
           label: 'Name',
           hidden: false,
           toggle: true,
-          formatFn: value => {
-            return value;
-          },
         },
         { field: 'email', label: 'Email', hidden: false, toggle: true },
         {
@@ -150,9 +172,33 @@ export default {
     ...mapGetters('users', ['users']),
   },
   methods: {
+    /** generate custom checkbox id */
     generateCheckboxId(library, id) {
       return `checkLib${library}${id}`;
     },
+
+    /** verify if the current field is "target" and is not hidden */
+    isTheColumn(current, target, hidden) {
+      return current === target && !hidden;
+    },
+
+    /** generate full name */
+    generateFullName({ firstName, lastName, middleName }) {
+      // name and lastname
+      if (lastName !== '-') {
+        return `${firstName} ${lastName}`;
+      }
+
+      // firstname only
+      if (!lastName === '-' && !middleName === '-') {
+        return firstName;
+      }
+
+      // name and middle name or only first name
+      return middleName !== '-' ? `${firstName} ${middleName}` : firstName;
+    },
+
+    // OLD DATATABLE
     /** on checked event */
     onCheckedLibrary({ id, checked, library }) {
       // const nodes = document.querySelectorAll('td.libraries-checkboxes');
@@ -160,10 +206,6 @@ export default {
     },
     isChecked(assignLibraries, library) {
       return assignLibraries[library];
-    },
-    /** verify if the field is "assignLibraries" and is not hidden */
-    printCheckboxes(field, hidden) {
-      return field === 'assignLibraries' && !hidden;
     },
   },
 };
