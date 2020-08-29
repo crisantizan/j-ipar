@@ -2,7 +2,54 @@
   <div>
     <h1>Users</h1>
     <div class="card-box mt-2">
-      <datatable :headers="headers" :columns="users" />
+      <!-- <datatable :headers="headers" :columns="users" /> -->
+      <client-only>
+        <vue-good-table
+          styleClass="vgt-table striped"
+          :columns="columns"
+          :rows="users"
+          compactMode
+          :pagination-options="{
+            enabled: true,
+            mode: 'pages',
+            perPage: 5,
+            perPageDropdown: [5, 10, 15, 20],
+          }"
+          :search-options="{
+            enabled: true,
+          }"
+        >
+          <template slot="table-row" slot-scope="props">
+            <template v-if="props.column.field == 'assignLibraries'">
+              <!-- <pre>{{ props.formattedRow }}</pre> -->
+              <div
+                v-for="library in availableLibraries"
+                :key="library"
+                class="custom-control custom-checkbox d-flex"
+              >
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  :id="generateCheckboxId(library, props.formattedRow.id)"
+                  :value="library"
+                  :checked="
+                    isChecked(props.formattedRow.assignLibraries, library)
+                  "
+                />
+                <label
+                  class="custom-control-label d-flex align-items-center"
+                  :for="generateCheckboxId(library, props.formattedRow.id)"
+                >
+                  {{ library }}
+                </label>
+              </div>
+            </template>
+            <span v-else>
+              {{ props.formattedRow[props.column.field] }}
+            </span>
+          </template>
+        </vue-good-table>
+      </client-only>
     </div>
   </div>
 </template>
@@ -19,6 +66,20 @@ export default {
     const self = this;
 
     return {
+      availableLibraries: ['Immigration', 'California'],
+      columns: [
+        { field: 'id', hidden: true },
+        { field: 'firstName', label: 'Name' },
+        { field: 'email', label: 'Email' },
+        {
+          field: 'admin',
+          label: 'Role',
+          formatFn: isAdmin => {
+            return isAdmin ? 'Admin' : 'User';
+          },
+        },
+        { field: 'assignLibraries', label: 'Libraries' },
+      ],
       /** datatable headers */
       headers: [
         {
@@ -79,10 +140,16 @@ export default {
     ...mapGetters('users', ['users']),
   },
   methods: {
+    generateCheckboxId(library, id) {
+      return `checkLib${library}${id}`;
+    },
     /** on checked event */
     onCheckedLibrary({ id, checked, library }) {
       // const nodes = document.querySelectorAll('td.libraries-checkboxes');
       console.log({ id, checked, library });
+    },
+    isChecked(assignLibraries, library) {
+      return assignLibraries[library];
     },
   },
 };

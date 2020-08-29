@@ -86,8 +86,9 @@ export default {
    */
   plugins: [
     { src: '@/plugins/filters.js' },
-    { src: '@/plugins/jquery.js', ssr: false },
-    { src: '@/plugins/bootstrap-table.js', ssr: false },
+    // { src: '@/plugins/jquery.js', ssr: false },
+    // { src: '@/plugins/bootstrap-table.js', ssr: false },
+    { src: '@/plugins/vue-good-table', ssr: false },
   ],
   /*
    ** Auto import components
