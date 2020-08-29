@@ -4,51 +4,66 @@
     <div class="card-box mt-2">
       <!-- <datatable :headers="headers" :columns="users" /> -->
       <client-only>
-        <div class="search btn-group mb-2">
-          <input
-            class="form-control search-input"
-            type="text"
-            placeholder="Search"
-            autocomplete="off"
-            v-model="searchTerm"
-          />
-          <div class="btn btn-primary" style="cursor: default;">
-            <i class="fa fa-search" aria-hidden="true"></i>
+        <!-- custom header -->
+        <div class="d-flex mb-2">
+          <div class="search btn-group mr-2">
+            <input
+              class="form-control search-input"
+              type="text"
+              placeholder="Search"
+              autocomplete="off"
+              v-model="searchTerm"
+            />
+            <div class="btn btn-primary" style="cursor: default;">
+              <i class="fa fa-search" aria-hidden="true"></i>
+            </div>
+          </div>
+
+          <div class="dropdown">
+            <button
+              class="btn btn-primary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              <i class="fa fa-th-list" aria-hidden="true"></i>
+            </button>
+
+            <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
+              <form @submit.prevent>
+                <div
+                  v-for="column of columns"
+                  :key="column.field"
+                  class="dropdown-item px-0"
+                >
+                  <div
+                    v-if="column.toggle"
+                    class="custom-control custom-checkbox mx-1"
+                  >
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      :id="`toggle${column.field}`"
+                      :checked="!column.hidden"
+                      @change="e => (column.hidden = !column.hidden)"
+                    />
+                    <!-- v-model="column.hidden" -->
+                    <label
+                      class="custom-control-label d-flex align-items-center"
+                      :for="`toggle${column.field}`"
+                    >
+                      {{ column.label }}
+                    </label>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
 
-        <div class="dropdown">
-          <button
-            class="btn btn-primary dropdown-toggle"
-            type="button"
-            id="dropdownMenuButton"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            Dropdown button
-          </button>
-          <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
-            <form @submit.prevent>
-              <div class="dropdown-item px-0">
-                <div class="custom-control custom-checkbox mx-1">
-                  <input
-                    type="checkbox"
-                    class="custom-control-input"
-                    id="holi"
-                    v-model="columns[2].hidden"
-                  />
-                  <label
-                    class="custom-control-label d-flex align-items-center"
-                    for="holi"
-                  >
-                    Select
-                  </label>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
+        <!-- end custom header -->
 
         <vue-good-table
           styleClass="vgt-table striped"
@@ -67,8 +82,11 @@
           }"
         >
           <template slot="table-row" slot-scope="props">
-            <template v-if="props.column.field == 'assignLibraries'">
-              <!-- <pre>{{ props.formattedRow }}</pre> -->
+            <template
+              v-if="
+                props.column.field == 'assignLibraries' && !props.column.hidden
+              "
+            >
               <div
                 v-for="library in availableLibraries"
                 :key="library"
@@ -117,17 +135,24 @@ export default {
       availableLibraries: ['Immigration', 'California'],
       columns: [
         { field: 'id', hidden: true },
-        { field: 'firstName', label: 'Name', hidden: false },
-        { field: 'email', label: 'Email', hidden: false },
+        { field: 'firstName', label: 'Name', hidden: false, toggle: true },
+        { field: 'email', label: 'Email', hidden: false, toggle: true },
         {
           field: 'admin',
           label: 'Role',
           hidden: false,
+          toggle: true,
           formatFn: isAdmin => {
             return isAdmin ? 'Admin' : 'User';
           },
         },
-        { field: 'assignLibraries', label: 'Libraries', sortable: false },
+        {
+          field: 'assignLibraries',
+          label: 'Libraries',
+          sortable: false,
+          toggle: true,
+          hidden: false,
+        },
       ],
       /** datatable headers */
       headers: [
