@@ -1,3 +1,4 @@
+/** generate checkbox element */
 export const generateCheckboxHTML = (id, label) => {
   return `
     <div class="custom-control custom-checkbox d-flex">

@@ -19,6 +19,7 @@ export default {
     const self = this;
 
     return {
+      /** datatable headers */
       headers: [
         {
           title: 'Name',
@@ -46,6 +47,7 @@ export default {
           field: 'assignLibraries',
           sortable: true,
           formatter: (current, { id }) => {
+            // print checkboxes
             return ['Immigration', 'California']
               .map(value => {
                 return generateCheckboxHTML(`${value}${id}`, value);
@@ -53,6 +55,7 @@ export default {
               .join('');
           },
           events: {
+            // listen input change event
             'change .custom-control-input': ({ target }, _, row) => {
               self.onCheckedLibrary({
                 id: row.id,
@@ -71,6 +74,7 @@ export default {
     ...mapGetters('users', ['users']),
   },
   methods: {
+    /** on checked event */
     onCheckedLibrary({ id, checked, library }) {
       console.log({ id, checked, library });
     },
