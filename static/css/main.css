@@ -30,3 +30,21 @@ th[class^='vgt'] {
     opacity: 1;
   }
 }
+
+.my-table {
+  border: none !important;
+}
+
+.my-table thead {
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+}
+
+.my-table thead th {
+  background: #f3f7f9 !important;
+}
+
+.my-table tbody tr {
+  border-bottom: 1px solid #dee2e6;
+}

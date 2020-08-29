@@ -65,8 +65,9 @@
 
         <!-- end custom header -->
 
+          <!-- styleClass="table my-table table-hover" -->
         <vue-good-table
-          styleClass="vgt-table striped"
+          styleClass="vgt-table my-table table-hover"
           :columns="columns"
           :rows="users"
           compactMode
