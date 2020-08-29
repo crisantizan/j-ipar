@@ -30,6 +30,11 @@
         <template slot="table-row" slot-scope="props">
           <slot name="table-row" v-bind="props"></slot>
         </template>
+
+        <!-- pagination slot -->
+        <template slot="pagination-bottom" slot-scope="props">
+          <pagination v-bind="props" />
+        </template>
       </vue-good-table>
     </div>
   </client-only>
@@ -38,6 +43,7 @@
 <script>
 export default {
   components: {
+    Pagination: () => import('./Pagination'),
     ColumnsToggleButton: () => import('./ColumnsToggleButton'),
     SearchInput: () => import('./SearchInput'),
   },
