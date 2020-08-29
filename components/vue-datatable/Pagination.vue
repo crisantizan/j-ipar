@@ -31,6 +31,51 @@
       </div>
       <span>rows per page</span>
     </div>
+
+    <div class="Pagination__items">
+      <ul class="pagination">
+        <!-- go to prev page -->
+        <li class="page-item page-pre" :class="{ disabled: prevDisabled }">
+          <a
+            class="page-link"
+            aria-label="previous page"
+            href="javascript:void(0)"
+            @click="customPageChange(page - 1)"
+          >
+            «
+          </a>
+        </li>
+
+        <!-- dynamic pages -->
+        <li
+          v-for="pageNumber in totalPages"
+          :key="pageNumber"
+          class="page-item"
+          :class="{ active: page === pageNumber }"
+        >
+          <a
+            class="page-link"
+            :aria-label="`to page ${pageNumber}`"
+            href="javascript:void(0)"
+            @click="customPageChange(pageNumber)"
+          >
+            {{ pageNumber }}
+          </a>
+        </li>
+
+        <!-- go to next page -->
+        <li class="page-item page-next" :class="{ disabled: nextDisabled }">
+          <a
+            class="page-link"
+            aria-label="next page"
+            href="javascript:void(0)"
+            @click="customPageChange(page + 1)"
+          >
+            »
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -55,7 +100,7 @@ export default {
   }),
   computed: {
     totalPages() {
-      return this.$props.total / this.perPage;
+      return Math.ceil(this.$props.total / this.perPage);
     },
     showing() {
       const { total } = this.$props;
@@ -65,6 +110,12 @@ export default {
       const endRow = row + perPage - 1;
 
       return `Showing ${row} to ${endRow} of ${total} rows`;
+    },
+    nextDisabled() {
+      return this.page === this.totalPages;
+    },
+    prevDisabled() {
+      return this.page === 1;
     },
   },
   created() {
@@ -86,6 +137,9 @@ export default {
 <style scoped>
 .Pagination {
   margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .Pagination__per-page {
@@ -94,6 +148,22 @@ export default {
 }
 
 .Pagination__per-page .dropdown {
-  margin: 0 .3rem;
+  margin: 0 0.3rem;
+}
+
+.Pagination__items .pagination {
+  margin-bottom: 0;
+}
+
+.dropdown-toggle {
+  width: 33px;
+  height: 35.5px;
+  display: flex;
+  justify-content: center;
+}
+
+.page-item.active .page-link {
+  background-color: #6658dd;
+  border-color: #6658dd;
 }
 </style>
