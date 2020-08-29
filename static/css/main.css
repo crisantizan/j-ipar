@@ -43,8 +43,21 @@ th[class^='vgt'] {
 
 .my-table thead th {
   background: #f3f7f9 !important;
+  font-size: 0.875rem;
 }
 
 .my-table tbody tr {
   border-bottom: 1px solid #dee2e6;
+}
+
+.my-table td {
+  vertical-align: middle !important;
+  font-size: 0.875rem;
+  color: #6c757d !important;
+}
+
+.table-wrapper {
+  border: 1px solid #dee2e6;
+  padding: 0.75rem;
+  border-radius: 3px;
 }
