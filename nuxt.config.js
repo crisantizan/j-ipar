@@ -115,6 +115,7 @@ export default {
   router: {
     linkExactActiveClass: 'active',
   },
+  pageTransition: 'page',
   /*
    ** Build configuration
    ** See https://nuxtjs.org/api/configuration-build/
