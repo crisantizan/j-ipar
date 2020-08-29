@@ -41,9 +41,6 @@ export default {
     ColumnsToggleButton: () => import('./ColumnsToggleButton'),
     SearchInput: () => import('./SearchInput'),
   },
-  head: () => ({
-    link: [{ rel: 'stylesheet', href: 'css/vue-datatable.css' }],
-  }),
   props: {
     columns: {
       type: Array,

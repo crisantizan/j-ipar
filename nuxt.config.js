@@ -47,6 +47,7 @@ export default {
         rel: 'stylesheet',
       },
       { rel: 'stylesheet', href: 'css/main.css' },
+      { rel: 'stylesheet', href: 'css/vue-datatable.css' },
     ],
     script: [
       {
