@@ -354,7 +354,7 @@
       "isAttorney": true,
       "admin": true,
       "assignLibraries": {
-        "Immigration": false,
+        "Immigration": true,
         "Illinois": false,
         "CookCountyIl": false,
         "Michigan": false,
@@ -377,7 +377,7 @@
         "Illinois": false,
         "CookCountyIl": false,
         "Michigan": false,
-        "California": false,
+        "California": true,
         "Australia": false,
         "Canada": false
       }
@@ -491,7 +491,7 @@
         "Illinois": false,
         "CookCountyIl": false,
         "Michigan": false,
-        "California": false,
+        "California": true,
         "Australia": false,
         "Canada": false
       }

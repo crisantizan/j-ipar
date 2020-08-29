@@ -46,11 +46,16 @@ export default {
           title: 'Libraries',
           field: 'assignLibraries',
           sortable: true,
+          class: 'libraries-checkboxes',
           formatter: (current, { id }) => {
             // print checkboxes
             return ['Immigration', 'California']
               .map(value => {
-                return generateCheckboxHTML(`${value}${id}`, value);
+                return generateCheckboxHTML(
+                  `${value}${id}`,
+                  value,
+                  current[value],
+                );
               })
               .join('');
           },
@@ -60,7 +65,7 @@ export default {
               self.onCheckedLibrary({
                 id: row.id,
                 checked: target.checked,
-                library: target.getAttribute('library'),
+                library: target.value,
               });
             },
           },
@@ -76,6 +81,7 @@ export default {
   methods: {
     /** on checked event */
     onCheckedLibrary({ id, checked, library }) {
+      // const nodes = document.querySelectorAll('td.libraries-checkboxes');
       console.log({ id, checked, library });
     },
   },
