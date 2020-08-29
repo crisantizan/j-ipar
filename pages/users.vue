@@ -38,14 +38,11 @@
               >
                 <form @submit.prevent>
                   <div
-                    v-for="column of columns"
+                    v-for="column of toggleColumnList"
                     :key="column.field"
                     class="dropdown-item px-0"
                   >
-                    <div
-                      v-if="column.toggle"
-                      class="custom-control custom-checkbox mx-1"
-                    >
+                    <div class="custom-control custom-checkbox mx-2">
                       <input
                         type="checkbox"
                         class="custom-control-input"
@@ -151,7 +148,6 @@ export default {
           hidden: false,
           toggle: true,
           formatFn: value => {
-            console.log(value);
             return value;
           },
         },
@@ -232,6 +228,9 @@ export default {
   },
   computed: {
     ...mapGetters('users', ['users']),
+    toggleColumnList() {
+      return this.columns.filter(column => column.toggle);
+    },
   },
   methods: {
     generateCheckboxId(library, id) {
