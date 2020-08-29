@@ -141,17 +141,30 @@ export default {
       searchTerm: '',
       availableLibraries: ['Immigration', 'California'],
       columns: [
-        { field: 'id', hidden: true },
-        { field: 'firstName', label: 'Name', hidden: false, toggle: true },
+        {
+          field: 'id',
+          hidden: true,
+        },
+        {
+          field: 'firstName',
+          label: 'Name',
+          hidden: false,
+          toggle: true,
+          formatFn: value => {
+            console.log(value);
+            return value;
+          },
+        },
         { field: 'email', label: 'Email', hidden: false, toggle: true },
         {
           field: 'admin',
           label: 'Role',
           hidden: false,
           toggle: true,
-          formatFn: isAdmin => {
-            return isAdmin ? 'Admin' : 'User';
-          },
+          type: 'boolean',
+          tdClass: 'text-left',
+          thClass: 'text-left',
+          formatFn: isAdmin => (isAdmin ? 'Admin' : 'User'),
         },
         {
           field: 'assignLibraries',
