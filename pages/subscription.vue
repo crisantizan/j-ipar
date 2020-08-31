@@ -383,6 +383,12 @@ export default {
 
     /** show plans filtered */
     getFilteredPlans() {
+      // california: price_1GrnVtEHlNK1KgjMvTmvPR5f
+      // immigration: price_1GrnRoEHlNK1KgjMXEMUQh3q
+      const checkedItems = [
+        { name: 'california', id: 'price_1GrnVtEHlNK1KgjMvTmvPR5f' },
+        { name: 'immigration', id: 'price_1GrnRoEHlNK1KgjMXEMUQh3q' },
+      ]
       const data = this.plans.reduce(
         (filtered, plan) => {
           switch (plan.interval) {
@@ -403,7 +409,9 @@ export default {
                 ...filtered,
                 month: {
                   ...filtered.month,
-                  notIncluded: [...filtered.month.notIncluded, plan],
+                  notIncluded: [...filtered.month.notIncluded, {
+                    ...plan, checked: checkedItems.some(v => v.id === plan.id)
+                  }],
                 },
               };
 
