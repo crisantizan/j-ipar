@@ -2,8 +2,6 @@
   <div>
     <h1>Users</h1>
     <div class="card-box mt-2">
-      <!-- <datatable :headers="headers" :columns="users" /> -->
-
       <vue-datatable :columns="columns" :rows="users">
         <!-- generate fullname -->
         <template slot="table-row" slot-scope="props">
@@ -65,109 +63,50 @@ import { generateCheckboxHTML } from '../helpers/generate-html';
 
 export default {
   components: {
-    // datatable: () => import('~/components/Datatable'),
     VueDatatable: () => import('@/components/vue-datatable/Table'),
   },
-  data() {
-    const self = this;
-
-    return {
-      searchTerm: '',
-      availableLibraries: ['Immigration', 'California'],
-      columns: [
-        {
-          field: 'id',
-          hidden: true,
-        },
-        {
-          field: 'lastName',
-          hidden: true,
-        },
-        {
-          field: 'middleName',
-          hidden: true,
-        },
-        {
-          field: 'firstName',
-          label: 'Name',
-          hidden: false,
-          toggle: true,
-        },
-        { field: 'email', label: 'Email', hidden: false, toggle: true },
-        {
-          field: 'admin',
-          label: 'Role',
-          hidden: false,
-          toggle: true,
-          type: 'boolean',
-          tdClass: 'text-left',
-          thClass: 'text-left',
-          formatFn: isAdmin => (isAdmin ? 'Admin' : 'User'),
-        },
-        {
-          field: 'assignLibraries',
-          label: 'Libraries',
-          sortable: false,
-          toggle: true,
-          hidden: false,
-        },
-      ],
-      /** datatable headers */
-      headers: [
-        {
-          title: 'Name',
-          field: 'firstName',
-          sortable: true,
-          formatter: (current, { lastName }) => {
-            return `${current} ${lastName}`;
-          },
-        },
-        {
-          title: 'Email',
-          field: 'email',
-          sortable: true,
-        },
-        {
-          title: 'Role',
-          field: 'admin',
-          sortable: true,
-          formatter: current => {
-            return current ? 'Admin' : 'User';
-          },
-        },
-        {
-          title: 'Libraries',
-          field: 'assignLibraries',
-          sortable: true,
-          class: 'libraries-checkboxes',
-          formatter: (current, { id }) => {
-            // print checkboxes
-            return ['Immigration', 'California']
-              .map(value => {
-                return generateCheckboxHTML(
-                  `${value}${id}`,
-                  value,
-                  current[value],
-                );
-              })
-              .join('');
-          },
-          events: {
-            // listen input change event
-            'change .custom-control-input': ({ target }, _, row) => {
-              self.onCheckedLibrary({
-                id: row.id,
-                checked: target.checked,
-                library: target.value,
-              });
-            },
-          },
-        },
-        { field: 'lastName', visible: false },
-        { field: 'id', visible: false },
-      ],
-    };
-  },
+  data: () => ({
+    searchTerm: '',
+    availableLibraries: ['Immigration', 'California'],
+    columns: [
+      {
+        field: 'id',
+        hidden: true,
+      },
+      {
+        field: 'lastName',
+        hidden: true,
+      },
+      {
+        field: 'middleName',
+        hidden: true,
+      },
+      {
+        field: 'firstName',
+        label: 'Name',
+        hidden: false,
+        toggle: true,
+      },
+      { field: 'email', label: 'Email', hidden: false, toggle: true },
+      {
+        field: 'admin',
+        label: 'Role',
+        hidden: false,
+        toggle: true,
+        type: 'boolean',
+        tdClass: 'text-left',
+        thClass: 'text-left',
+        formatFn: isAdmin => (isAdmin ? 'Admin' : 'User'),
+      },
+      {
+        field: 'assignLibraries',
+        label: 'Libraries',
+        sortable: false,
+        toggle: true,
+        hidden: false,
+      },
+    ],
+  }),
   computed: {
     ...mapGetters('users', ['users']),
   },
