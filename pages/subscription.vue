@@ -175,7 +175,7 @@
                         </label>
                       </div>
 
-                      <div class="text-success" v-if="isIncluded(plan)">
+                      <div class="text-success" v-if="isParent(plan)">
                         <b> Discount:</b> 5% for 12 months
                       </div>
 
@@ -341,7 +341,7 @@ export default {
     ]),
 
     /** verify if the current plan is included in "coreIds" */
-    isIncluded(plan) {
+    isParent(plan) {
       return this.coreIds.includes(plan.id);
     },
 
@@ -381,71 +381,73 @@ export default {
       }
     },
 
+    /** calculate "users" property value */
+    calcUsers(currentValue, isChecked, totalChecked, totalUsers, middle) {
+      if (!isChecked) {
+        return currentValue;
+      }
+
+      return isChecked && totalChecked === 1 ? totalUsers - middle : middle;
+    },
+
     /** show plans filtered */
     getFilteredPlans() {
+      const plans = [...this.plans];
       // california: price_1GrnVtEHlNK1KgjMvTmvPR5f
       // immigration: price_1GrnRoEHlNK1KgjMXEMUQh3q
       const checkedItems = [
         { name: 'california', id: 'price_1GrnVtEHlNK1KgjMvTmvPR5f' },
         { name: 'immigration', id: 'price_1GrnRoEHlNK1KgjMXEMUQh3q' },
-      ]
-      const data = this.plans.reduce(
-        (filtered, plan) => {
+      ];
+
+      /** sort values */
+      const sorted = plans.sort((a, b) => {
+        if (this.coreIds.includes(a.id)) {
+          return -1;
+        }
+
+        return 1;
+      });
+
+      const totalUsers = sorted[0].users;
+      const middle = Math.floor(totalUsers / 2);
+
+      let totalChecked = 0;
+
+      // split in "month" and "year"
+      return sorted.reduce(
+        (acc, plan) => {
           switch (plan.interval) {
             case 'month':
-              // included in "coreIds" array
-              if (this.coreIds.includes(plan.id)) {
-                return {
-                  ...filtered,
-                  month: {
-                    ...filtered.month,
-                    included: [...filtered.month.included, plan],
-                  },
-                };
+              const checked = checkedItems.some(v => v.id === plan.id);
+
+              if (checked && totalChecked < 3) {
+                totalChecked++;
               }
 
-              // add to not-included
               return {
-                ...filtered,
-                month: {
-                  ...filtered.month,
-                  notIncluded: [...filtered.month.notIncluded, {
-                    ...plan, checked: checkedItems.some(v => v.id === plan.id)
-                  }],
-                },
+                ...acc,
+                month: [
+                  ...acc.month,
+                  {
+                    ...plan,
+                    checked: this.isParent(plan) || checked,
+                    users: this.calcUsers(
+                      plan.users,
+                      checked,
+                      totalChecked,
+                      totalUsers,
+                      middle
+                    ),
+                  },
+                ],
               };
+              break;
 
+            // yearly
             default:
-              // included in "coreIds" array
-              if (this.coreIds.includes(plan.id)) {
-                return {
-                  ...filtered,
-                  year: {
-                    ...filtered.year,
-                    included: [...filtered.year.included, plan],
-                  },
-                };
-              }
-
-              // add to not-included
-              return {
-                ...filtered,
-                year: {
-                  ...filtered.year,
-                  notIncluded: [...filtered.year.notIncluded, plan],
-                },
-              };
+              return { ...acc, year: [...acc.year, plan] };
           }
-        },
-        {
-          month: { included: [], notIncluded: [] },
-          year: { included: [], notIncluded: [] },
-        },
-      );
-
-      return Object.entries(data).reduce(
-        (acc, [key, values]) => {
-          return { ...acc, [key]: [...values.included, ...values.notIncluded] };
         },
         { month: [], year: [] },
       );
