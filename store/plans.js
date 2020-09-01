@@ -64,17 +64,17 @@ export const mutations = {
     state.lastChangedPlan = id;
   },
 
-  UPDATE_SPECIAL_USERS(state, { value, oldValue, index, isMain }) {
-    const plan = state[state.period][index];
+  UPDATE_SPECIAL_USERS(state, { value, oldValue, index, isMain, period }) {
+    const plan = state[period][index];
     plan.users = value;
 
     // by period selected
-    const [california, immigration] = state.defaultCheckedUsers[state.period];
+    const [california, immigration] = state.defaultCheckedUsers[period];
 
-    const californiaIndex = state[state.period].findIndex(
+    const californiaIndex = state[period].findIndex(
       v => v.id === california.id,
     );
-    const immigrationIndex = state[state.period].findIndex(
+    const immigrationIndex = state[period].findIndex(
       v => v.id === immigration.id,
     );
 
@@ -86,8 +86,8 @@ export const mutations = {
       const middle = Math.floor(value / 2);
 
       // update both
-      state[state.period][californiaIndex].users = value - middle;
-      state[state.period][immigrationIndex].users = middle;
+      state[period][californiaIndex].users = value - middle;
+      state[period][immigrationIndex].users = middle;
       return;
     }
 
@@ -95,12 +95,16 @@ export const mutations = {
     const isCalifornia = plan.id === california.id;
 
     if (isCalifornia) {
-      otherPlan = state[state.period][immigrationIndex];
+      otherPlan = state[period][immigrationIndex];
     } else {
-      otherPlan = state[state.period][californiaIndex];
+      otherPlan = state[period][californiaIndex];
     }
 
+    // console.log({ isCalifornia });
+    // console.log({ ...otherPlan });
+
     const total = oldValue + otherPlan.users;
+    // console.log({ oldValue, total });
     otherPlan.users = total - value;
   },
 

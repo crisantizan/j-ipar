@@ -206,7 +206,7 @@
                         @change="
                           onChangeUsers({
                             event: $event,
-                            plan: plan,
+                            plan: { ...plan },
                             value: Number($event.target.value),
                             index,
                           })
@@ -473,41 +473,58 @@ export default {
     },
 
     /** on change users handler */
-    onChangeUsers(data) {
+    onChangeUsers({ event, value, plan, index }) {
       // no negative numbers accepted
-      if (Number(data.event.target.value) < 0) {
-        data.value = 0;
-        data.event.target.value = 0;
+      if (Number(event.target.value) < 0) {
+        value = 0;
+        event.target.value = 0;
       }
 
+      const mirrorPeriod = this.paymentPeriod === 'month' ? 'year' : 'month';
+
       // data { event, plan, value, index });
-      if (this.planIsMain(data.plan.id)) {
+      if (this.planIsMain(plan.id)) {
         this.UPDATE_SPECIAL_USERS({
-          value: data.value,
-          oldValue: data.plan.users,
-          index: data.index,
+          value,
+          oldValue: plan.users,
+          index,
           isMain: true,
+          period: this.paymentPeriod,
+        });
+
+        this.UPDATE_SPECIAL_USERS({
+          value,
+          oldValue: plan.users,
+          index,
+          isMain: true,
+          period: mirrorPeriod,
         });
         return;
       }
 
-      if (this.isDefaultCheckedUser(data.plan)) {
-        if (Number(data.event.target.value) > this.mainPlan.users) {
+      if (this.isDefaultCheckedUser(plan)) {
+        if (Number(event.target.value) > this.mainPlan.users) {
           // set old value
-          data.event.target.value = data.plan.users;
+          event.target.value = plan.users;
           return;
         }
 
         this.UPDATE_SPECIAL_USERS({
-          value: data.value,
-          oldValue: data.plan.users,
-          index: data.index,
+          value,
+          oldValue: plan.users,
+          index,
           isMain: false,
+          period: this.paymentPeriod,
+        });
+
+        this.UPDATE_SPECIAL_USERS({
+          value,
+          oldValue: plan.users,
+          index,
+          isMain: false,
+          period: mirrorPeriod,
         });
       }
-
-      // // delete data.event;
-      // this.SET_CHECKED_OR_USERS({ prop: 'users', ...data });
     },
 
     periodChange() {
