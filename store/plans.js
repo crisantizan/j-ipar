@@ -64,97 +64,44 @@ export const mutations = {
     state.lastChangedPlan = id;
   },
 
-  UPDATE_SPECIAL_USERS(state, { value, oldValue, index }) {
+  UPDATE_SPECIAL_USERS(state, { value, oldValue, index, isMain }) {
     const plan = state[state.period][index];
     plan.users = value;
 
-    const isIncrement = value >= oldValue;
-    const isMain = state.defaultCheckedUsers.core.includes(plan.id);
+    // by period selected
+    const [california, immigration] = state.defaultCheckedUsers[state.period];
 
-    if (isMain) {
-      // by period selected
-      const [california, immigration] = state.defaultCheckedUsers[state.period];
+    const californiaIndex = state[state.period].findIndex(
+      v => v.id === california.id,
+    );
+    const immigrationIndex = state[state.period].findIndex(
+      v => v.id === immigration.id,
+    );
 
-      const californiaIndex = state[state.period].findIndex(
-        v => v.id === california.id,
-      );
-      const immigrationIndex = state[state.period].findIndex(
-        v => v.id === immigration.id,
-      );
-
-      if (californiaIndex === -1 || immigrationIndex === -1) {
-        throw new Error('Plan not found');
-      }
-
-      const diff = isIncrement ? value - oldValue : oldValue - value;
-      const diffMiddle = Math.floor(diff / 2);
-
-      switch (diffMiddle) {
-        // update one
-        case 0:
-          // update california
-          if (
-            state.lastChangedPlan === null ||
-            state.lastChangedPlan === california.id
-          ) {
-            const val = state[state.period][californiaIndex];
-            // decrement, is zero, omit
-            if (val.users === 0 && !isIncrement) {
-              return;
-            }
-
-            // update value
-            val.users = isIncrement ? val.users + 1 : val.users - 1;
-
-            // update value of lastChangedPlan property
-            state.lastChangedPlan = immigration.id;
-            return;
-          }
-
-          // update immigration
-          const val = state[state.period][immigrationIndex];
-          // decrement, is zero, omit
-          if (val.users === 0 && !isIncrement) {
-            return;
-          }
-
-          // update value
-          val.users = isIncrement ? val.users + 1 : val.users - 1;
-
-          // update value of lastChangedPlan property
-          state.lastChangedPlan = california.id;
-          return;
-
-        default:
-          // update both
-          const californiaPlan = state[state.period][californiaIndex];
-          const immigrationPlan = state[state.period][immigrationIndex];
-
-          // decrement
-          if (!isIncrement) {
-            if (californiaPlan.users !== 0) {
-              // update california
-              const result = californiaPlan.users - (diff - diffMiddle);
-              californiaPlan.users = result < 0 ? 0 : result;
-            }
-
-            if (immigrationPlan.users !== 0) {
-              // update california
-              const result = immigrationPlan.users - (diff - diffMiddle);
-              immigrationPlan.users = result < 0 ? 0 : result;
-            }
-
-            return;
-          }
-
-          // increment
-          californiaPlan.users += diff - diffMiddle;
-          immigrationPlan.users += diff - diffMiddle;
-          break;
-      }
+    if (californiaIndex === -1 || immigrationIndex === -1) {
+      throw new Error('Plan not found');
     }
 
-    console.log({ value, oldValue, index, isIncrement, isMain });
+    if (isMain) {
+      const middle = Math.floor(value / 2);
+
+      // update both
+      state[state.period][californiaIndex].users = value - middle;
+      state[state.period][immigrationIndex].users = middle;
+      return;
+    }
+
+    let otherPlan = {};
+    const isCalifornia = plan.id === california.id;
+
+    if (isCalifornia) {
+      otherPlan = state[state.period][immigrationIndex];
+    } else {
+      otherPlan = state[state.period][californiaIndex];
+    }
+
+    const total = oldValue + otherPlan.users;
+    otherPlan.users = total - value;
   },
 
   SET_PAYMENT_METHODS(state, payload) {
@@ -190,6 +137,11 @@ export const getters = {
 
   planIsMain(state) {
     return id => state.defaultCheckedUsers.core.includes(id);
+  },
+
+  mainPlan(state) {
+    const ids = state.defaultCheckedUsers.core;
+    return state[state.period].find(v => ids.includes(v.id));
   },
 
   isDefaultCheckedUser({ defaultCheckedUsers, period }, getters) {

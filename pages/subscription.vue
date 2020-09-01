@@ -205,6 +205,7 @@
                         :value="plan.users"
                         @change="
                           onChangeUsers({
+                            event: $event,
                             plan: plan,
                             value: Number($event.target.value),
                             index,
@@ -279,6 +280,7 @@ export default {
       'defaultCheckedUsers',
       'isDefaultCheckedUser',
       'planIsMain',
+      'mainPlan',
     ]),
 
     paymentPeriod: {
@@ -473,23 +475,35 @@ export default {
     /** on change users handler */
     onChangeUsers(data) {
       // no negative numbers accepted
-      // if (Number(data.event.target.value) < 0) {
-      //   console.log(data.event.target.value);
-      //   console.log('Menor que cero');
-      //   data.event.target.value = 0;
-      // }
+      if (Number(data.event.target.value) < 0) {
+        data.value = 0;
+        data.event.target.value = 0;
+      }
 
       // data { event, plan, value, index });
-      if (
-        this.planIsMain(data.plan.id) ||
-        this.isDefaultCheckedUser(data.plan)
-      ) {
+      if (this.planIsMain(data.plan.id)) {
         this.UPDATE_SPECIAL_USERS({
           value: data.value,
           oldValue: data.plan.users,
           index: data.index,
+          isMain: true,
         });
         return;
+      }
+
+      if (this.isDefaultCheckedUser(data.plan)) {
+        if (Number(data.event.target.value) > this.mainPlan.users) {
+          // set old value
+          data.event.target.value = data.plan.users;
+          return;
+        }
+
+        this.UPDATE_SPECIAL_USERS({
+          value: data.value,
+          oldValue: data.plan.users,
+          index: data.index,
+          isMain: false,
+        });
       }
 
       // // delete data.event;
