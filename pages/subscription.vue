@@ -472,7 +472,14 @@ export default {
 
     /** on change users handler */
     onChangeUsers(data) {
-      // data { plan, value, index });
+      // no negative numbers accepted
+      // if (Number(data.event.target.value) < 0) {
+      //   console.log(data.event.target.value);
+      //   console.log('Menor que cero');
+      //   data.event.target.value = 0;
+      // }
+
+      // data { event, plan, value, index });
       if (
         this.planIsMain(data.plan.id) ||
         this.isDefaultCheckedUser(data.plan)
@@ -485,7 +492,8 @@ export default {
         return;
       }
 
-      this.SET_CHECKED_OR_USERS({ prop: 'users', ...data });
+      // // delete data.event;
+      // this.SET_CHECKED_OR_USERS({ prop: 'users', ...data });
     },
 
     periodChange() {
