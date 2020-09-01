@@ -16,7 +16,7 @@
         :columns="$props.columns"
         :rows="$props.rows"
         :pagination-options="{
-          enabled: true,
+          enabled: $props.pagination,
           mode: 'pages',
         }"
         :search-options="{
@@ -30,7 +30,11 @@
         </template>
 
         <!-- pagination slot -->
-        <template slot="pagination-bottom" slot-scope="props">
+        <template
+          v-if="$props.pagination"
+          slot="pagination-bottom"
+          slot-scope="props"
+        >
           <pagination v-bind="props" />
         </template>
       </vue-good-table>
@@ -53,6 +57,10 @@ export default {
     rows: {
       type: Array,
       default: () => [],
+    },
+    pagination: {
+      type: Boolean,
+      default: true,
     },
   },
   data: () => ({

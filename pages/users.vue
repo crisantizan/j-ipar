@@ -2,7 +2,7 @@
   <div>
     <h1>Users</h1>
     <div class="card-box mt-2">
-      <vue-datatable :columns="columns" :rows="users">
+      <vue-datatable :columns="columns" :rows="users" :pagination="false">
         <!-- generate fullname -->
         <template slot="table-row" slot-scope="props">
           <template
