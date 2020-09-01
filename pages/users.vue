@@ -24,27 +24,38 @@
             "
           >
             <!-- print only avaibales libraries -->
-            <div
-              v-for="library in availableLibraries"
-              :key="library"
-              class="custom-control custom-checkbox d-flex"
+            <template
+              v-for="(libraryValue, libraryKey) in props.formattedRow
+                .assignLibraries"
             >
-              <input
-                type="checkbox"
-                class="custom-control-input"
-                :id="generateCheckboxId(library, props.formattedRow.id)"
-                :value="library"
-                :checked="
-                  isChecked(props.formattedRow.assignLibraries, library)
-                "
-              />
-              <label
-                class="custom-control-label d-flex align-items-center"
-                :for="generateCheckboxId(library, props.formattedRow.id)"
+              <div
+                :key="libraryKey"
+                class="custom-control custom-checkbox d-flex"
+                v-if="displayLibraryCheckbox(libraryKey)"
               >
-                {{ library }}
-              </label>
-            </div>
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  :id="generateCheckboxId(libraryKey, props.formattedRow.id)"
+                  :value="libraryKey"
+                  :checked="isChecked(props.row.originalIndex, libraryKey)"
+                  :disabled="isDisabled(props.row.originalIndex, libraryKey)"
+                  @change="
+                    onChange({
+                      checked: $event.target.checked,
+                      library: $event.target.value,
+                      index: props.row.originalIndex,
+                    })
+                  "
+                />
+                <label
+                  class="custom-control-label d-flex align-items-center"
+                  :for="generateCheckboxId(libraryKey, props.formattedRow.id)"
+                >
+                  {{ libraryKey }}
+                </label>
+              </div>
+            </template>
           </template>
 
           <!-- print default data -->
@@ -58,7 +69,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import { generateCheckboxHTML } from '../helpers/generate-html';
 
 export default {
@@ -67,7 +78,6 @@ export default {
   },
   data: () => ({
     searchTerm: '',
-    availableLibraries: ['Immigration', 'California'],
     columns: [
       {
         field: 'id',
@@ -108,9 +118,10 @@ export default {
     ],
   }),
   computed: {
-    ...mapGetters('users', ['users']),
+    ...mapGetters('users', ['users', 'libraries', 'selected']),
   },
   methods: {
+    ...mapMutations('users', ['SET_CHECKED']),
     /** generate custom checkbox id */
     generateCheckboxId(library, id) {
       return `checkLib${library}${id}`;
@@ -137,14 +148,20 @@ export default {
       return middleName !== '-' ? `${firstName} ${middleName}` : firstName;
     },
 
-    // OLD DATATABLE
-    /** on checked event */
-    onCheckedLibrary({ id, checked, library }) {
-      // const nodes = document.querySelectorAll('td.libraries-checkboxes');
-      console.log({ id, checked, library });
+    onChange({ checked, library, index }) {
+      this.SET_CHECKED({ checked, library, index });
     },
-    isChecked(assignLibraries, library) {
-      return assignLibraries[library];
+
+    isChecked(index, key) {
+      return this.users[index].assignLibraries[key];
+    },
+
+    isDisabled(index, key) {
+      return this.selected[key] >= 3 && !this.isChecked(index, key);
+    },
+
+    displayLibraryCheckbox(key) {
+      return Object.keys(this.libraries).includes(key);
     },
   },
 };

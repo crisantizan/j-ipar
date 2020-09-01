@@ -74,6 +74,7 @@ export const actions = {
       //          firstName
       //          middleName
       //          lastName
+      //          email
       //          tenantCode
       //          isAttorney
       //          admin
