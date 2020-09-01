@@ -175,7 +175,7 @@
                         </label>
                       </div>
 
-                      <div class="text-success" v-if="isParent(plan)">
+                      <div class="text-success" v-if="planIsMain(plan.id)">
                         <b> Discount:</b> 5% for 12 months
                       </div>
 
@@ -205,6 +205,7 @@
                         :value="plan.users"
                         @change="
                           onChangeUsers({
+                            plan: plan,
                             value: Number($event.target.value),
                             index,
                           })
@@ -263,10 +264,10 @@ import gql from 'graphql-tag';
 export default {
   data: () => ({
     isProcesing: true,
-    coreIds: [
-      'price_1Gv7zkEHlNK1KgjMGy4WHzUf',
-      'price_1Gv80DEHlNK1KgjMaPRisapB',
-    ],
+    // coreIds: [
+    //   'price_1Gv7zkEHlNK1KgjMGy4WHzUf',
+    //   'price_1Gv80DEHlNK1KgjMaPRisapB',
+    // ],
   }),
   computed: {
     ...mapGetters('plans', [
@@ -275,7 +276,11 @@ export default {
       'totalPaid',
       'customer',
       'paymentMethods',
+      'defaultCheckedUsers',
+      'isDefaultCheckedUser',
+      'planIsMain',
     ]),
+
     paymentPeriod: {
       get() {
         return this.$store.getters['plans/period'];
@@ -338,12 +343,8 @@ export default {
       'SET_MONTHLY',
       'SET_YEARLY',
       'SET_CHECKED_OR_USERS',
+      'UPDATE_SPECIAL_USERS',
     ]),
-
-    /** verify if the current plan is included in "coreIds" */
-    isParent(plan) {
-      return this.coreIds.includes(plan.id);
-    },
 
     /** create payment method (with apollo) */
     async createPaymentMethod(stripe, card) {
@@ -402,7 +403,7 @@ export default {
 
       /** sort values */
       const sorted = plans.sort((a, b) => {
-        if (this.coreIds.includes(a.id)) {
+        if (this.planIsMain(a.id)) {
           return -1;
         }
 
@@ -419,7 +420,9 @@ export default {
         (acc, plan) => {
           switch (plan.interval) {
             case 'month':
-              const checked = checkedItems.some(v => v.id === plan.id);
+              const checked = this.defaultCheckedUsers.month.some(
+                v => v.id === plan.id,
+              );
 
               if (checked && totalChecked < 3) {
                 totalChecked++;
@@ -431,13 +434,13 @@ export default {
                   ...acc.month,
                   {
                     ...plan,
-                    checked: this.isParent(plan) || checked,
+                    checked: this.planIsMain(plan.id) || checked,
                     users: this.calcUsers(
                       plan.users,
                       checked,
                       totalChecked,
                       totalUsers,
-                      middle
+                      middle,
                     ),
                   },
                 ],
@@ -469,7 +472,19 @@ export default {
 
     /** on change users handler */
     onChangeUsers(data) {
-      // data { value, index });
+      // data { plan, value, index });
+      if (
+        this.planIsMain(data.plan.id) ||
+        this.isDefaultCheckedUser(data.plan)
+      ) {
+        this.UPDATE_SPECIAL_USERS({
+          value: data.value,
+          oldValue: data.plan.users,
+          index: data.index,
+        });
+        return;
+      }
+
       this.SET_CHECKED_OR_USERS({ prop: 'users', ...data });
     },
 

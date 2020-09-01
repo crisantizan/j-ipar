@@ -13,16 +13,19 @@ export const state = () => ({
   period: 'month',
   month: [],
   year: [],
-  // month: {
-  //   included: [],
-  //   notIncluded: [],
-  // },
-  // year: {
-  //   included: [],
-  //   notIncluded: [],
-  // },
   paymentMethods: [],
   customer: null,
+  defaultCheckedUsers: {
+    core: ['price_1Gv7zkEHlNK1KgjMGy4WHzUf', 'price_1Gv80DEHlNK1KgjMaPRisapB'],
+    month: [
+      { name: 'california', id: 'price_1GrnVtEHlNK1KgjMvTmvPR5f' },
+      { name: 'immigration', id: 'price_1GrnRoEHlNK1KgjMXEMUQh3q' },
+    ],
+    year: [
+      { name: 'california', id: 'price_1GrnVtEHlNK1KgjMs3hjm4MU' },
+      { name: 'immigration', id: 'price_1GrnTXEHlNK1KgjMULxeVjhQ' },
+    ],
+  },
 });
 
 export const mutations = {
@@ -56,6 +59,10 @@ export const mutations = {
     other[prop] = value;
   },
 
+  UPDATE_SPECIAL_USERS(state, { value, oldValue, index }) {
+    console.log({ value, oldValue, index });
+  },
+
   SET_PAYMENT_METHODS(state, payload) {
     // TODO:: "payload" is not an array, set to null while
     state.paymentMethods = Array.isArray(payload) ? payload : null;
@@ -81,6 +88,26 @@ export const getters = {
 
   totalPaid(state) {
     return state[state.period].reduce(helpers.calcTotalPaid, 0);
+  },
+
+  defaultCheckedUsers(state) {
+    return state.defaultCheckedUsers;
+  },
+
+  planIsMain(state) {
+    return id => state.defaultCheckedUsers.core.includes(id);
+  },
+
+  isDefaultCheckedUser({ defaultCheckedUsers, period }, getters) {
+    return plan => {
+      const index = getters.show.findIndex(v => v.id === plan.id);
+
+      if (index === -1) {
+        return false;
+      }
+
+      return defaultCheckedUsers[period].some(v => v.id === plan.id);
+    };
   },
 
   customer(state) {
