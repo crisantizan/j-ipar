@@ -100,12 +100,8 @@ export const mutations = {
       otherPlan = state[period][californiaIndex];
     }
 
-    // console.log({ isCalifornia });
-    // console.log({ ...otherPlan });
-
-    const total = oldValue + otherPlan.users;
-    // console.log({ oldValue, total });
-    otherPlan.users = total - value;
+    const mainPlan = this.getters['plans/mainPlan'](period);
+    mainPlan.users = plan.users + otherPlan.users;
   },
 
   SET_PAYMENT_METHODS(state, payload) {
@@ -145,7 +141,7 @@ export const getters = {
 
   mainPlan(state) {
     const ids = state.defaultCheckedUsers.core;
-    return state[state.period].find(v => ids.includes(v.id));
+    return period => state[period].find(v => ids.includes(v.id));
   },
 
   isDefaultCheckedUser({ defaultCheckedUsers, period }, getters) {

@@ -280,7 +280,6 @@ export default {
       'defaultCheckedUsers',
       'isDefaultCheckedUser',
       'planIsMain',
-      'mainPlan',
     ]),
 
     paymentPeriod: {
@@ -482,7 +481,7 @@ export default {
 
       const mirrorPeriod = this.paymentPeriod === 'month' ? 'year' : 'month';
 
-      // data { event, plan, value, index });
+      // update from main plan
       if (this.planIsMain(plan.id)) {
         this.UPDATE_SPECIAL_USERS({
           value,
@@ -502,13 +501,8 @@ export default {
         return;
       }
 
+      // update from children plans (specials only)
       if (this.isDefaultCheckedUser(plan)) {
-        if (Number(event.target.value) > this.mainPlan.users) {
-          // set old value
-          event.target.value = plan.users;
-          return;
-        }
-
         this.UPDATE_SPECIAL_USERS({
           value,
           oldValue: plan.users,
