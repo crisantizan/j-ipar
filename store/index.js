@@ -69,19 +69,19 @@ export const actions = {
       //         id
       //         invoiceSettings
       //       }
-
-      //       users {
-      //         id
-      //         firstName
-      //         middleName
-      //         lastName
-      //         email
-      //         tenantCode
-      //         isAttorney
-      //         admin
-      //         tenantCode
-      //         assignLibraries
-      //       }
+      //        users {
+      //          id
+      //          firstName
+      //          middleName
+      //          lastName
+      //          tenantCode
+      //          isAttorney
+      //          admin
+      //          tenantCode
+      //          active
+      //          assignLibraries
+      //          librariesQuantity
+      //        }
       //     }
       //   `,
       // });
