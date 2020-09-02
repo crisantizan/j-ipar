@@ -65,7 +65,7 @@ export const mutations = {
   },
 
   UPDATE_SPECIAL_USERS(state, { value, oldValue, index, isMain, period }) {
-    state[period][index] = value;
+    state[period][index].users = value;
   },
 
 

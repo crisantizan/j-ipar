@@ -1,154 +1,160 @@
 <template>
-    <vue-datatable :columns="columns" :rows="users" :pagination="false" class="mt-2">
-      <!-- available libraries -->
-      <template slot="header-right">
-        <div class="d-flex flex-column align-items-center">
-          <h5 class="text-right text-secondary" style="margin: .1rem 0 .1rem 0">
-            Availables Libraries
-          </h5>
-          <div class="text-right">
-            <span
-              v-for="(value, key) in libraries"
-              :key="key"
-              class="badge badge-pill badge-light text-secondary ml-1"
-              style="font-size: 14px; background: linear-gradient(#f4f5f8,#f1f3f6);"
-            >
-              {{ key }}
-              <span style="color: #000">{{ value - selected[key] }}</span></span
-            >
-          </div>
+  <vue-datatable
+    :columns="columns"
+    :rows="users"
+    :pagination="false"
+    class="mt-2"
+  >
+    <!-- available libraries -->
+    <template slot="header-right">
+      <div class="d-flex flex-column align-items-center">
+        <h5 class="text-right text-secondary" style="margin: .1rem 0 .1rem 0">
+          Availables Libraries
+        </h5>
+        <div class="text-right">
+          <span
+            v-for="(value, key) in libraries"
+            :key="key"
+            class="badge badge-pill badge-light text-secondary ml-1"
+            style="font-size: 14px; background: linear-gradient(#f4f5f8,#f1f3f6);"
+          >
+            {{ key }}
+            <span style="color: #000">{{ value - selected[key] }}</span></span
+          >
+        </div>
+      </div>
+    </template>
+    <!-- end available libraries -->
+
+    <!-- generate fullname -->
+    <template slot="table-row" slot-scope="props">
+      <template
+        v-if="isTheColumn(props.column.field, 'firstName', props.column.hidden)"
+      >
+        <span>{{ generateFullName(props.formattedRow) }}</span>
+      </template>
+
+      <!-- printo isAttorney checkbox -->
+      <template
+        v-else-if="
+          isTheColumn(props.column.field, 'isAttorney', props.column.hidden)
+        "
+      >
+        <div
+          class="custom-control custom-checkbox d-flex justify-content-center"
+        >
+          <input
+            type="checkbox"
+            class="custom-control-input"
+            :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
+            :value="libraryKey"
+            :checked="isAttorneyChecked(props.row.originalIndex)"
+            @change="
+              onChangeIsAttorney({
+                index: props.row.originalIndex,
+                checked: $event.target.checked,
+              })
+            "
+          />
+          <label
+            class="custom-control-label d-flex align-items-center"
+            :for="generateCheckboxId('isAttorney', props.formattedRow.id)"
+          >
+          </label>
         </div>
       </template>
-      <!-- end available libraries -->
 
-      <!-- generate fullname -->
-      <template slot="table-row" slot-scope="props">
+      <!-- generate checkboxes in "assignLibraries" field -->
+      <template
+        v-else-if="
+          isTheColumn(
+            props.column.field,
+            'assignLibraries',
+            props.column.hidden,
+          )
+        "
+      >
+        <!-- print only avaibales libraries -->
         <template
-          v-if="
-            isTheColumn(props.column.field, 'firstName', props.column.hidden)
-          "
-        >
-          <span>{{ generateFullName(props.formattedRow) }}</span>
-        </template>
-
-        <!-- printo isAttorney checkbox -->
-        <template
-          v-else-if="
-            isTheColumn(props.column.field, 'isAttorney', props.column.hidden)
-          "
+          v-for="(libraryValue, libraryKey) in props.formattedRow
+            .assignLibraries"
         >
           <div
-            class="custom-control custom-checkbox d-flex justify-content-center"
+            :key="libraryKey"
+            class="custom-control custom-checkbox d-flex"
+            v-if="displayLibraryCheckbox(libraryKey)"
           >
             <input
               type="checkbox"
               class="custom-control-input"
-              :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
+              :id="generateCheckboxId(libraryKey, props.formattedRow.id)"
               :value="libraryKey"
-              :checked="isAttorneyChecked(props.row.originalIndex)"
+              :checked="isChecked(props.row.originalIndex, libraryKey)"
+              :disabled="isDisabled(props.row.originalIndex, libraryKey)"
               @change="
-                onChangeIsAttorney({
-                  index: props.row.originalIndex,
+                onChange({
                   checked: $event.target.checked,
+                  library: $event.target.value,
+                  index: props.row.originalIndex,
                 })
               "
             />
             <label
               class="custom-control-label d-flex align-items-center"
-              :for="generateCheckboxId('isAttorney', props.formattedRow.id)"
+              :for="generateCheckboxId(libraryKey, props.formattedRow.id)"
             >
+              {{ libraryKey }}
             </label>
           </div>
         </template>
-
-        <!-- generate checkboxes in "assignLibraries" field -->
-        <template
-          v-else-if="
-            isTheColumn(
-              props.column.field,
-              'assignLibraries',
-              props.column.hidden,
-            )
-          "
-        >
-          <!-- print only avaibales libraries -->
-          <template
-            v-for="(libraryValue, libraryKey) in props.formattedRow
-              .assignLibraries"
-          >
-            <div
-              :key="libraryKey"
-              class="custom-control custom-checkbox d-flex"
-              v-if="displayLibraryCheckbox(libraryKey)"
-            >
-              <input
-                type="checkbox"
-                class="custom-control-input"
-                :id="generateCheckboxId(libraryKey, props.formattedRow.id)"
-                :value="libraryKey"
-                :checked="isChecked(props.row.originalIndex, libraryKey)"
-                :disabled="isDisabled(props.row.originalIndex, libraryKey)"
-                @change="
-                  onChange({
-                    checked: $event.target.checked,
-                    library: $event.target.value,
-                    index: props.row.originalIndex,
-                  })
-                "
-              />
-              <label
-                class="custom-control-label d-flex align-items-center"
-                :for="generateCheckboxId(libraryKey, props.formattedRow.id)"
-              >
-                {{ libraryKey }}
-              </label>
-            </div>
-          </template>
-        </template>
-
-        <!-- generate buttons in actions field -->
-        <template
-          v-else-if="
-            isTheColumn(props.column.field, 'actions', props.column.hidden)
-          "
-        >
-          <div class="dropdown">
-            <button
-              class="btn btn-primary dropdown-toggle btn-sm"
-              type="button"
-              id="dropdownMenuButton"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Actions
-              <div class="arrow-down"></div>
-            </button>
-
-            <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-cogs mr-1"></i>
-                Relations
-              </a>
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-paper-plane mr-1"></i>
-                Resend Email
-              </a>
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-thumbs-down mr-1"></i>
-                Disable
-              </a>
-            </div>
-          </div>
-        </template>
-
-        <!-- print default data -->
-        <span v-else>
-          {{ props.formattedRow[props.column.field] }}
-        </span>
       </template>
-    </vue-datatable>
 
+      <!-- generate buttons in actions field -->
+      <template
+        v-else-if="
+          isTheColumn(props.column.field, 'actions', props.column.hidden)
+        "
+      >
+        <div class="dropdown">
+          <button
+            class="btn btn-primary dropdown-toggle btn-sm"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Actions
+            <div class="arrow-down"></div>
+          </button>
+
+          <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">
+              <i class="fas fa-cogs mr-1"></i>
+              Relations
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="fas fa-paper-plane mr-1"></i>
+              Resend Email
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="fas fa-thumbs-down mr-1"></i>
+              Disable
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="fas fa-key mr-1"></i>
+              Reset password
+            </a>
+          </div>
+        </div>
+      </template>
+
+      <!-- print default data -->
+      <span v-else>
+        {{ props.formattedRow[props.column.field] }}
+      </span>
+    </template>
+  </vue-datatable>
 </template>
 
 <script>
