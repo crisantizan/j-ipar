@@ -280,6 +280,7 @@ export default {
       'defaultCheckedUsers',
       'isDefaultCheckedUser',
       'planIsMain',
+      'getDefaultCheckedPlansUsers',
     ]),
 
     paymentPeriod: {
@@ -483,6 +484,14 @@ export default {
 
       // update from main plan
       if (this.planIsMain(plan.id)) {
+        const { immigration, california } = this.getDefaultCheckedPlansUsers;
+        const minValue = immigration.value + california.value;
+
+        if (value < minValue) {
+          value = minValue;
+          event.target.value = minValue;
+        }
+
         this.UPDATE_SPECIAL_USERS({
           value,
           oldValue: plan.users,
@@ -498,6 +507,7 @@ export default {
           isMain: true,
           period: mirrorPeriod,
         });
+
         return;
       }
 
