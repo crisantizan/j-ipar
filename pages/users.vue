@@ -3,21 +3,30 @@
     <h1>Users</h1>
     <div class="card-box mt-2">
       <vue-datatable :columns="columns" :rows="users">
+        <!-- available libraries -->
         <template slot="header-right">
-          <div>
-            <h5 class="text-right" style="margin: .1rem 0 .1rem 0">
-              Libraries availables
+          <div class="d-flex flex-column align-items-center">
+            <h5
+              class="text-right text-secondary"
+              style="margin: .1rem 0 .1rem 0"
+            >
+              Availables Libraries
             </h5>
             <div class="text-right">
-              <span class="badge badge-info" style="font-size: 13px;"
-                >California 2</span
-              >
-              <span class="badge badge-warning" style="font-size: 13px;"
-                >California 3</span
+              <span
+                v-for="(value, key) in libraries"
+                :key="key"
+                class="badge badge-pill badge-light text-secondary"
+                style="font-size: 14px; background: linear-gradient(#f4f5f8,#f1f3f6);"
+                >
+                {{ key }}
+                <span style="color: #000">{{ value - selected[key] }}</span></span
               >
             </div>
           </div>
         </template>
+        <!-- end available libraries -->
+
         <!-- generate fullname -->
         <template slot="table-row" slot-scope="props">
           <template
