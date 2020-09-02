@@ -41,3 +41,12 @@ th[class^='vgt'] {
   opacity: 0;
   transform-origin: 50% 50%;
 }
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+}
+
+.btn-icon i {
+  margin-right: .3rem;
+}

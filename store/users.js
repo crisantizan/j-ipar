@@ -62,6 +62,10 @@ export const getters = {
     );
   },
 
+  librariesQuantity(state) {
+    return state.librariesQuantity;
+  },
+
   selected(state) {
     return state.users.reduce(
       (acc, user) => {

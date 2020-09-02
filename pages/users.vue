@@ -88,6 +88,18 @@
             </template>
           </template>
 
+          <!-- generate buttons in actions field -->
+          <template
+            v-else-if="
+              isTheColumn(props.column.field, 'actions', props.column.hidden)
+            "
+          >
+            <button class="btn btn-danger btn-sm btn-icon">
+              <i class="fas fa-thumbs-down"></i>
+              Disable
+            </button>
+          </template>
+
           <!-- print default data -->
           <span v-else>
             {{ props.formattedRow[props.column.field] }}
@@ -153,10 +165,16 @@ export default {
         toggle: true,
         hidden: false,
       },
+      {
+        field: 'actions',
+        sortable: false,
+        toggle: true,
+        label: 'Actions',
+      },
     ],
   }),
   computed: {
-    ...mapGetters('users', ['users', 'libraries', 'selected']),
+    ...mapGetters('users', ['users', 'libraries', 'selected', 'librariesQuantity']),
   },
   methods: {
     ...mapMutations('users', ['SET_CHECKED', 'SET_IS_ATTORNEY_CHECKED']),
@@ -204,7 +222,7 @@ export default {
     },
 
     isDisabled(index, key) {
-      return this.selected[key] >= 3 && !this.isChecked(index, key);
+      return this.selected[key] >= this.librariesQuantity[key] && !this.isChecked(index, key);
     },
 
     displayLibraryCheckbox(key) {
