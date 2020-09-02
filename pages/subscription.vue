@@ -384,15 +384,6 @@ export default {
       }
     },
 
-    /** calculate "users" property value */
-    calcUsers(currentValue, isChecked, totalChecked, totalUsers, middle) {
-      if (!isChecked) {
-        return currentValue;
-      }
-
-      return isChecked && totalChecked === 1 ? totalUsers - middle : middle;
-    },
-
     /** show plans filtered */
     getFilteredPlans() {
       const plans = [...this.plans];
@@ -411,9 +402,6 @@ export default {
 
         return 1;
       });
-
-      const totalUsers = sorted[0].users;
-      const middle = Math.floor(totalUsers / 2);
 
       let totalChecked = 0;
 
@@ -437,13 +425,7 @@ export default {
                   {
                     ...plan,
                     checked: this.planIsMain(plan.id) || checked,
-                    users: this.calcUsers(
-                      plan.users,
-                      checked,
-                      totalChecked,
-                      totalUsers,
-                      middle,
-                    ),
+                    users: 0,
                   },
                 ],
               };
