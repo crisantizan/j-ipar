@@ -94,10 +94,34 @@
               isTheColumn(props.column.field, 'actions', props.column.hidden)
             "
           >
-            <button class="btn btn-danger btn-sm btn-icon">
-              <i class="fas fa-thumbs-down"></i>
-              Disable
-            </button>
+            <div class="dropdown">
+              <button
+                class="btn btn-primary dropdown-toggle btn-sm"
+                type="button"
+                id="dropdownMenuButton"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Actions
+               <div class="arrow-down"></div>
+              </button>
+
+              <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-cogs mr-1"></i>
+                  Relations
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-paper-plane mr-1"></i>
+                  Resend Email
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-thumbs-down mr-1"></i>
+                  Disable
+                </a>
+              </div>
+            </div>
           </template>
 
           <!-- print default data -->
@@ -168,13 +192,19 @@ export default {
       {
         field: 'actions',
         sortable: false,
+        hidden: false,
         toggle: true,
         label: 'Actions',
       },
     ],
   }),
   computed: {
-    ...mapGetters('users', ['users', 'libraries', 'selected', 'librariesQuantity']),
+    ...mapGetters('users', [
+      'users',
+      'libraries',
+      'selected',
+      'librariesQuantity',
+    ]),
   },
   methods: {
     ...mapMutations('users', ['SET_CHECKED', 'SET_IS_ATTORNEY_CHECKED']),
@@ -222,7 +252,10 @@ export default {
     },
 
     isDisabled(index, key) {
-      return this.selected[key] >= this.librariesQuantity[key] && !this.isChecked(index, key);
+      return (
+        this.selected[key] >= this.librariesQuantity[key] &&
+        !this.isChecked(index, key)
+      );
     },
 
     displayLibraryCheckbox(key) {
