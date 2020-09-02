@@ -2,11 +2,15 @@
   <client-only>
     <div class="table-wrapper">
       <!-- custom header -->
-      <div class="d-flex mb-2">
-        <!-- search input component -->
-        <search-input v-model="searchTerm" />
-        <!-- columns toggle button component -->
-        <columns-toggle-button :columns="toggleColumnList" />
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex">
+          <!-- search input component -->
+          <search-input v-model="searchTerm" />
+          <!-- columns toggle button component -->
+          <columns-toggle-button :columns="toggleColumnList" />
+        </div>
+
+        <slot name="header-right"></slot>
       </div>
       <!-- end custom header -->
 

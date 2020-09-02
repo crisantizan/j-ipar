@@ -3,6 +3,21 @@
     <h1>Users</h1>
     <div class="card-box mt-2">
       <vue-datatable :columns="columns" :rows="users">
+        <template slot="header-right">
+          <div>
+            <h5 class="text-right" style="margin: .1rem 0 .1rem 0">
+              Libraries availables
+            </h5>
+            <div class="text-right">
+              <span class="badge badge-info" style="font-size: 13px;"
+                >California 2</span
+              >
+              <span class="badge badge-warning" style="font-size: 13px;"
+                >California 3</span
+              >
+            </div>
+          </div>
+        </template>
         <!-- generate fullname -->
         <template slot="table-row" slot-scope="props">
           <template
@@ -104,10 +119,13 @@
                 aria-expanded="false"
               >
                 Actions
-               <div class="arrow-down"></div>
+                <div class="arrow-down"></div>
               </button>
 
-              <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
+              <div
+                class="dropdown-menu p-0"
+                aria-labelledby="dropdownMenuButton"
+              >
                 <a class="dropdown-item" href="#">
                   <i class="fas fa-cogs mr-1"></i>
                   Relations

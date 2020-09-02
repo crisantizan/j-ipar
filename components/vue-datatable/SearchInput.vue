@@ -8,7 +8,7 @@
       :value="$props.value"
       @input="$emit('input', $event.target.value)"
     />
-    <div class="btn btn-primary" style="cursor: default;">
+    <div class="btn btn-primary" style="cursor: default; height: 37.4px;">
       <i class="fa fa-search" aria-hidden="true"></i>
     </div>
   </div>
