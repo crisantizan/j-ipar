@@ -82,30 +82,30 @@ export const mutations = {
     //   return;
     // }
 
-    const { california, immigration } = this.getters[
-      'plans/getDefaultCheckedPlansUsers'
-    ];
+    // const { california, immigration } = this.getters[
+    //   'plans/getDefaultCheckedPlans'
+    // ];
 
-    let otherPlan = {};
-    const isCalifornia = plan.id === california.id;
+    // let otherPlan = {};
+    // const isCalifornia = plan.id === california.id;
 
-    if (isCalifornia) {
-      otherPlan = state[period][california.index];
-    } else {
-      otherPlan = state[period][immigration.index];
-    }
+    // if (isCalifornia) {
+    //   otherPlan = state[period][california.index];
+    // } else {
+    //   otherPlan = state[period][immigration.index];
+    // }
 
-    const isIncrement = value > oldValue;
-    const diff = isIncrement ? value - oldValue : oldValue - value;
+    // const isIncrement = value > oldValue;
+    // const diff = isIncrement ? value - oldValue : oldValue - value;
 
-    const mainPlan = this.getters['plans/mainPlan'](period);
+    // const mainPlan = this.getters['plans/mainPlan'](period);
 
-    if (isIncrement) {
-      mainPlan.users += diff;
-      return;
-    }
+    // if (isIncrement) {
+    //   mainPlan.users += diff;
+    //   return;
+    // }
 
-    mainPlan.users -= diff;
+    // mainPlan.users -= diff;
   },
 
   //   if (mainPlan.users - diff < plan.users + otherPlan.users) {
@@ -148,7 +148,7 @@ export const getters = {
     return state.defaultCheckedUsers;
   },
 
-  getDefaultCheckedPlansUsers(state) {
+  getDefaultCheckedPlans(state) {
     // by period selected
     const [california, immigration] = state.defaultCheckedUsers[state.period];
 
@@ -162,11 +162,11 @@ export const getters = {
 
     return {
       california: {
-        value: state[state.period][californiaIndex].users,
+        value: state[state.period][californiaIndex],
         index: californiaIndex,
       },
       immigration: {
-        value: state[state.period][immigrationIndex].users,
+        value: state[state.period][immigrationIndex],
         index: immigrationIndex,
       },
     };

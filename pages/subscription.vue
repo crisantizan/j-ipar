@@ -280,7 +280,8 @@ export default {
       'defaultCheckedUsers',
       'isDefaultCheckedUser',
       'planIsMain',
-      'getDefaultCheckedPlansUsers',
+      'mainPlan',
+      'getDefaultCheckedPlans',
     ]),
 
     paymentPeriod: {
@@ -463,15 +464,14 @@ export default {
       }
 
       const mirrorPeriod = this.paymentPeriod === 'month' ? 'year' : 'month';
+      const { immigration, california } = this.getDefaultCheckedPlans;
 
       // update from main plan
       if (this.planIsMain(plan.id)) {
-        const { immigration, california } = this.getDefaultCheckedPlansUsers;
-        const minValue = immigration.value + california.value;
-
-        if (value < minValue) {
-          value = minValue;
-          event.target.value = minValue;
+        const sum = immigration.value.users + california.value.users;
+        if (value < sum) {
+          value = sum;
+          event.target.value = sum;
         }
 
         this.UPDATE_SPECIAL_USERS({
@@ -495,6 +495,25 @@ export default {
 
       // update from children plans (specials only)
       if (this.isDefaultCheckedUser(plan)) {
+        const mainPlan = this.mainPlan(this.paymentPeriod);
+
+        const isCalifornia = plan.id === california.value.id;
+        const otherPlan = isCalifornia ? immigration.value : california.value;
+
+        const min = mainPlan.users - otherPlan.users;
+
+        if (value + otherPlan.users > mainPlan.users) {
+          value = min;
+          event.target.value = min;
+        }
+
+        // const totalValue = value + otherPlan.users;
+
+        // if (totalValue > mainPlan.users) {
+        //   value = min;
+        //   event.target.value = min;
+        // }
+
         this.UPDATE_SPECIAL_USERS({
           value,
           oldValue: plan.users,
