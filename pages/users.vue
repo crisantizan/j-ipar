@@ -16,7 +16,7 @@
               <span
                 v-for="(value, key) in libraries"
                 :key="key"
-                class="badge badge-pill badge-light text-secondary"
+                class="badge badge-pill badge-light text-secondary ml-1"
                 style="font-size: 14px; background: linear-gradient(#f4f5f8,#f1f3f6);"
                 >
                 {{ key }}
