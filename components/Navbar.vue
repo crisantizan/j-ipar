@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="navbar navbar-expand-lg navbar-dark"
+    class="navbar navbar-expand-lg navbar-dark fixed-top"
     style="background-color: #2d5f8b"
   >
     <a class="navbar-brand" href="#">

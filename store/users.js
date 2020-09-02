@@ -23,27 +23,6 @@ export const mutations = {
   SET_IS_ATTORNEY_CHECKED(state, { index, checked }) {
     state.users[index].isAttorney = checked;
   },
-
-  // SET_CHECKED(state, { id, checked, library }) {
-  //   // search user
-  //   const user = state.users.find(user => user.id === id);
-
-  //   if (!user) {
-  //     return;
-  //   }
-
-  //   user.assignLibraries.forEach((val, index) => {
-  //     // set new value
-  //     if (val === library) {
-  //       user.assignLibraries[index] = checked;
-  //       return;
-  //     }
-  //   });
-  // },
-
-  UPDATE_LIBRARY_QUANTITY(state, library) {
-    // state.librariesQuantity[]
-  },
 };
 
 export const getters = {

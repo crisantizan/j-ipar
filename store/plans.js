@@ -65,57 +65,9 @@ export const mutations = {
   },
 
   UPDATE_SPECIAL_USERS(state, { value, oldValue, index, isMain, period }) {
-    const plan = state[period][index];
-
-    plan.users = value;
-
-    if (isMain) {
-      return;
-    }
-
-    // if (isMain) {
-    // const middle = Math.floor(value / 2);
-
-    // // update both
-    // state[period][californiaIndex].users = value - middle;
-    // state[period][immigrationIndex].users = middle;
-    //   return;
-    // }
-
-    // const { california, immigration } = this.getters[
-    //   'plans/getDefaultCheckedPlans'
-    // ];
-
-    // let otherPlan = {};
-    // const isCalifornia = plan.id === california.id;
-
-    // if (isCalifornia) {
-    //   otherPlan = state[period][california.index];
-    // } else {
-    //   otherPlan = state[period][immigration.index];
-    // }
-
-    // const isIncrement = value > oldValue;
-    // const diff = isIncrement ? value - oldValue : oldValue - value;
-
-    // const mainPlan = this.getters['plans/mainPlan'](period);
-
-    // if (isIncrement) {
-    //   mainPlan.users += diff;
-    //   return;
-    // }
-
-    // mainPlan.users -= diff;
+    state[period][index] = value;
   },
 
-  //   if (mainPlan.users - diff < plan.users + otherPlan.users) {
-  //     mainPlan = plan.users + otherPlan.users;
-  //   }
-
-  //   const currentValue = mainPlan.users;
-  //   const diff = currentValue - plan.users + otherPlan.users;
-  //   mainPlan.users = plan.users + otherPlan.users;
-  // },
 
   SET_PAYMENT_METHODS(state, payload) {
     // TODO:: "payload" is not an array, set to null while

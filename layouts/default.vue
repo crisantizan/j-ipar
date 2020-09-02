@@ -1,7 +1,7 @@
 <template>
   <div>
-    <navbar />
-    <div class="container-fluid">
+    <navbar/>
+    <div class="container-fluid" style="margin-top: 69.6px;">
       <Nuxt />
     </div>
   </div>
