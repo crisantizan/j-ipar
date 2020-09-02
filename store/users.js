@@ -20,6 +20,10 @@ export const mutations = {
     state.users[index].assignLibraries[library] = checked;
   },
 
+  SET_IS_ATTORNEY_CHECKED(state, { index, checked }) {
+    state.users[index].isAttorney = checked;
+  },
+
   // SET_CHECKED(state, { id, checked, library }) {
   //   // search user
   //   const user = state.users.find(user => user.id === id);

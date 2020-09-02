@@ -2,7 +2,7 @@
   <div>
     <h1>Users</h1>
     <div class="card-box mt-2">
-      <vue-datatable :columns="columns" :rows="users" :pagination="false">
+      <vue-datatable :columns="columns" :rows="users">
         <!-- generate fullname -->
         <template slot="table-row" slot-scope="props">
           <template
@@ -11,6 +11,36 @@
             "
           >
             <span>{{ generateFullName(props.formattedRow) }}</span>
+          </template>
+
+          <!-- printo isAttorney checkbox -->
+          <template
+            v-else-if="
+              isTheColumn(props.column.field, 'isAttorney', props.column.hidden)
+            "
+          >
+            <div
+              class="custom-control custom-checkbox d-flex justify-content-center"
+            >
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
+                :value="libraryKey"
+                :checked="isAttorneyChecked(props.row.originalIndex)"
+                @change="
+                  onChangeIsAttorney({
+                    index: props.row.originalIndex,
+                    checked: $event.target.checked,
+                  })
+                "
+              />
+              <label
+                class="custom-control-label d-flex align-items-center"
+                :for="generateCheckboxId('isAttorney', props.formattedRow.id)"
+              >
+              </label>
+            </div>
           </template>
 
           <!-- generate checkboxes in "assignLibraries" field -->
@@ -109,6 +139,14 @@ export default {
         formatFn: isAdmin => (isAdmin ? 'Admin' : 'User'),
       },
       {
+        field: 'isAttorney',
+        label: 'Is Attorney',
+        hidden: false,
+        toggle: true,
+        type: 'boolean',
+        thClass: 'text-center',
+      },
+      {
         field: 'assignLibraries',
         label: 'Libraries',
         sortable: false,
@@ -121,7 +159,7 @@ export default {
     ...mapGetters('users', ['users', 'libraries', 'selected']),
   },
   methods: {
-    ...mapMutations('users', ['SET_CHECKED']),
+    ...mapMutations('users', ['SET_CHECKED', 'SET_IS_ATTORNEY_CHECKED']),
     /** generate custom checkbox id */
     generateCheckboxId(library, id) {
       return `checkLib${library}${id}`;
@@ -152,8 +190,17 @@ export default {
       this.SET_CHECKED({ checked, library, index });
     },
 
+    onChangeIsAttorney(data) {
+      // data: { index, checked }
+      this.SET_IS_ATTORNEY_CHECKED(data);
+    },
+
     isChecked(index, key) {
       return this.users[index].assignLibraries[key];
+    },
+
+    isAttorneyChecked(index) {
+      return this.users[index].isAttorney;
     },
 
     isDisabled(index, key) {
