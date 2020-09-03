@@ -12,7 +12,7 @@
           aria-haspopup="true"
           aria-expanded="false"
         >
-          {{ perPage }}
+          {{ byPage }}
         </button>
         <div
           class="dropdown-menu p-0"
@@ -20,7 +20,7 @@
           aria-labelledby="dropdownMenuButton"
         >
           <a
-            v-for="item of perPageDropdown"
+            v-for="item of $props.perPageDropdown"
             :key="item"
             class="dropdown-item"
             href="#"
@@ -93,25 +93,33 @@ export default {
     total: {
       type: Number,
       required: true,
+    },  
+    perPageDropdown: {
+      type: Array,
+      required: true,
+    },
+    perPage: {
+      type: Number,
+      required: true,
     },
   },
   data: () => ({
-    perPageDropdown: [5, 10, 15, 20],
-    perPage: 5,
+    // perPageDropdown: [5, 10, 15, 20],
+    byPage: 0,
     page: 1,
   }),
   computed: {
     totalPages() {
-      return Math.ceil(this.$props.total / this.perPage);
+      return Math.ceil(this.$props.total / this.byPage);
     },
 
     /** show message with pagination data */
     showPaginationData() {
       const { total } = this.$props;
-      const { perPage, page } = this;
+      const { page, byPage } = this;
 
-      const row = page * perPage - (perPage - 1);
-      let endRow = row + perPage - 1;
+      const row = page * byPage - (byPage - 1);
+      let endRow = row + byPage - 1;
 
       if (endRow > total) {
         endRow = total;
@@ -129,7 +137,7 @@ export default {
     },
   },
   created() {
-    this.customPerPageChange(this.perPage);
+    this.customPerPageChange(this.$props.perPage);
   },
   methods: {
     /** updaye "page" value on dtatable */
@@ -140,7 +148,7 @@ export default {
 
     /** update "perPage" value on datatable */
     customPerPageChange(customPerPage) {
-      this.perPage = customPerPage;
+      this.byPage = customPerPage;
       this.page = 1;
       this.perPageChanged({ currentPerPage: customPerPage });
     },

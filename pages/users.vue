@@ -2,8 +2,12 @@
   <vue-datatable
     :columns="columns"
     :rows="users"
-    :pagination="false"
     class="mt-2"
+    :pagination="{
+      enabled: true,
+      perPageDropdown: [5, 10, 15, 20, 50, 100],
+      perPage: 100,
+    }"
   >
     <!-- available libraries -->
     <template slot="header-right">
@@ -44,7 +48,6 @@
             type="checkbox"
             class="custom-control-input"
             :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
-            :value="libraryKey"
             :checked="isAttorneyChecked(props.row.originalIndex)"
             @change="
               onChangeIsAttorney({
