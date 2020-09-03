@@ -7,20 +7,17 @@
   >
     <!-- available libraries -->
     <template slot="header-right">
-      <div class="d-flex flex-column align-items-center">
-        <h5 class="text-right text-secondary" style="margin: .1rem 0 .1rem 0">
-          Availables Libraries
-        </h5>
+      <div class="d-flex">
         <div class="text-right">
-          <span
+          <div
             v-for="(value, key) in libraries"
             :key="key"
-            class="badge badge-pill badge-light text-secondary ml-1"
+            class="badge badge-pill badge-light text-success ml-1 d-block mb-no-last"
+            :class="{ 'text-danger': selected[key] === librariesQuantity[key]}"
             style="font-size: 14px; background: linear-gradient(#f4f5f8,#f1f3f6);"
           >
-            {{ key }}
-            <span style="color: #000">{{ value - selected[key] }}</span></span
-          >
+            {{ selected[key] }}/{{ librariesQuantity[key] }} {{ key }}
+          </div>
         </div>
       </div>
     </template>
@@ -287,3 +284,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  .mb-no-last:not(:last-child) {
+    margin-bottom: .3rem;
+  }
+
+</style>
