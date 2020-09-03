@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="card-box p-3 mb-0">
+    <div class="p-3 mb-0">
       <div class="table-wrapper">
         <!-- custom header -->
         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -19,6 +19,7 @@
           styleClass="vgt-table my-table table-hover"
           :columns="$props.columns"
           :rows="$props.rows"
+          max-height="400px"
           :pagination-options="{
             enabled: $props.pagination,
             mode: 'pages',

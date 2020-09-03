@@ -2,6 +2,10 @@
   font-family: 'Roboto', sans-serif;
 }
 
+body {
+  background: #fff;
+}
+
 .h1,
 .h2,
 .h3,
@@ -20,6 +24,12 @@ h6 {
 td[class^='vgt'],
 th[class^='vgt'] {
   animation: fadeIn ease 300ms;
+}
+
+th[class^='vgt'] {
+  position: sticky !important;
+  top: 0;
+  z-index: 100;
 }
 
 @keyframes fadeIn {
@@ -48,5 +58,5 @@ th[class^='vgt'] {
 }
 
 .btn-icon i {
-  margin-right: .3rem;
+  margin-right: 0.3rem;
 }

@@ -197,6 +197,7 @@ export default {
       {
         field: 'isAttorney',
         label: 'Is Attorney',
+        sortable: false,
         hidden: false,
         toggle: true,
         type: 'boolean',
