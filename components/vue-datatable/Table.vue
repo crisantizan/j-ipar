@@ -17,7 +17,6 @@
 
         <vue-good-table
           styleClass="vgt-table my-table table-hover"
-          compactMode
           :columns="$props.columns"
           :rows="$props.rows"
           :pagination-options="{

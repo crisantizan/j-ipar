@@ -478,16 +478,16 @@ export default {
           value,
           oldValue: plan.users,
           index,
-          isMain: true,
           period: this.paymentPeriod,
+          mainPlan: null,
         });
 
         this.UPDATE_SPECIAL_USERS({
           value,
           oldValue: plan.users,
           index,
-          isMain: true,
           period: mirrorPeriod,
+          mainPlan: null,
         });
 
         return;
@@ -500,34 +500,31 @@ export default {
         const isCalifornia = plan.id === california.value.id;
         const otherPlan = isCalifornia ? immigration.value : california.value;
 
-        const min = mainPlan.users - otherPlan.users;
+        // const min = mainPlan.value.users - otherPlan.users;
+        let mainValues = null;
 
-        if (value + otherPlan.users > mainPlan.users) {
-          value = min;
-          event.target.value = min;
+        // update main plan
+        if (value + otherPlan.users > mainPlan.value.users) {
+          mainValues = {
+            newValue: value + otherPlan.users,
+            index: mainPlan.index,
+          }
         }
-
-        // const totalValue = value + otherPlan.users;
-
-        // if (totalValue > mainPlan.users) {
-        //   value = min;
-        //   event.target.value = min;
-        // }
 
         this.UPDATE_SPECIAL_USERS({
           value,
           oldValue: plan.users,
           index,
-          isMain: false,
           period: this.paymentPeriod,
+          mainPlan: mainValues,
         });
 
         this.UPDATE_SPECIAL_USERS({
           value,
           oldValue: plan.users,
           index,
-          isMain: false,
           period: mirrorPeriod,
+          mainPlan: mainValues,
         });
       }
     },

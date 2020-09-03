@@ -64,10 +64,14 @@ export const mutations = {
     state.lastChangedPlan = id;
   },
 
-  UPDATE_SPECIAL_USERS(state, { value, oldValue, index, isMain, period }) {
+  UPDATE_SPECIAL_USERS(state, { value, oldValue, index, period, mainPlan }) {
     state[period][index].users = value;
-  },
 
+    // update main value
+    if (mainPlan !== null) {
+      state[period][mainPlan.index].users = mainPlan.newValue;
+    }
+  },
 
   SET_PAYMENT_METHODS(state, payload) {
     // TODO:: "payload" is not an array, set to null while
@@ -130,7 +134,11 @@ export const getters = {
 
   mainPlan(state) {
     const ids = state.defaultCheckedUsers.core;
-    return period => state[period].find(v => ids.includes(v.id));
+
+    return period => {
+      const index = state[period].findIndex(v => ids.includes(v.id));
+      return { index, value: state[period][index] };
+    };
   },
 
   isDefaultCheckedUser({ defaultCheckedUsers, period }, getters) {
