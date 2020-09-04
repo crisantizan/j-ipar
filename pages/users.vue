@@ -5,7 +5,7 @@
   >
     <vue-datatable
       :columns="columns"
-      :rows="users"
+      :rows="showedUsers"
       class="w-100"
       :pagination="{
         enabled: true,
@@ -60,7 +60,6 @@
           "
         >
           <span>{{ generateFullName(props.formattedRow) }}</span>
-          <small>{{ props.formattedRow.active }}</small>
         </template>
 
         <!-- printo isAttorney checkbox -->
@@ -161,7 +160,7 @@
             </button>
 
             <div
-              class="dropdown-menu dropdown-menu-left"
+              class="dropdown-menu dropdown-menu-right p-0"
               aria-labelledby="dropdownMenuButton"
             >
               <a
@@ -178,7 +177,7 @@
                 @click="
                   onClickAction({
                     action: action.action,
-                    userIndex: props.row.originalIndex,
+                    userId: props.formattedRow.id,
                   })
                 "
               >
@@ -313,6 +312,16 @@ export default {
       'selected',
       'librariesQuantity',
     ]),
+
+    showedUsers() {
+      // show only actived users
+      if (!this.showDisabledUsers) {
+        return this.users.filter(user => user.active);
+      }
+
+      // show all
+      return this.users;
+    }
   },
   methods: {
     ...mapMutations('users', [
@@ -378,18 +387,14 @@ export default {
       return row.active ? '' : 'disabled';
     },
 
-    /** on change disabled users checkbox **/
-    /*    onChangeDisabledUsers(checked) {
-      const currentAction = checked ? ''
-      const enabledIndex = this.userActions.findIndex(v => v.action)
-    },*/
-
     /** on click user action **/
-    onClickAction({ action, userIndex }) {
+    onClickAction({ action, userId }) {
       switch (action) {
         case 'disable':
-          const isActive = this.users[userIndex].active;
-          this.SET_ACTIVE({ index: userIndex, value: !isActive });
+          const index = this.users.findIndex(user => user.id === userId);
+          const isActive = this.users[index].active;
+
+          this.SET_ACTIVE({ index: index, value: !isActive });
           break;
 
         default:
