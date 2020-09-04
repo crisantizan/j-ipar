@@ -1,160 +1,166 @@
 <template>
-  <vue-datatable
-    :columns="columns"
-    :rows="users"
-    class="mt-2"
-    :pagination="{
-      enabled: true,
-      perPageDropdown: [5, 10, 15, 20, 50, 100],
-      perPage: 100,
-    }"
-  >
-    <!-- available libraries -->
-    <template slot="header-right">
-      <div class="d-flex">
-        <div class="text-right">
-          <div
-            v-for="(value, key) in libraries"
-            :key="key"
-            class="badge badge-pill badge-light text-success ml-1 d-block mb-no-last"
-            :class="{ 'text-danger': selected[key] === librariesQuantity[key]}"
-            style="font-size: 14px; background: linear-gradient(#f4f5f8,#f1f3f6);"
-          >
-            {{ selected[key] }}/{{ librariesQuantity[key] }} {{ key }}
+  <div class="d-flex align-items-center" style="min-height: calc(100vh - 69.6px);">
+    <vue-datatable
+      :columns="columns"
+      :rows="users"
+      class="w-100"
+      :pagination="{
+        enabled: true,
+        perPageDropdown: [5, 10, 15, 20, 50, 100],
+        perPage: 100,
+      }"
+    >
+      <!-- available libraries -->
+      <template slot="header-right">
+        <div class="d-flex">
+          <div class="text-right">
+            <div
+              v-for="(value, key) in libraries"
+              :key="key"
+              class="badge badge-pill badge-light text-success ml-1 d-block mb-no-last"
+              :class="{
+                'text-danger': selected[key] === librariesQuantity[key],
+              }"
+              style="font-size: 14px; background: linear-gradient(#f4f5f8,#f1f3f6);"
+            >
+              {{ selected[key] }}/{{ librariesQuantity[key] }} {{ key }}
+            </div>
           </div>
         </div>
-      </div>
-    </template>
-    <!-- end available libraries -->
-
-    <!-- generate fullname -->
-    <template slot="table-row" slot-scope="props">
-      <template
-        v-if="isTheColumn(props.column.field, 'firstName', props.column.hidden)"
-      >
-        <span>{{ generateFullName(props.formattedRow) }}</span>
       </template>
+      <!-- end available libraries -->
 
-      <!-- printo isAttorney checkbox -->
-      <template
-        v-else-if="
-          isTheColumn(props.column.field, 'isAttorney', props.column.hidden)
-        "
-      >
-        <div
-          class="custom-control custom-checkbox d-flex justify-content-center"
-        >
-          <input
-            type="checkbox"
-            class="custom-control-input"
-            :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
-            :checked="isAttorneyChecked(props.row.originalIndex)"
-            @change="
-              onChangeIsAttorney({
-                index: props.row.originalIndex,
-                checked: $event.target.checked,
-              })
-            "
-          />
-          <label
-            class="custom-control-label d-flex align-items-center"
-            :for="generateCheckboxId('isAttorney', props.formattedRow.id)"
-          >
-          </label>
-        </div>
-      </template>
-
-      <!-- generate checkboxes in "assignLibraries" field -->
-      <template
-        v-else-if="
-          isTheColumn(
-            props.column.field,
-            'assignLibraries',
-            props.column.hidden,
-          )
-        "
-      >
-        <!-- print only avaibales libraries -->
+      <!-- generate fullname -->
+      <template slot="table-row" slot-scope="props">
         <template
-          v-for="(libraryValue, libraryKey) in props.formattedRow
-            .assignLibraries"
+          v-if="
+            isTheColumn(props.column.field, 'firstName', props.column.hidden)
+          "
+        >
+          <span>{{ generateFullName(props.formattedRow) }}</span>
+        </template>
+
+        <!-- printo isAttorney checkbox -->
+        <template
+          v-else-if="
+            isTheColumn(props.column.field, 'isAttorney', props.column.hidden)
+          "
         >
           <div
-            :key="libraryKey"
-            class="custom-control custom-checkbox d-flex"
-            v-if="displayLibraryCheckbox(libraryKey)"
+            class="custom-control custom-checkbox d-flex justify-content-center"
           >
             <input
               type="checkbox"
               class="custom-control-input"
-              :id="generateCheckboxId(libraryKey, props.formattedRow.id)"
-              :value="libraryKey"
-              :checked="isChecked(props.row.originalIndex, libraryKey)"
-              :disabled="isDisabled(props.row.originalIndex, libraryKey)"
+              :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
+              :checked="isAttorneyChecked(props.row.originalIndex)"
               @change="
-                onChange({
-                  checked: $event.target.checked,
-                  library: $event.target.value,
+                onChangeIsAttorney({
                   index: props.row.originalIndex,
+                  checked: $event.target.checked,
                 })
               "
             />
             <label
               class="custom-control-label d-flex align-items-center"
-              :for="generateCheckboxId(libraryKey, props.formattedRow.id)"
+              :for="generateCheckboxId('isAttorney', props.formattedRow.id)"
             >
-              {{ libraryKey }}
             </label>
           </div>
         </template>
-      </template>
 
-      <!-- generate buttons in actions field -->
-      <template
-        v-else-if="
-          isTheColumn(props.column.field, 'actions', props.column.hidden)
-        "
-      >
-        <div class="dropdown">
-          <button
-            class="btn btn-primary dropdown-toggle btn-sm"
-            type="button"
-            id="dropdownMenuButton"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
+        <!-- generate checkboxes in "assignLibraries" field -->
+        <template
+          v-else-if="
+            isTheColumn(
+              props.column.field,
+              'assignLibraries',
+              props.column.hidden,
+            )
+          "
+        >
+          <!-- print only avaibales libraries -->
+          <template
+            v-for="(libraryValue, libraryKey) in props.formattedRow
+              .assignLibraries"
           >
-            Actions
-            <div class="arrow-down"></div>
-          </button>
+            <div
+              :key="libraryKey"
+              class="custom-control custom-checkbox d-flex"
+              v-if="displayLibraryCheckbox(libraryKey)"
+            >
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                :id="generateCheckboxId(libraryKey, props.formattedRow.id)"
+                :value="libraryKey"
+                :checked="isChecked(props.row.originalIndex, libraryKey)"
+                :disabled="isDisabled(props.row.originalIndex, libraryKey)"
+                @change="
+                  onChange({
+                    checked: $event.target.checked,
+                    library: $event.target.value,
+                    index: props.row.originalIndex,
+                  })
+                "
+              />
+              <label
+                class="custom-control-label d-flex align-items-center"
+                :for="generateCheckboxId(libraryKey, props.formattedRow.id)"
+              >
+                {{ libraryKey }}
+              </label>
+            </div>
+          </template>
+        </template>
 
-          <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-cogs mr-1"></i>
-              Relations
-            </a>
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-paper-plane mr-1"></i>
-              Resend Email
-            </a>
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-thumbs-down mr-1"></i>
-              Disable
-            </a>
-            <a class="dropdown-item" href="#">
-              <i class="fas fa-key mr-1"></i>
-              Reset password
-            </a>
+        <!-- generate buttons in actions field -->
+        <template
+          v-else-if="
+            isTheColumn(props.column.field, 'actions', props.column.hidden)
+          "
+        >
+          <div class="dropdown">
+            <button
+              class="btn btn-primary dropdown-toggle btn-sm"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Actions
+              <div class="arrow-down"></div>
+            </button>
+
+            <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="#">
+                <i class="fas fa-cogs mr-1"></i>
+                Relations
+              </a>
+              <a class="dropdown-item" href="#">
+                <i class="fas fa-paper-plane mr-1"></i>
+                Resend Email
+              </a>
+              <a class="dropdown-item" href="#">
+                <i class="fas fa-thumbs-down mr-1"></i>
+                Disable
+              </a>
+              <a class="dropdown-item" href="#">
+                <i class="fas fa-key mr-1"></i>
+                Reset password
+              </a>
+            </div>
           </div>
-        </div>
-      </template>
+        </template>
 
-      <!-- print default data -->
-      <span v-else>
-        {{ props.formattedRow[props.column.field] }}
-      </span>
-    </template>
-  </vue-datatable>
+        <!-- print default data -->
+        <span v-else>
+          {{ props.formattedRow[props.column.field] }}
+        </span>
+      </template>
+    </vue-datatable>
+  </div>
 </template>
 
 <script>
@@ -290,8 +296,7 @@ export default {
 </script>
 
 <style scoped>
-  .mb-no-last:not(:last-child) {
-    margin-bottom: .3rem;
-  }
-
+.mb-no-last:not(:last-child) {
+  margin-bottom: 0.3rem;
+}
 </style>

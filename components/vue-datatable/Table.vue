@@ -1,6 +1,7 @@
 <template>
   <client-only>
     <div class="table-wrapper">
+      <!-- style="min-height: calc(100vh - 95px);" -->
       <!-- custom header -->
       <div class="d-flex justify-content-between align-items-center mb-2">
         <div class="d-flex">
@@ -18,7 +19,7 @@
         styleClass="vgt-table my-table table-hover"
         :columns="$props.columns"
         :rows="$props.rows"
-        max-height="400px"
+        max-height="calc(100vh - 275px)"
         :pagination-options="{
           mode: 'pages',
           enabled: $props.pagination.enabled,
