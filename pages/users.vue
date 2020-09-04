@@ -13,6 +13,21 @@
         perPage: 100,
       }"
     >
+      <template slot="second-header">
+        <div class="mb-2 d-flex align-items-end">
+          <div class="custom-control custom-checkbox show-disabled-users-check ml-1">
+            <input
+              type="checkbox"
+              class="custom-control-input show-disabled-users-input"
+              id="showDisabledUsers"
+              v-model="showDisabledUsers"
+            />
+            <label class="custom-control-label" for="showDisabledUsers">
+              Show disabled users
+            </label>
+          </div>  
+        </div>
+      </template>
       <!-- available libraries -->
       <template slot="header-right">
         <div class="d-flex">
@@ -146,26 +161,6 @@
                 <i :class="[action.icon, 'mr-1']"></i>
                 {{ action.label }}
               </a>
-              <!--               <a class="dropdown-item" href="#">
-                <i class="fas fa-user-edit mr-1"></i>
-                Edit
-              </a>
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-thumbs-down mr-1"></i>
-                Disable
-              </a>
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-key mr-1"></i>
-                Reset password
-              </a>
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-paper-plane mr-1"></i>
-                Resend Email
-              </a>
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-cogs mr-1"></i>
-                Relations
-              </a> -->
             </div>
           </div>
         </template>
@@ -247,9 +242,14 @@ export default {
       { action: 'edit', label: 'Edit', icon: 'fas fa-user-edit' },
       { action: 'disable', label: 'Disable', icon: 'fas fa-thumbs-down' },
       { action: 'resetPassword', label: 'Reset Password', icon: 'fas fa-key' },
-      { action: 'resendEmail', label: 'Resend Email', icon: 'fas fa-paper-plane' },
+      {
+        action: 'resendEmail',
+        label: 'Resend Email',
+        icon: 'fas fa-paper-plane',
+      },
       { action: 'relations', label: 'Relations', icon: 'fas fa-cogs' },
     ],
+    showDisabledUsers: false,
   }),
   computed: {
     ...mapGetters('users', [
@@ -321,5 +321,13 @@ export default {
 <style scoped>
 .mb-no-last:not(:last-child) {
   margin-bottom: 0.3rem;
+}
+
+.show-disabled-users-check .custom-control-input:checked ~ .custom-control-label {
+  color: rgba(0,0,0,.5);
+} 
+
+.show-disabled-users-check .custom-control-label {
+  color: rgba(0,0,0,.3);
 }
 </style>

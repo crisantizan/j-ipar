@@ -9,10 +9,15 @@
           <search-input v-model="searchTerm" />
           <!-- columns toggle button component -->
           <columns-toggle-button :columns="toggleColumnList" />
+
+          <slot name="header-left"></slot>
         </div>
 
         <slot name="header-right"></slot>
       </div>
+
+      <slot name="second-header">
+      </slot>
       <!-- end custom header -->
 
       <vue-good-table
