@@ -23,6 +23,10 @@ export const mutations = {
   SET_IS_ATTORNEY_CHECKED(state, { index, checked }) {
     state.users[index].isAttorney = checked;
   },
+
+  SET_ACTIVE(state, { index, value }) {
+    state.users[index].active = value;
+  },
 };
 
 export const getters = {

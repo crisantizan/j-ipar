@@ -60,7 +60,7 @@
   background-color: #ececec;
 }
 
-.my-table tr.disabled td *:not(button) {
+.my-table tr.disabled td *:not(button, a) {
   color: #98a6ad;
 }
 

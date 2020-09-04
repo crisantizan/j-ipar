@@ -178,7 +178,7 @@
                 @click="
                   onClickAction({
                     action: action.action,
-                    userIsActive: props.formattedRow.active,
+                    userIndex: props.row.originalIndex,
                   })
                 "
               >
@@ -315,7 +315,11 @@ export default {
     ]),
   },
   methods: {
-    ...mapMutations('users', ['SET_CHECKED', 'SET_IS_ATTORNEY_CHECKED']),
+    ...mapMutations('users', [
+      'SET_CHECKED',
+      'SET_IS_ATTORNEY_CHECKED',
+      'SET_ACTIVE',
+    ]),
     /** generate custom checkbox id */
     generateCheckboxId(library, id) {
       return `checkLib${library}${id}`;
@@ -381,11 +385,11 @@ export default {
     },*/
 
     /** on click user action **/
-    onClickAction({ action, actionIndex, userIsActive }) {
+    onClickAction({ action, userIndex }) {
       switch (action) {
         case 'disable':
-          console.log('Disabled');
-          this.userActions[actionIndex];
+          const isActive = this.users[userIndex].active;
+          this.SET_ACTIVE({ index: userIndex, value: !isActive });
           break;
 
         default:
