@@ -1,5 +1,8 @@
 <template>
-  <div class="d-flex align-items-center" style="min-height: calc(100vh - 69.6px);">
+  <div
+    class="d-flex align-items-center"
+    style="min-height: calc(100vh - 69.6px);"
+  >
     <vue-datatable
       :columns="columns"
       :rows="users"
@@ -134,13 +137,18 @@
             </button>
 
             <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-cogs mr-1"></i>
-                Relations
+              <a
+                v-for="action in userActions"
+                :key="action.action"
+                class="dropdown-item"
+                href="#"
+              >
+                <i :class="[action.icon, 'mr-1']"></i>
+                {{ action.label }}
               </a>
-              <a class="dropdown-item" href="#">
-                <i class="fas fa-paper-plane mr-1"></i>
-                Resend Email
+              <!--               <a class="dropdown-item" href="#">
+                <i class="fas fa-user-edit mr-1"></i>
+                Edit
               </a>
               <a class="dropdown-item" href="#">
                 <i class="fas fa-thumbs-down mr-1"></i>
@@ -150,6 +158,14 @@
                 <i class="fas fa-key mr-1"></i>
                 Reset password
               </a>
+              <a class="dropdown-item" href="#">
+                <i class="fas fa-paper-plane mr-1"></i>
+                Resend Email
+              </a>
+              <a class="dropdown-item" href="#">
+                <i class="fas fa-cogs mr-1"></i>
+                Relations
+              </a> -->
             </div>
           </div>
         </template>
@@ -226,6 +242,13 @@ export default {
         toggle: true,
         label: 'Actions',
       },
+    ],
+    userActions: [
+      { action: 'edit', label: 'Edit', icon: 'fas fa-user-edit' },
+      { action: 'disable', label: 'Disable', icon: 'fas fa-thumbs-down' },
+      { action: 'resetPassword', label: 'Reset Password', icon: 'fas fa-key' },
+      { action: 'resendEmail', label: 'Resend Email', icon: 'fas fa-paper-plane' },
+      { action: 'relations', label: 'Relations', icon: 'fas fa-cogs' },
     ],
   }),
   computed: {

@@ -353,6 +353,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": true,
       "admin": true,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -381,6 +382,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": false,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -409,6 +411,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": false,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -437,6 +440,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": false,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -465,6 +469,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": true,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -493,6 +498,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -521,6 +527,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": false,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -549,6 +556,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -577,6 +585,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -605,6 +614,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": false,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -633,6 +643,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": false,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -661,6 +672,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -689,6 +701,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -717,6 +730,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -745,6 +759,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -773,6 +788,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -801,6 +817,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": true,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -829,6 +846,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": false,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
@@ -857,6 +875,7 @@
       "tenantCode": "B6GLU2160419817",
       "isAttorney": false,
       "admin": false,
+      "active": false,
       "assignLibraries": {
         "Immigration": false,
         "Illinois": false,
