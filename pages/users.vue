@@ -12,20 +12,24 @@
         perPageDropdown: [5, 10, 15, 20, 50, 100],
         perPage: 100,
       }"
+      :row-style-class="rowStyleClassFn"
     >
       <template slot="second-header">
         <div class="mb-2 d-flex align-items-end">
-          <div class="custom-control custom-checkbox show-disabled-users-check ml-1">
+          <div
+            class="custom-control custom-checkbox show-disabled-users-check ml-1"
+          >
             <input
               type="checkbox"
               class="custom-control-input show-disabled-users-input"
               id="showDisabledUsers"
               v-model="showDisabledUsers"
             />
+            <!-- @change="onChangeDisabledUsers($event.target.checked)" -->
             <label class="custom-control-label" for="showDisabledUsers">
               Show disabled users
             </label>
-          </div>  
+          </div>
         </div>
       </template>
       <!-- available libraries -->
@@ -56,6 +60,7 @@
           "
         >
           <span>{{ generateFullName(props.formattedRow) }}</span>
+          <small>{{ props.formattedRow.active }}</small>
         </template>
 
         <!-- printo isAttorney checkbox -->
@@ -70,6 +75,7 @@
             <input
               type="checkbox"
               class="custom-control-input"
+              :disabled="!props.formattedRow.active"
               :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
               :checked="isAttorneyChecked(props.row.originalIndex)"
               @change="
@@ -113,7 +119,10 @@
                 :id="generateCheckboxId(libraryKey, props.formattedRow.id)"
                 :value="libraryKey"
                 :checked="isChecked(props.row.originalIndex, libraryKey)"
-                :disabled="isDisabled(props.row.originalIndex, libraryKey)"
+                :disabled="
+                  isDisabled(props.row.originalIndex, libraryKey) ||
+                    !props.formattedRow.active
+                "
                 @change="
                   onChange({
                     checked: $event.target.checked,
@@ -151,15 +160,45 @@
               <div class="arrow-down"></div>
             </button>
 
-            <div class="dropdown-menu p-0" aria-labelledby="dropdownMenuButton">
+            <div
+              class="dropdown-menu dropdown-menu-left"
+              aria-labelledby="dropdownMenuButton"
+            >
               <a
                 v-for="action in userActions"
                 :key="action.action"
                 class="dropdown-item"
                 href="#"
+                :class="{
+                  disabled: dropdownActionItemIsDisabled(
+                    action.action,
+                    props.formattedRow.active,
+                  ),
+                }"
+                @click="
+                  onClickAction({
+                    action: action.action,
+                    userIsActive: props.formattedRow.active,
+                  })
+                "
               >
-                <i :class="[action.icon, 'mr-1']"></i>
-                {{ action.label }}
+                <i
+                  :class="[
+                    dropdownActionItemPrintIcon(
+                      action.icon,
+                      action.action,
+                      props.formattedRow.active,
+                    ),
+                    'mr-1',
+                  ]"
+                ></i>
+                {{
+                  dropdownActionItemPrintLabel(
+                    action.label,
+                    action.action,
+                    props.formattedRow.active,
+                  )
+                }}
               </a>
             </div>
           </div>
@@ -187,6 +226,10 @@ export default {
     columns: [
       {
         field: 'id',
+        hidden: true,
+      },
+      {
+        field: 'active',
         hidden: true,
       },
       {
@@ -240,14 +283,26 @@ export default {
     ],
     userActions: [
       { action: 'edit', label: 'Edit', icon: 'fas fa-user-edit' },
-      { action: 'disable', label: 'Disable', icon: 'fas fa-thumbs-down' },
-      { action: 'resetPassword', label: 'Reset Password', icon: 'fas fa-key' },
+      {
+        action: 'disable',
+        label: 'Disable',
+        icon: 'fas fa-thumbs-down',
+      },
+      {
+        action: 'resetPassword',
+        label: 'Reset Password',
+        icon: 'fas fa-key',
+      },
       {
         action: 'resendEmail',
         label: 'Resend Email',
         icon: 'fas fa-paper-plane',
       },
-      { action: 'relations', label: 'Relations', icon: 'fas fa-cogs' },
+      {
+        action: 'relations',
+        label: 'Relations',
+        icon: 'fas fa-cogs',
+      },
     ],
     showDisabledUsers: false,
   }),
@@ -314,6 +369,52 @@ export default {
     displayLibraryCheckbox(key) {
       return Object.keys(this.libraries).includes(key);
     },
+
+    rowStyleClassFn(row) {
+      return row.active ? '' : 'disabled';
+    },
+
+    /** on change disabled users checkbox **/
+    /*    onChangeDisabledUsers(checked) {
+      const currentAction = checked ? ''
+      const enabledIndex = this.userActions.findIndex(v => v.action)
+    },*/
+
+    /** on click user action **/
+    onClickAction({ action, actionIndex, userIsActive }) {
+      switch (action) {
+        case 'disable':
+          console.log('Disabled');
+          this.userActions[actionIndex];
+          break;
+
+        default:
+          console.log(action);
+      }
+    },
+
+    /* disable dropdown actions items */
+    dropdownActionItemIsDisabled(action, isActive) {
+      return action !== 'disable' && !isActive;
+    },
+
+    /* print text in dropdown actions items */
+    dropdownActionItemPrintLabel(label, action, isActive) {
+      if (action !== 'disable') {
+        return label;
+      }
+
+      return isActive ? label : 'Enable';
+    },
+
+    /* print icon in dropdown actions items */
+    dropdownActionItemPrintIcon(icon, action, isActive) {
+      if (action !== 'disable') {
+        return icon;
+      }
+
+      return isActive ? icon : 'fas fa-thumbs-up';
+    },
   },
 };
 </script>
@@ -323,11 +424,13 @@ export default {
   margin-bottom: 0.3rem;
 }
 
-.show-disabled-users-check .custom-control-input:checked ~ .custom-control-label {
-  color: rgba(0,0,0,.5);
-} 
+.show-disabled-users-check
+  .custom-control-input:checked
+  ~ .custom-control-label {
+  color: rgba(0, 0, 0, 0.5);
+}
 
 .show-disabled-users-check .custom-control-label {
-  color: rgba(0,0,0,.3);
+  color: rgba(0, 0, 0, 0.3);
 }
 </style>

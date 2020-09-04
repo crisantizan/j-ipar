@@ -17,6 +17,7 @@
   vertical-align: middle !important;
   font-size: 0.875rem;
   color: #6c757d !important;
+  /*max-width: 190px;*/
 }
 
 .table-wrapper {
@@ -52,4 +53,19 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+
+.my-table tr.disabled, .my-table tr.disabled:hover {
+  background-color: #ececec;
+}
+
+.my-table tr.disabled td *:not(button) {
+  color: #98a6ad;
+}
+
+.my-table tr.disabled .custom-control-label::before {
+  border: 1px solid rgba(0,0,0,.2);
+  /*background-color: #dedcdc;*/
+  background-color: #f1f1f1;
 }

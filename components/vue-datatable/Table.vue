@@ -25,6 +25,7 @@
         :columns="$props.columns"
         :rows="$props.rows"
         max-height="calc(100vh - 275px)"
+        :row-style-class="$props.rowStyleClass"
         :pagination-options="{
           mode: 'pages',
           enabled: $props.pagination.enabled,
@@ -79,6 +80,10 @@ export default {
         perPageDropdown: [5, 10, 15, 20],
         perPage: 5,
       }),
+    },
+    rowStyleClass: {
+      type: [String, Function],
+      default: '',
     },
   },
   data: () => ({
