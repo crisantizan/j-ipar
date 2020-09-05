@@ -180,6 +180,7 @@
                     userId: props.formattedRow.id,
                   })
                 "
+                v-bind="bindModalProps(action.action)"
               >
                 <i
                   :class="[
@@ -209,6 +210,48 @@
         </span>
       </template>
     </vue-datatable>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="editUserModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="editUserModalLabel"
+      aria-hidden="true"
+      ref="modal"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editUserModalLabel">
+              Edit user data
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -220,91 +263,99 @@ export default {
   components: {
     VueDatatable: () => import('@/components/vue-datatable/Table'),
   },
-  data: () => ({
-    searchTerm: '',
-    columns: [
-      {
-        field: 'id',
-        hidden: true,
-      },
-      {
-        field: 'active',
-        hidden: true,
-      },
-      {
-        field: 'lastName',
-        hidden: true,
-      },
-      {
-        field: 'middleName',
-        hidden: true,
-      },
-      {
-        field: 'firstName',
-        label: 'Name',
-        hidden: false,
-        toggle: true,
-      },
-      { field: 'email', label: 'Email', hidden: false, toggle: true },
-      {
-        field: 'admin',
-        label: 'Role',
-        hidden: false,
-        toggle: true,
-        type: 'boolean',
-        tdClass: 'text-left',
-        thClass: 'text-left',
-        formatFn: isAdmin => (isAdmin ? 'Admin' : 'User'),
-      },
-      {
-        field: 'isAttorney',
-        label: 'Is Attorney',
-        sortable: false,
-        hidden: false,
-        toggle: true,
-        type: 'boolean',
-        thClass: 'text-center',
-      },
-      {
-        field: 'assignLibraries',
-        label: 'Libraries',
-        sortable: false,
-        toggle: true,
-        hidden: false,
-      },
-      {
-        field: 'actions',
-        sortable: false,
-        hidden: false,
-        toggle: true,
-        label: 'Actions',
-      },
-    ],
-    userActions: [
-      { action: 'edit', label: 'Edit', icon: 'fas fa-user-edit' },
-      {
-        action: 'disable',
-        label: 'Disable',
-        icon: 'fas fa-thumbs-down',
-      },
-      {
-        action: 'resetPassword',
-        label: 'Reset Password',
-        icon: 'fas fa-key',
-      },
-      {
-        action: 'resendEmail',
-        label: 'Resend Email',
-        icon: 'fas fa-paper-plane',
-      },
-      {
-        action: 'relations',
-        label: 'Relations',
-        icon: 'fas fa-cogs',
-      },
-    ],
-    showDisabledUsers: false,
-  }),
+  data() {
+    const self = this;
+
+    return {
+      searchTerm: '',
+      columns: [
+        {
+          field: 'id',
+          hidden: true,
+        },
+        {
+          field: 'active',
+          hidden: true,
+        },
+        {
+          field: 'lastName',
+          hidden: true,
+        },
+        {
+          field: 'middleName',
+          hidden: true,
+        },
+        {
+          field: 'firstName',
+          label: 'Name',
+          hidden: false,
+          toggle: true,
+        },
+        { field: 'email', label: 'Email', hidden: false, toggle: true },
+        {
+          field: 'admin',
+          label: 'Role',
+          hidden: false,
+          toggle: true,
+          type: 'boolean',
+          tdClass: 'text-left',
+          thClass: 'text-left',
+          formatFn: isAdmin => (isAdmin ? 'Admin' : 'User'),
+        },
+        {
+          field: 'isAttorney',
+          label: 'Is Attorney',
+          sortable: false,
+          hidden: false,
+          toggle: true,
+          type: 'boolean',
+          thClass: 'text-center',
+        },
+        {
+          field: 'assignLibraries',
+          label: 'Libraries',
+          sortable: false,
+          toggle: true,
+          hidden: false,
+        },
+        {
+          field: 'actions',
+          sortable: false,
+          hidden: false,
+          toggle: true,
+          label: 'Actions',
+        },
+      ],
+      userActions: [
+        {
+          action: 'edit',
+          label: 'Edit',
+          icon: 'fas fa-user-edit',
+        },
+        {
+          action: 'disable',
+          label: 'Disable',
+          icon: 'fas fa-thumbs-down',
+        },
+        {
+          action: 'resetPassword',
+          label: 'Reset Password',
+          icon: 'fas fa-key',
+        },
+        {
+          action: 'resendEmail',
+          label: 'Resend Email',
+          icon: 'fas fa-paper-plane',
+        },
+        {
+          action: 'relations',
+          label: 'Relations',
+          icon: 'fas fa-cogs',
+        },
+      ],
+      showDisabledUsers: false,
+    };
+  },
   computed: {
     ...mapGetters('users', [
       'users',
@@ -321,7 +372,7 @@ export default {
 
       // show all
       return this.users;
-    }
+    },
   },
   methods: {
     ...mapMutations('users', [
@@ -423,6 +474,15 @@ export default {
       }
 
       return isActive ? icon : 'fas fa-thumbs-up';
+    },
+
+    /** bind modal properties in "Edit" item **/
+    bindModalProps(action) {
+      if (action !== 'edit') {
+        return {};
+      }
+
+      return { 'data-toggle': 'modal', 'data-target': '#editUserModal' };
     },
   },
 };
