@@ -265,10 +265,6 @@ import gql from 'graphql-tag';
 export default {
   data: () => ({
     isProcesing: true,
-    // coreIds: [
-    //   'price_1Gv7zkEHlNK1KgjMGy4WHzUf',
-    //   'price_1Gv80DEHlNK1KgjMaPRisapB',
-    // ],
   }),
   computed: {
     ...mapGetters('plans', [
@@ -283,6 +279,7 @@ export default {
       'mainPlan',
       'getDefaultCheckedPlans',
     ]),
+    ...mapGetters(['loaded']),
 
     paymentPeriod: {
       get() {
@@ -292,14 +289,6 @@ export default {
         this.$store.commit('plans/SET_PERIOD', period);
       },
     },
-  },
-  async created() {
-    // set monthly and yearly plans, one time
-    if (!this.show.length) {
-      const { month, year } = this.getFilteredPlans();
-      this.SET_MONTHLY(month);
-      this.SET_YEARLY(this.copyMonthlyValues(month, year));
-    }
   },
   mounted() {
     // Create a Stripe client.
@@ -341,6 +330,20 @@ export default {
       this.createPaymentMethod(stripe, cardElement);
     });
   },
+  watch: {
+    loaded: {
+      immediate: true,
+      deep: true,
+      handler(val) {
+        // set monthly and yearly plans, one time
+        if (val) {
+          const { month, year } = this.getFilteredPlans();
+          this.SET_MONTHLY(month);
+          this.SET_YEARLY(this.copyMonthlyValues(month, year));
+        }
+      },
+    }
+  },
   methods: {
     ...mapMutations('plans', [
       'SET_MONTHLY',
@@ -359,6 +362,8 @@ export default {
           type: 'card',
           card,
         });
+
+        console.log(paymentMethod);
 
         // TODO: should be "create" instead of "edit"
         const mutation = gql`

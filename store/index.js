@@ -12,6 +12,10 @@ export const mutations = {
   },
 };
 
+export const getters = {
+  loaded: state => state.loaded,
+};
+
 export const actions = {
   async getAll({ commit, state }) {
     // data al ready loaded
