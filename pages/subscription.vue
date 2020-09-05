@@ -406,7 +406,11 @@ export default {
           return -1;
         }
 
-        return 1;
+        if (this.isDefaultCheckedUser(a)) {
+          return 1;
+        }
+
+        return 0;
       });
 
       let totalChecked = 0;
