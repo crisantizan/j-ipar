@@ -336,7 +336,7 @@ export default {
       deep: true,
       handler(val) {
         // set monthly and yearly plans, one time
-        if (val) {
+        if (val && !this.show.length) {
           const { month, year } = this.getFilteredPlans();
           this.SET_MONTHLY(month);
           this.SET_YEARLY(this.copyMonthlyValues(month, year));
