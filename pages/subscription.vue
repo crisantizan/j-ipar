@@ -342,7 +342,7 @@ export default {
           this.SET_YEARLY(this.copyMonthlyValues(month, year));
         }
       },
-    }
+    },
   },
   methods: {
     ...mapMutations('plans', [
@@ -350,7 +350,7 @@ export default {
       'SET_YEARLY',
       'SET_CHECKED_OR_USERS',
       'UPDATE_SPECIAL_USERS',
-      'CHANGE_DEFAULT_CUSTOMER'
+      'CHANGE_DEFAULT_CUSTOMER',
     ]),
 
     /** create payment method (with apollo) */
@@ -437,7 +437,6 @@ export default {
                   {
                     ...plan,
                     checked: this.planIsMain(plan.id) || checked,
-                    users: 0,
                   },
                 ],
               };
@@ -519,7 +518,7 @@ export default {
           mainValues = {
             newValue: value + otherPlan.users,
             index: mainPlan.index,
-          }
+          };
         }
 
         this.UPDATE_SPECIAL_USERS({
