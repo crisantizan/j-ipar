@@ -4,16 +4,23 @@ import gql from 'graphql-tag';
 
 export const state = () => ({
   loaded: false,
+  loading: false,
 });
 
 export const mutations = {
   SET_LOADED(state, loaded) {
     state.loaded = loaded;
   },
+
+  SET_LOADING(state, loading) {
+    console.log({loading})
+    state.loading = loading;
+  },
 };
 
 export const getters = {
   loaded: state => state.loaded,
+  loading: state => state.loading,
 };
 
 export const actions = {
@@ -27,6 +34,8 @@ export const actions = {
     const client = this.app.apolloProvider.defaultClient;
 
     try {
+      commit('SET_LOADING', true);
+
       const { data } = await client.query({
         query: gql`
           query {
@@ -109,6 +118,8 @@ export const actions = {
 
     } catch (error) {
       console.error(error);
+    } finally {
+      commit('SET_LOADING', false);
     }
   },
 };

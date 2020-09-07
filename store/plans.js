@@ -195,6 +195,8 @@ export const actions = {
     const client = this.app.apolloProvider.defaultClient;
 
     try {
+      commit('SET_LOADING', true, { root: true });
+
       const result = await client.mutate({
         mutation: gql`
           mutation($plans: Array!) {
@@ -236,6 +238,8 @@ export const actions = {
       console.log({...result})
     } catch (err) {
       console.error(err);
+    } finally {
+      commit('SET_LOADING', false, { root: true });
     }
   },
 
@@ -244,6 +248,8 @@ export const actions = {
     const client = this.app.apolloProvider.defaultClient;
 
     try {
+      commit('SET_LOADING', true, { root: true });
+
       const { data } = await client.query({
         query: gql`
           query {
@@ -260,6 +266,8 @@ export const actions = {
       commit('SET_PAYMENT_METHODS', data.paymentMethods);
     } catch (err) {
       console.error(err);
+    } finally {
+      commit('SET_LOADING', false, { root: true });
     }
   },
 };

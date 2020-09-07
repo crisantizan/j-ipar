@@ -20,10 +20,9 @@
                 <button
                   type="submit"
                   class="btn btn-success mt-2"
+                  :class="{ disabled: loading }"
                   id="add-payment-method"
                 >
-                  <!-- v-bind:disabled="isProcesing ? '' : disabled"
-              v-bind:disabled="isProcesing ? '' : disabled" -->
                   Add
                 </button>
                 <div></div>
@@ -244,18 +243,15 @@
                 class="btn btn-success"
                 v-if="!!paymentMethods.length"
                 @click="subscribeUpdatePlan()"
+                :disabled="loading"
               >
                 Subscribe / Update
               </button>
             </div>
-
-            <span v-if="!plans.length"> Loading ... </span>
           </div>
         </div>
       </div>
     </div>
-
-    <pre>{{isUpdate}}</pre>
   </div>
 </template>
 
@@ -264,9 +260,6 @@ import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
 
 export default {
-  data: () => ({
-    isProcesing: true,
-  }),
   computed: {
     ...mapGetters('plans', [
       'show',
@@ -281,7 +274,7 @@ export default {
       'getDefaultCheckedPlans',
     ]),
     ...mapGetters('users', ['isUpdate']),
-    ...mapGetters(['loaded']),
+    ...mapGetters(['loaded', 'loading']),
 
     paymentPeriod: {
       get() {
@@ -357,11 +350,12 @@ export default {
       'REMOVE_PAYMENT_METHOD',
     ]),
     ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
+    ...mapMutations(['SET_LOADING']),
 
     /** create payment method (with apollo) */
     async createPaymentMethod(stripe, card) {
-      try {
-        this.isProcesing = true;
+      try {        
+        this.SET_LOADING(true, { root: true });
 
         // get stripe payment method
         const { paymentMethod } = await stripe.createPaymentMethod({
@@ -396,7 +390,7 @@ export default {
       } catch (error) {
         console.error(error);
       } finally {
-        this.isProcesing = false;
+        this.SET_LOADING(false, { root: true });
       }
     },
 
@@ -580,7 +574,7 @@ export default {
 
       // execute request
       try {
-        this.isProcesing = true;
+        this.SET_LOADING(true, { root: true });
 
         const mutation = gql`
           mutation($id: String!) {
@@ -600,7 +594,7 @@ export default {
       } catch (error) {
         console.error(error);
       } finally {
-        this.isProcesing = false;
+        this.SET_LOADING(false, { root: true });
       }
     },
 
@@ -621,7 +615,7 @@ export default {
 
       // execute request
       try {
-        this.isProcesing = true;
+        this.SET_LOADING(true, { root: true });
 
         const mutation = gql`
           mutation($id: String!) {
@@ -648,7 +642,7 @@ export default {
       } catch (error) {
         console.error(error);
       } finally {
-        this.isProcesing = false;
+        this.SET_LOADING(false, { root: true });
       }
     },
 
