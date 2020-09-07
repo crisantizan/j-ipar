@@ -242,14 +242,14 @@
               <button
                 type="button"
                 class="btn btn-success"
-                v-if="paymentMethods != null"
-                v-on:click="subscribeUpdatePlan()"
+                v-if="!!paymentMethods.length"
+                @click="subscribeUpdatePlan()"
               >
                 Subscribe / Update
               </button>
             </div>
 
-            <span v-if="plans === null"> Loading ... </span>
+            <span v-if="!plans.length"> Loading ... </span>
           </div>
         </div>
       </div>
