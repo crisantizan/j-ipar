@@ -87,7 +87,7 @@
                         paymentMethod.id !=
                           customer.invoiceSettings.default_payment_method
                       "
-                      :click="changeDefaultPaymentMethod(paymentMethod.id)"
+                      @click="changeDefaultPaymentMethod(paymentMethod.id)"
                       >Set Default</a
                     >
                     <a
@@ -364,6 +364,7 @@ export default {
         });
 
         console.log(paymentMethod);
+        console.log('**********');
 
         // TODO: should be "create" instead of "edit"
         const mutation = gql`
