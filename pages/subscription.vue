@@ -353,7 +353,7 @@ export default {
       'ADD_PAYMENT_METHOD',
       'REMOVE_PAYMENT_METHOD',
     ]),
-    ...mapActions('plans', ['getPaymentMethods']),
+    ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
 
     /** create payment method (with apollo) */
     async createPaymentMethod(stripe, card) {
@@ -640,7 +640,6 @@ export default {
           return;
         }
 
-        
         // fetching data from server
         await this.getPaymentMethods();
       } catch (error) {
@@ -650,8 +649,8 @@ export default {
       }
     },
 
-    subscribeUpdatePlan() {
-      Swal.fire({
+    async subscribeUpdatePlan() {
+      const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
         text: 'Are you sure you want to update your subscription?',
         icon: 'warning',
@@ -660,7 +659,16 @@ export default {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, do it!',
       });
-      console.log('A subscribirse papa');
+      
+      if (!isConfirmed) {
+        return;
+      }
+
+      const plans = this.show
+        .filter(plan => plan.checked)
+        .map(plan => ({ planId: plan.id, quantity: plan.users }));
+
+      this.addSubscription(plans);
     },
   },
 };

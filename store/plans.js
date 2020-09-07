@@ -190,6 +190,55 @@ export const getters = {
 };
 
 export const actions = {
+  async addSubscription({ commit, state }, plans) {
+    // apollo client
+    const client = this.app.apolloProvider.defaultClient;
+
+    try {
+      const result = await client.mutate({
+        mutation: gql`
+          mutation($plans: Array!) {
+            stripeSubscripterAdd(newSubscripter: { plans: $plans }) {
+              id
+              object
+              applicationFeePercent
+              billingCycleAnchor
+              billingThresholds
+              cancelAt
+              cancelAtPeriodEnd
+              canceledAt
+              collectionMethod
+              created
+              currentPeriodEnd
+              currentPeriodStart
+              customer
+              daysUntilDue
+              defaultPaymentMethod
+              defaultSource
+              defaultTaxRates
+              discount
+              endedAt
+              items
+              latestInvoice
+              livemode
+              metadata
+              nextPendingInvoiceItemInvoice
+              quantity
+              status
+            }
+          }
+        `,
+        fetchPolicy: 'no-cache',
+        variables: { plans }
+      });
+
+      // refresh payment methods
+      console.log({...result})
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
   async getPaymentMethods({ commit, state }) {
     // apollo client
     const client = this.app.apolloProvider.defaultClient;
