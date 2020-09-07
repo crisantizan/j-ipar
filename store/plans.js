@@ -81,6 +81,10 @@ export const mutations = {
   SET_CUSTOMER(state, payload) {
     state.customer = payload;
   },
+
+  CHANGE_DEFAULT_CUSTOMER(state, payload) {
+    state.customer.invoiceSettings.default_payment_method = payload;
+  },
 };
 
 export const getters = {

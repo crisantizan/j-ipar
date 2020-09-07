@@ -350,6 +350,7 @@ export default {
       'SET_YEARLY',
       'SET_CHECKED_OR_USERS',
       'UPDATE_SPECIAL_USERS',
+      'CHANGE_DEFAULT_CUSTOMER'
     ]),
 
     /** create payment method (with apollo) */
@@ -588,8 +589,7 @@ export default {
           variables: { id },
         });
 
-        // TODO: update payment methods list
-        console.log(result);
+        this.CHANGE_DEFAULT_CUSTOMER(id);
       } catch (error) {
         console.error(error);
       } finally {
