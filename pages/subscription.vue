@@ -351,6 +351,7 @@ export default {
       'SET_CHECKED_OR_USERS',
       'UPDATE_SPECIAL_USERS',
       'CHANGE_DEFAULT_CUSTOMER',
+      'ADD_PAYMENT_METHOD',
     ]),
 
     /** create payment method (with apollo) */
@@ -363,9 +364,6 @@ export default {
           type: 'card',
           card,
         });
-
-        console.log(paymentMethod);
-        console.log('**********');
 
         // TODO: should be "create" instead of "edit"
         const mutation = gql`
@@ -382,9 +380,12 @@ export default {
           variables: { paymentMethodId: paymentMethod.id },
         });
 
-        // TODO: update payment methods list
+        // list in screen
+        this.ADD_PAYMENT_METHOD({ id: paymentMethod.id, card: paymentMethod.card });
+        // set as default
+        this.CHANGE_DEFAULT_CUSTOMER(paymentMethod.id);
+
         card.clear();
-        console.log(result);
       } catch (error) {
         console.error(error);
       } finally {

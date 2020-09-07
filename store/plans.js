@@ -85,6 +85,17 @@ export const mutations = {
   CHANGE_DEFAULT_CUSTOMER(state, payload) {
     state.customer.invoiceSettings.default_payment_method = payload;
   },
+
+  ADD_PAYMENT_METHOD(state, payload) {
+    // payload: { id, card }
+    state.paymentMethods.unshift(payload);
+
+    // max 10
+    if (state.paymentMethods.length > 10) {
+      // delete last element
+      state.paymentMethods.pop();
+    }
+  },
 };
 
 export const getters = {
