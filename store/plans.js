@@ -1,3 +1,5 @@
+import gql from 'graphql-tag';
+
 const helpers = {
   calcTotalPaid(acc, plan) {
     if (!plan.checked) {
@@ -74,8 +76,7 @@ export const mutations = {
   },
 
   SET_PAYMENT_METHODS(state, payload) {
-    // TODO:: "payload" is not an array, set to null while
-    state.paymentMethods = Array.isArray(payload) ? payload : null;
+    state.paymentMethods = payload;
   },
 
   SET_CUSTOMER(state, payload) {
@@ -95,6 +96,17 @@ export const mutations = {
       // delete last element
       state.paymentMethods.pop();
     }
+  },
+
+  REMOVE_PAYMENT_METHOD(state, id) {
+    const index = state.paymentMethods.findIndex(v => v.id === id);
+
+    if (index === -1) {
+      return;
+    }
+
+    // remove element
+    state.paymentMethods.splice(index, 1);
   },
 };
 
@@ -174,5 +186,31 @@ export const getters = {
 
   paymentMethods(state) {
     return state.paymentMethods;
+  },
+};
+
+export const actions = {
+  async getPaymentMethods({ commit, state }) {
+    // apollo client
+    const client = this.app.apolloProvider.defaultClient;
+
+    try {
+      const { data } = await client.query({
+        query: gql`
+          query {
+            paymentMethods: stripePaymentMethods {
+              id
+              card
+            }
+          }
+        `,
+        fetchPolicy: 'no-cache',
+      });
+
+      // refresh payment methods
+      commit('SET_PAYMENT_METHODS', data.paymentMethods);
+    } catch (err) {
+      console.error(err);
+    }
   },
 };

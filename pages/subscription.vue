@@ -35,7 +35,7 @@
         <hr class="mt-1" />
 
         <div class="row p-2">
-          <div v-if="paymentMethods == null">Add Payment Method</div>
+          <div v-if="!paymentMethods.length">Add Payment Method</div>
           <!-- go to 489 line -->
           <div
             v-else
@@ -43,7 +43,6 @@
             v-for="paymentMethod in paymentMethods"
             :key="paymentMethod.id"
           >
-            <!-- v-if="paymentMethods !== null" -->
             <div
               v-bind:class="{
                 'credit-card-default':
@@ -259,7 +258,7 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters } from 'vuex';
+import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
 
 export default {
@@ -352,7 +351,9 @@ export default {
       'UPDATE_SPECIAL_USERS',
       'CHANGE_DEFAULT_CUSTOMER',
       'ADD_PAYMENT_METHOD',
+      'REMOVE_PAYMENT_METHOD',
     ]),
+    ...mapActions('plans', ['getPaymentMethods']),
 
     /** create payment method (with apollo) */
     async createPaymentMethod(stripe, card) {
@@ -381,7 +382,10 @@ export default {
         });
 
         // list in screen
-        this.ADD_PAYMENT_METHOD({ id: paymentMethod.id, card: paymentMethod.card });
+        this.ADD_PAYMENT_METHOD({
+          id: paymentMethod.id,
+          card: paymentMethod.card,
+        });
         // set as default
         this.CHANGE_DEFAULT_CUSTOMER(paymentMethod.id);
 
@@ -597,10 +601,8 @@ export default {
       }
     },
 
-    deletePaymentMethod(paymentMethodId) {
-      let _this = this;
-
-      Swal.fire({
+    async deletePaymentMethod(id) {
+      const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
         text: 'You want to delete this Payment method',
         icon: 'warning',
@@ -608,43 +610,44 @@ export default {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, do It!',
-      }).then(result => {
-        if (result.isConfirmed) {
-          _this.isProcesing = true;
-          let data = {
-            query:
-              `
-              mutation {
-                paymentMethodDelete(paymentMethodId: "` +
-              paymentMethodId +
-              `") { id },
-              }`,
-            variables: {},
-          };
-
-          var config = {
-            method: 'post',
-            url: this.url,
-            headers: {
-              'Content-Type': 'application/json',
-              Cookie: '__cfduid=d786e683ada5a0538598f646cca563d951591798240',
-            },
-            data: data,
-          };
-
-          this.$axios
-            .post(config)
-            .then(function(response) {
-              console.log(JSON.stringify(response.data));
-
-              _this.getPaymentMethods();
-              _this.isProcesing = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        }
       });
+
+      if (!isConfirmed) {
+        return;
+      }
+
+      // execute request
+      try {
+        this.isProcesing = true;
+
+        const mutation = gql`
+          mutation($id: String!) {
+            paymentMethodDelete(paymentMethodId: $id) {
+              id
+            }
+          }
+        `;
+
+        // backend result
+        const result = await this.$apollo.mutate({
+          mutation,
+          variables: { id },
+        });
+
+        // only remove on local, server does not have more data
+        if (this.paymentMethods.length < 10) {
+          this.REMOVE_PAYMENT_METHOD(id);
+          return;
+        }
+
+        
+        // fetching data from server
+        await this.getPaymentMethods();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isProcesing = false;
+      }
     },
 
     subscribeUpdatePlan() {
