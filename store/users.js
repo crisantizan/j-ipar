@@ -1,14 +1,15 @@
 export const state = () => ({
   users: [],
-  librariesQuantity: {
-    Immigration: 3,
+  librariesQuantity: {},
+/*  librariesQuantity: {
+    Immigration: 0,
     Michigan: 0,
     Illinois: 0,
     CookCountyIl: 0,
-    California: 3,
+    California: 0,
     Canada: 0,
     Australia: 0,
-  },
+  },*/
 });
 
 export const mutations = {
@@ -27,13 +28,17 @@ export const mutations = {
   SET_ACTIVE(state, { index, value }) {
     state.users[index].active = value;
   },
+
+  SET_LIBRARIES_QUANTITY(state, payload) {
+    state.librariesQuantity = payload;
+  },
 };
 
 export const getters = {
   users: state => state.users,
 
-  libraries: state => {
-    return Object.entries(state.librariesQuantity).reduce(
+  libraries: (state, getters) => {
+    return Object.entries(getters.librariesQuantity).reduce(
       (acc, [key, value]) => {
         if (value > 0) {
           return { ...acc, [key]: value };
@@ -46,7 +51,22 @@ export const getters = {
   },
 
   librariesQuantity(state) {
-    return state.librariesQuantity;
+    const keys = Object.keys(state.librariesQuantity);
+
+    if (!keys.length) {
+      return {};
+    }
+
+    // const skip = 'Core';
+    const availables = Object.keys(state.users[0].assignLibraries);
+
+    return Object.keys(state.librariesQuantity).reduce((acc, key) => {
+      if (availables.includes(key)) {
+        return { ...acc, [key]: state.librariesQuantity[key] };
+      }
+
+      return acc;
+    }, {});
   },
 
   selected(state) {
@@ -55,22 +75,18 @@ export const getters = {
         for (const key in user.assignLibraries) {
           const isChecked = user.assignLibraries[key];
 
+          const val = typeof acc[key] === 'undefined' ? 0 : acc[key];
+
           if (isChecked) {
-            acc[key] += 1;
+            acc[key] = val + 1;
+          } else {
+            acc[key] = val;
           }
+
         }
 
         return acc;
       },
-      {
-        Immigration: 0,
-        Michigan: 0,
-        Illinois: 0,
-        CookCountyIl: 0,
-        California: 0,
-        Canada: 0,
-        Australia: 0,
-      },
-    );
+      {});
   },
 };

@@ -73,6 +73,7 @@ export const actions = {
               id
               invoiceSettings
             }
+
              users {
                id
                firstName
@@ -100,6 +101,12 @@ export const actions = {
       commit('plans/SET_PAYMENT_METHODS', data.paymentMethods);
       // users module
       commit('users/SET_USERS', data.users);
+
+      // set libraries quantity
+      if (!!data.users.length) {
+        commit('users/SET_LIBRARIES_QUANTITY', data.users[0].librariesQuantity);
+      }
+
     } catch (error) {
       console.error(error);
     }
