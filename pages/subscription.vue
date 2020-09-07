@@ -254,6 +254,8 @@
         </div>
       </div>
     </div>
+
+    <pre>{{isUpdate}}</pre>
   </div>
 </template>
 
@@ -278,6 +280,7 @@ export default {
       'mainPlan',
       'getDefaultCheckedPlans',
     ]),
+    ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded']),
 
     paymentPeriod: {

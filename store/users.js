@@ -1,15 +1,6 @@
 export const state = () => ({
   users: [],
   librariesQuantity: {},
-/*  librariesQuantity: {
-    Immigration: 0,
-    Michigan: 0,
-    Illinois: 0,
-    CookCountyIl: 0,
-    California: 0,
-    Canada: 0,
-    Australia: 0,
-  },*/
 });
 
 export const mutations = {
@@ -37,6 +28,20 @@ export const mutations = {
 export const getters = {
   users: state => state.users,
 
+  isUpdate: (state, getters) => {
+    const keys = Object.keys(getters.librariesQuantity);
+
+    if (!keys.length) {
+      return false;
+    }
+
+    const quantity = keys.reduce((acc, key) => {
+      return acc + getters.librariesQuantity[key];
+    }, 0);
+
+    return quantity > 0;
+  },
+
   libraries: (state, getters) => {
     return Object.entries(getters.librariesQuantity).reduce(
       (acc, [key, value]) => {
@@ -57,10 +62,9 @@ export const getters = {
       return {};
     }
 
-    // const skip = 'Core';
-    const availables = Object.keys(state.users[0].assignLibraries);
+    const availables = [...Object.keys(state.users[0].assignLibraries), 'Core'];
 
-    return Object.keys(state.librariesQuantity).reduce((acc, key) => {
+    return keys.reduce((acc, key) => {
       if (availables.includes(key)) {
         return { ...acc, [key]: state.librariesQuantity[key] };
       }
@@ -69,24 +73,31 @@ export const getters = {
     }, {});
   },
 
-  selected(state) {
-    return state.users.reduce(
-      (acc, user) => {
-        for (const key in user.assignLibraries) {
-          const isChecked = user.assignLibraries[key];
+  selected(state, getters) {
+    const obj = state.users.reduce((acc, user) => {
+      for (const key in user.assignLibraries) {
+        const isChecked = user.assignLibraries[key];
 
-          const val = typeof acc[key] === 'undefined' ? 0 : acc[key];
+        const val = typeof acc[key] === 'undefined' ? 0 : acc[key];
 
-          if (isChecked) {
-            acc[key] = val + 1;
-          } else {
-            acc[key] = val;
-          }
-
+        if (isChecked) {
+          acc[key] = val + 1;
+        } else {
+          acc[key] = val;
         }
+      }
 
-        return acc;
-      },
-      {});
+      return acc;
+    }, {});
+
+    obj.Core = Object.keys(getters.librariesQuantity).reduce((acc, key) => {
+      if (key !== 'Core') {
+        return acc + getters.librariesQuantity[key];
+      }
+
+      return acc;
+    }, 0);
+
+    return obj;
   },
 };

@@ -25,7 +25,6 @@
               id="showDisabledUsers"
               v-model="showDisabledUsers"
             />
-            <!-- @change="onChangeDisabledUsers($event.target.checked)" -->
             <label class="custom-control-label" for="showDisabledUsers">
               Show disabled users
             </label>
