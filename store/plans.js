@@ -49,8 +49,18 @@ export const mutations = {
     state.period = period;
   },
 
-  SET_CUPON(state, { index, value }) {
+  /*SET_CUPON(state, { index, value }) {
     const plan = state.all[index];
+
+    plan.cuponId.value = value;
+
+    if (plan.cuponId.valid !== null) {
+      state.all[index].cuponId.valid = null;
+    }
+  },*/
+
+  SET_CUPON(state, { index, value, period }) {
+    const plan = state[period][index]
 
     plan.cuponId.value = value;
 
@@ -59,9 +69,13 @@ export const mutations = {
     }
   },
 
-  SET_CUPON_STATE(state, { index, value }) {
-    state.all[index].cuponId.valid = value;
+  SET_CUPON_STATE(state, { index, value, period }) {
+    state[period][index].cuponId.valid = value;
   },
+
+/*  SET_CUPON_STATE(state, { index, value }) {
+    state.all[index].cuponId.valid = value;
+  },*/
 
   /** update "checked" and "users" plan properties */
   SET_CHECKED_OR_USERS(state, { prop, value, index }) {

@@ -180,15 +180,16 @@
                       <div v-else class="input-group input-group-sm mt-1">
                         <input
                           type="text"
-                          class="form-control form-control-sm"
+                          class="form-control form-control-sm text-secondary"
                           placeholder="Add Coupon"
+                          :disabled="!plan.checked"
                           :title="inputCuponTitle(plan.cuponId.valid)"
                           :class="isValidCupon(plan.cuponId.valid)"
                           :value="plan.cuponId.value"
                           @input="
                             onTypeCupon({
                               value: $event.target.value,
-                              index: plan.index,
+                              index,
                             })
                           "
                         />
@@ -199,12 +200,26 @@
                             :disabled="btnAddCuponDisabledState(plan.cuponId)"
                             @click="
                               verifyCupon({
-                                index: plan.index,
+                                index,
                                 value: plan.cuponId.value,
+                                planId: plan.id,
                               })
                             "
                           >
-                            Add
+                            <template
+                              v-if="
+                                loading && currentVerifyCuponPlan === plan.id
+                              "
+                            >
+                              <div
+                                class="spinner-border text-primary"
+                                role="status"
+                              >
+                                <span class="sr-only">Loading...</span>
+                              </div>
+                            </template>
+
+                            <span v-else>Add</span>
                           </button>
                         </div>
                       </div>
@@ -216,6 +231,7 @@
                         maxlength="3"
                         min="0"
                         size="3"
+                        :disabled="!plan.checked"
                         :value="plan.users"
                         @change="
                           onChangeUsers({
@@ -276,6 +292,9 @@ import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
 
 export default {
+  data: () => ({
+    currentVerifyCuponPlan: null,
+  }),
   computed: {
     ...mapGetters('plans', [
       'show',
@@ -299,6 +318,10 @@ export default {
       set(period) {
         this.$store.commit('plans/SET_PERIOD', period);
       },
+    },
+
+    mirrorPeriod() {
+      return this.paymentPeriod === 'month' ? 'year' : 'month';
     },
   },
   mounted() {
@@ -414,7 +437,8 @@ export default {
     /** update cupon value on type **/
     onTypeCupon(data) {
       // data: { value, index }
-      this.SET_CUPON(data);
+      this.SET_CUPON({ ...data, period: this.paymentPeriod });
+      this.SET_CUPON({ ...data, period: this.mirrorPeriod });
     },
 
     /** input class according to cupon state **/
@@ -447,9 +471,10 @@ export default {
     },
 
     /** verify cupon **/
-    async verifyCupon({ value, index }) {
+    async verifyCupon({ value, index, planId }) {
       try {
         this.SET_LOADING(true, { root: true });
+        this.currentVerifyCuponPlan = planId;
 
         const query = gql`
           query($cuponId: String!) {
@@ -481,14 +506,31 @@ export default {
 
         const { valid } = result.data.verifyStripeCoupon;
 
-        this.SET_CUPON_STATE({ index, value: valid });
-
-        console.log(result);
+        this.SET_CUPON_STATE({
+          index,
+          value: valid,
+          period: this.paymentPeriod,
+        });
+        this.SET_CUPON_STATE({
+          index,
+          value: valid,
+          period: this.mirrorPeriod,
+        });
       } catch (err) {
-        console.error(err);
-        this.SET_CUPON_STATE({ index, value: false });
+        // invalid cupon
+        this.SET_CUPON_STATE({
+          index,
+          value: false,
+          period: this.paymentPeriod,
+        });
+        this.SET_CUPON_STATE({
+          index,
+          value: false,
+          period: this.mirrorPeriod,
+        });
       } finally {
         this.SET_LOADING(false, { root: true });
+        this.currentVerifyCuponPlan = null;
       }
     },
 
@@ -792,5 +834,14 @@ export default {
 
 .users-td input {
   max-width: 70px;
+}
+
+.is-valid {
+  color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.spinner-border {
+  width: 17px;
+  height: 17px;
 }
 </style>
