@@ -75,10 +75,10 @@
               class="custom-control-input"
               :disabled="!props.formattedRow.active"
               :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
-              :checked="isAttorneyChecked(props.row.originalIndex)"
+              :checked="isAttorneyChecked(props.row.index)"
               @change="
                 onChangeIsAttorney({
-                  index: props.row.originalIndex,
+                  index: props.row.index,
                   checked: $event.target.checked,
                 })
               "
@@ -116,16 +116,16 @@
                 class="custom-control-input"
                 :id="generateCheckboxId(libraryKey, props.formattedRow.id)"
                 :value="libraryKey"
-                :checked="isChecked(props.row.originalIndex, libraryKey)"
+                :checked="isChecked(props.row.index, libraryKey)"
                 :disabled="
-                  isDisabled(props.row.originalIndex, libraryKey) ||
+                  isDisabled(props.row.index, libraryKey) ||
                     !props.formattedRow.active
                 "
                 @change="
                   onChange({
                     checked: $event.target.checked,
                     library: $event.target.value,
-                    index: props.row.originalIndex,
+                    index: props.row.index,
                   })
                 "
               />
@@ -176,7 +176,7 @@
                 @click="
                   onClickAction({
                     action: action.action,
-                    userId: props.formattedRow.id,
+                    index: props.row.index,
                   })
                 "
                 v-bind="bindModalProps(action.action)"
@@ -270,6 +270,10 @@ export default {
       columns: [
         {
           field: 'id',
+          hidden: true,
+        },
+        {
+          field: 'index',
           hidden: true,
         },
         {
@@ -438,11 +442,24 @@ export default {
     },
 
     /** on click user action **/
-    onClickAction({ action, userId }) {
+    onClickAction({ action, index }) {
       switch (action) {
         case 'disable':
-          const index = this.users.findIndex(user => user.id === userId);
+          // const index = this.users.findIndex(user => user.id === userId);
           const isActive = this.users[index].active;
+
+          // disabled
+          if (isActive) {
+            // verify active licences
+            const libs = this.users[index].assignLibraries;
+
+            Object.keys(libs).forEach(key => {
+              // if true set to false
+              if (libs[key]) {
+                this.SET_CHECKED({ checked: false, library: key, index });
+              }
+            });
+          }
 
           this.SET_ACTIVE({ index: index, value: !isActive });
           break;

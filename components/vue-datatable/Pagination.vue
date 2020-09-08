@@ -93,7 +93,11 @@ export default {
     total: {
       type: Number,
       required: true,
-    },  
+    },
+    subtractTotal: {
+      type: Number,
+      default: 0,
+    },
     perPageDropdown: {
       type: Array,
       required: true,

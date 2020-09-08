@@ -26,7 +26,7 @@ export const mutations = {
 };
 
 export const getters = {
-  users: state => state.users,
+  users: state => state.users.map((u, i) => ({ ...u, index: i })),
 
   isUpdate: (state, getters) => {
     const keys = Object.keys(getters.librariesQuantity);
