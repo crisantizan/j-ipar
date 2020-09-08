@@ -61,12 +61,12 @@ export const mutations = {
     plan.cuponId.value = value;
 
     if (plan.cuponId.valid !== null) {
-      state.all[index].cuponId.valid = null;
+      plan.cuponId.valid = null;
     }
 
     // remove discount
     if (plan.discount > 0) {
-      state.all[index].discount = 0;
+      plan.discount = 0;
     }
   },
 
