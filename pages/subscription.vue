@@ -182,11 +182,27 @@
                           type="text"
                           class="form-control form-control-sm"
                           placeholder="Add Coupon"
+                          :title="inputCuponTitle(plan.cuponId.valid)"
+                          :class="isValidCupon(plan.cuponId.valid)"
+                          :value="plan.cuponId.value"
+                          @input="
+                            onTypeCupon({
+                              value: $event.target.value,
+                              index: plan.index,
+                            })
+                          "
                         />
                         <div class="input-group-append">
                           <button
                             class="btn btn-sm btn-outline-secondary"
                             type="button"
+                            :disabled="btnAddCuponDisabledState(plan.cuponId)"
+                            @click="
+                              verifyCupon({
+                                index: plan.index,
+                                value: plan.cuponId.value,
+                              })
+                            "
                           >
                             Add
                           </button>
@@ -348,13 +364,15 @@ export default {
       'CHANGE_DEFAULT_CUSTOMER',
       'ADD_PAYMENT_METHOD',
       'REMOVE_PAYMENT_METHOD',
+      'SET_CUPON',
+      'SET_CUPON_STATE',
     ]),
     ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
     ...mapMutations(['SET_LOADING']),
 
     /** create payment method (with apollo) */
     async createPaymentMethod(stripe, card) {
-      try {        
+      try {
         this.SET_LOADING(true, { root: true });
 
         // get stripe payment method
@@ -363,7 +381,6 @@ export default {
           card,
         });
 
-        // TODO: should be "create" instead of "edit"
         const mutation = gql`
           mutation($paymentMethodId: String!) {
             paymentMethodEdit(paymentMethodId: $paymentMethodId) {
@@ -389,6 +406,87 @@ export default {
         card.clear();
       } catch (error) {
         console.error(error);
+      } finally {
+        this.SET_LOADING(false, { root: true });
+      }
+    },
+
+    /** update cupon value on type **/
+    onTypeCupon(data) {
+      // data: { value, index }
+      this.SET_CUPON(data);
+    },
+
+    /** input class according to cupon state **/
+    isValidCupon(isValid) {
+      switch (isValid) {
+        case null:
+          return '';
+        case false:
+          return 'is-invalid';
+        case true:
+          return 'is-valid';
+      }
+    },
+
+    /** manage "disabled" property in button "Add" cupon **/
+    btnAddCuponDisabledState(cuponId) {
+      return cuponId.value.length < 4 || cuponId.valid !== null;
+    },
+
+    /** set "title" property to input add cupon **/
+    inputCuponTitle(valid) {
+      switch (valid) {
+        case null:
+          return 'Type a cupon id';
+        case true:
+          return 'Valid cupon';
+        case false:
+          return 'Invalid cupon';
+      }
+    },
+
+    /** verify cupon **/
+    async verifyCupon({ value, index }) {
+      try {
+        this.SET_LOADING(true, { root: true });
+
+        const query = gql`
+          query($cuponId: String!) {
+            verifyStripeCoupon(id: $cuponId) {
+              id
+              object
+              amountOff
+              created
+              currency
+              duration
+              durationInMonths
+              livemode
+              maxRedemptions
+              metadata
+              name
+              percentOff
+              redeemBy
+              timesRedeemed
+              valid
+            }
+          }
+        `;
+
+        // backend result
+        const result = await this.$apollo.query({
+          query,
+          variables: { cuponId: value },
+        });
+
+        const { valid } = result.data.verifyStripeCoupon;
+
+        this.SET_CUPON_STATE({ index, value: valid });
+
+        console.log(result);
+      } catch (err) {
+        console.error(err);
+        this.SET_CUPON_STATE({ index, value: false });
       } finally {
         this.SET_LOADING(false, { root: true });
       }
@@ -656,7 +754,7 @@ export default {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, do it!',
       });
-      
+
       if (!isConfirmed) {
         return;
       }

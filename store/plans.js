@@ -33,7 +33,8 @@ export const state = () => ({
 
 export const mutations = {
   SET_ALL(state, plans) {
-    state.all = plans;
+    // add "cuponId" field
+    state.all = plans.map((plan, index) => ({ ...plan, cuponId: { value: '', valid: null }, index }));
   },
 
   SET_MONTHLY(state, plans) {
@@ -46,6 +47,20 @@ export const mutations = {
 
   SET_PERIOD(state, period) {
     state.period = period;
+  },
+
+  SET_CUPON(state, { index, value }) {
+    const plan = state.all[index];
+
+    plan.cuponId.value = value;
+
+    if (plan.cuponId.valid !== null) {
+      state.all[index].cuponId.valid = null;
+    }
+  },
+
+  SET_CUPON_STATE(state, { index, value }) {
+    state.all[index].cuponId.valid = value;
   },
 
   /** update "checked" and "users" plan properties */
