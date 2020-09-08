@@ -70,7 +70,8 @@ export const mutations = {
     }
   },
 
-  SET_CUPON_STATE(state, { index, value, period, discount=null }) {
+  SET_CUPON_STATE(state, { index, value, period, discount = null }) {
+    // discount: { value: Number, type: 'percent' | 'amount' }
     const plan = state[period][index];
 
     plan.cuponId.valid = value;
@@ -78,7 +79,13 @@ export const mutations = {
     // apply cupon discount
     if (discount !== null) {
       const total = (plan.amount * plan.users) / 100;
-      plan.discount = (total * discount) / 100;
+
+      const discountTotal =
+        discount.type === 'percent'
+          ? (total * discount.value) / 100
+          : Number(String(discount.value).slice(0, -2));
+
+      plan.discount = discountTotal;
     }
   },
 

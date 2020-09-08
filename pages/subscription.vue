@@ -246,7 +246,9 @@
                     <td class="text-center">
                       {{ plan.amount | slice(0, -2) | enUsFormatter }}
                     </td>
-                    <td class="text-center">$0</td>
+                    <td class="text-center">
+                      {{ plan.discount | enUsFormatter }}
+                    </td>
                     <td class="text-center">
                       {{
                         plan.amount
@@ -505,19 +507,30 @@ export default {
           variables: { cuponId: value },
         });
 
-        const { valid, percentOff } = result.data.verifyStripeCoupon;
+        const { valid, percentOff, amountOff } = result.data.verifyStripeCoupon;
+
+        const discountType = percentOff !== null ? 'percent' : 'amount';
+        const discountValue =
+          discountType === 'percent' ? percentOff : amountOff;
 
         this.SET_CUPON_STATE({
           index,
           value: valid,
           period: this.paymentPeriod,
-          discount: percentOff
+          discount: {
+            value: discountValue,
+            type: discountType,
+          },
         });
+
         this.SET_CUPON_STATE({
           index,
           value: valid,
           period: this.mirrorPeriod,
-          discount: percentOff
+          discount: {
+            value: discountValue,
+            type: discountType,
+          },
         });
       } catch (err) {
         // invalid cupon
@@ -526,6 +539,7 @@ export default {
           value: false,
           period: this.paymentPeriod,
         });
+
         this.SET_CUPON_STATE({
           index,
           value: false,
