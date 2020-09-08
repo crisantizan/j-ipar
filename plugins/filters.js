@@ -6,3 +6,5 @@ Vue.filter('enUsFormatter', value => enUsFormatter.format(value));
 Vue.filter('slice', (value, start, end) => value.toString().slice(start, end));
 
 Vue.filter('multiply', (value, arg) => Number(value) * Number(arg));
+
+Vue.filter('subtract', (value, arg) => Number(value) - Number(arg));

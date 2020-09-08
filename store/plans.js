@@ -6,7 +6,7 @@ const helpers = {
       return acc;
     }
     const totalPlan = (plan.amount * plan.users) / 100;
-    return acc + totalPlan;
+    return acc + (totalPlan - plan.discount);
   },
 };
 
@@ -33,8 +33,14 @@ export const state = () => ({
 
 export const mutations = {
   SET_ALL(state, plans) {
-    // add "cuponId" field
-    state.all = plans.map((plan, index) => ({ ...plan, cuponId: { value: '', valid: null }, index }));
+    // add custom fields
+    state.all = plans.map(plan => ({
+      ...plan,
+      // manage cupon data
+      cuponId: { value: '', valid: null },
+      // for apply cupon discount
+      discount: 0,
+    }));
   },
 
   SET_MONTHLY(state, plans) {
@@ -49,33 +55,32 @@ export const mutations = {
     state.period = period;
   },
 
-  /*SET_CUPON(state, { index, value }) {
-    const plan = state.all[index];
-
-    plan.cuponId.value = value;
-
-    if (plan.cuponId.valid !== null) {
-      state.all[index].cuponId.valid = null;
-    }
-  },*/
-
   SET_CUPON(state, { index, value, period }) {
-    const plan = state[period][index]
+    const plan = state[period][index];
 
     plan.cuponId.value = value;
 
     if (plan.cuponId.valid !== null) {
       state.all[index].cuponId.valid = null;
     }
+
+    // remove discount
+    if (plan.discount > 0) {
+      state.all[index].discount = 0;
+    }
   },
 
-  SET_CUPON_STATE(state, { index, value, period }) {
-    state[period][index].cuponId.valid = value;
-  },
+  SET_CUPON_STATE(state, { index, value, period, discount=null }) {
+    const plan = state[period][index];
 
-/*  SET_CUPON_STATE(state, { index, value }) {
-    state.all[index].cuponId.valid = value;
-  },*/
+    plan.cuponId.valid = value;
+
+    // apply cupon discount
+    if (discount !== null) {
+      const total = (plan.amount * plan.users) / 100;
+      plan.discount = (total * discount) / 100;
+    }
+  },
 
   /** update "checked" and "users" plan properties */
   SET_CHECKED_OR_USERS(state, { prop, value, index }) {
@@ -260,11 +265,11 @@ export const actions = {
           }
         `,
         fetchPolicy: 'no-cache',
-        variables: { plans }
+        variables: { plans },
       });
 
       // refresh payment methods
-      console.log({...result})
+      console.log({ ...result });
     } catch (err) {
       console.error(err);
     } finally {

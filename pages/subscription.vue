@@ -252,6 +252,7 @@
                         plan.amount
                           | slice(0, -2)
                           | multiply(plan.users)
+                          | subtract(plan.discount)
                           | enUsFormatter
                       }}
                     </td>
@@ -504,17 +505,19 @@ export default {
           variables: { cuponId: value },
         });
 
-        const { valid } = result.data.verifyStripeCoupon;
+        const { valid, percentOff } = result.data.verifyStripeCoupon;
 
         this.SET_CUPON_STATE({
           index,
           value: valid,
           period: this.paymentPeriod,
+          discount: percentOff
         });
         this.SET_CUPON_STATE({
           index,
           value: valid,
           period: this.mirrorPeriod,
+          discount: percentOff
         });
       } catch (err) {
         // invalid cupon
