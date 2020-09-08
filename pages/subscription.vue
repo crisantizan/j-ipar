@@ -183,9 +183,9 @@
                           class="form-control form-control-sm text-secondary"
                           placeholder="Add Coupon"
                           :disabled="!plan.checked"
-                          :title="inputCuponTitle(plan.cuponId.valid)"
-                          :class="isValidCupon(plan.cuponId.valid)"
-                          :value="plan.cuponId.value"
+                          :title="inputCuponTitle(plan.couponId.valid)"
+                          :class="isValidCupon(plan.couponId.valid)"
+                          :value="plan.couponId.value"
                           @input="
                             onTypeCupon({
                               value: $event.target.value,
@@ -197,11 +197,11 @@
                           <button
                             class="btn btn-sm btn-outline-secondary"
                             type="button"
-                            :disabled="btnAddCuponDisabledState(plan.cuponId)"
+                            :disabled="btnAddCuponDisabledState(plan.couponId)"
                             @click="
                               verifyCupon({
                                 index,
-                                value: plan.cuponId.value,
+                                value: plan.couponId.value,
                                 planId: plan.id,
                               })
                             "
@@ -457,8 +457,8 @@ export default {
     },
 
     /** manage "disabled" property in button "Add" cupon **/
-    btnAddCuponDisabledState(cuponId) {
-      return cuponId.value.length < 4 || cuponId.valid !== null;
+    btnAddCuponDisabledState(couponId) {
+      return couponId.value.length < 4 || couponId.valid !== null;
     },
 
     /** set "title" property to input add cupon **/
@@ -480,8 +480,8 @@ export default {
         this.currentVerifyCuponPlan = planId;
 
         const query = gql`
-          query($cuponId: String!) {
-            verifyStripeCoupon(id: $cuponId) {
+          query($couponId: String!) {
+            verifyStripeCoupon(id: $couponId) {
               id
               object
               amountOff
@@ -504,7 +504,7 @@ export default {
         // backend result
         const result = await this.$apollo.query({
           query,
-          variables: { cuponId: value },
+          variables: { couponId: value },
         });
 
         const { valid, percentOff, amountOff } = result.data.verifyStripeCoupon;
@@ -820,7 +820,19 @@ export default {
 
       const plans = this.show
         .filter(plan => plan.checked)
-        .map(plan => ({ planId: plan.id, quantity: plan.users }));
+        .map(plan => {
+            const obj = {
+              planId: plan.id,
+              quantity: plan.users,
+            }
+
+            // send coupon
+            if (plan.couponId.valid) {
+              obj.coupon = plan.couponId.value;
+            }
+
+            return obj;
+          });
 
       this.addSubscription(plans);
     },

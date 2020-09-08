@@ -37,7 +37,7 @@ export const mutations = {
     state.all = plans.map(plan => ({
       ...plan,
       // manage cupon data
-      cuponId: { value: '', valid: null },
+      couponId: { value: '', valid: null },
       // for apply cupon discount
       discount: 0,
     }));
@@ -58,10 +58,10 @@ export const mutations = {
   SET_CUPON(state, { index, value, period }) {
     const plan = state[period][index];
 
-    plan.cuponId.value = value;
+    plan.couponId.value = value;
 
-    if (plan.cuponId.valid !== null) {
-      plan.cuponId.valid = null;
+    if (plan.couponId.valid !== null) {
+      plan.couponId.valid = null;
     }
 
     // remove discount
@@ -74,7 +74,7 @@ export const mutations = {
     // discount: { value: Number, type: 'percent' | 'amount' }
     const plan = state[period][index];
 
-    plan.cuponId.valid = value;
+    plan.couponId.valid = value;
 
     // apply cupon discount
     if (discount !== null) {
