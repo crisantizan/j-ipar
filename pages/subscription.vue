@@ -205,6 +205,11 @@
                             class="btn btn-sm btn-outline-secondary"
                             type="button"
                             :disabled="btnAddCuponDisabledState(plan.couponId)"
+                            :title="
+                              plan.couponId.valid !== null
+                                ? 'Remove coupon'
+                                : 'Add coupon'
+                            "
                             @click="
                               verifyCupon({
                                 index,
@@ -226,7 +231,9 @@
                               </div>
                             </template>
 
-                            <span v-else>Add</span>
+                            <span v-else>{{
+                              plan.couponId.valid !== null ? 'Del' : 'Add'
+                            }}</span>
                           </button>
                         </div>
                       </div>
@@ -465,24 +472,32 @@ export default {
 
     /** manage "disabled" property in button "Add" cupon **/
     btnAddCuponDisabledState(couponId) {
-      return couponId.value.length < 4 || couponId.valid !== null;
+      return couponId.value.length < 4;
     },
 
     /** set "title" property to input add cupon **/
     inputCuponTitle(valid) {
       switch (valid) {
         case null:
-          return 'Type a cupon id';
+          return 'Type a coupon ID';
         case true:
-          return 'Valid cupon';
+          return 'Valid coupon';
         case false:
-          return 'Invalid cupon';
+          return 'Invalid coupon';
       }
     },
 
     /** verify cupon **/
     async verifyCupon({ couponId, index, planId }) {
+      // invalid input data
       if (this.btnAddCuponDisabledState(couponId)) {
+        return;
+      }
+
+      // remove current coupon
+      if (couponId.valid !== null) {
+        this.SET_CUPON({ index, value: '', period: this.paymentPeriod });
+        this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
         return;
       }
 
