@@ -192,6 +192,13 @@
                               index,
                             })
                           "
+                          @keyup.enter="
+                            verifyCupon({
+                              index,
+                              couponId: plan.couponId,
+                              planId: plan.id,
+                            })
+                          "
                         />
                         <div class="input-group-append">
                           <button
@@ -201,7 +208,7 @@
                             @click="
                               verifyCupon({
                                 index,
-                                value: plan.couponId.value,
+                                couponId: plan.couponId,
                                 planId: plan.id,
                               })
                             "
@@ -474,7 +481,11 @@ export default {
     },
 
     /** verify cupon **/
-    async verifyCupon({ value, index, planId }) {
+    async verifyCupon({ couponId, index, planId }) {
+      if (this.btnAddCuponDisabledState(couponId)) {
+        return;
+      }
+
       try {
         this.SET_LOADING(true, { root: true });
         this.currentVerifyCuponPlan = planId;
@@ -504,7 +515,7 @@ export default {
         // backend result
         const result = await this.$apollo.query({
           query,
-          variables: { couponId: value },
+          variables: { couponId: couponId.value },
         });
 
         const { valid, percentOff, amountOff } = result.data.verifyStripeCoupon;
@@ -821,18 +832,18 @@ export default {
       const plans = this.show
         .filter(plan => plan.checked)
         .map(plan => {
-            const obj = {
-              planId: plan.id,
-              quantity: plan.users,
-            }
+          const obj = {
+            planId: plan.id,
+            quantity: plan.users,
+          };
 
-            // send coupon
-            if (plan.couponId.valid) {
-              obj.coupon = plan.couponId.value;
-            }
+          // send coupon
+          if (plan.couponId.valid) {
+            obj.coupon = plan.couponId.value;
+          }
 
-            return obj;
-          });
+          return obj;
+        });
 
       this.addSubscription(plans);
     },
