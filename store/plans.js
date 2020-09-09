@@ -69,6 +69,10 @@ export const mutations = {
 
     plan.couponId.valid = value;
 
+    if (value === false) {
+      plan.couponId.value = '';
+    }
+
     // apply cupon discount
     if (discount !== null) {
       const total = (plan.amount * plan.users) / 100;
@@ -94,17 +98,6 @@ export const mutations = {
     // set new value
     current[prop] = value;
     other[prop] = value;
-
-    // changing "checked" property
-/*    if (prop === 'checked' && !value && current.discount !== 0) {
-      current.couponId.value = '';
-      current.couponId.valid = null;
-      current.discount = 0;
-
-      other.couponId.value = '';
-      other.couponId.valid = null;
-      other.discount = 0;
-    }*/
   },
 
   SET_LAST_CHANGED_PLAN(state, id) {

@@ -177,68 +177,83 @@
                         <b> Discount:</b> 5% for 12 months
                       </div>
 
-                      <div v-else class="input-group input-group-sm mt-1">
-                        <input
-                          type="text"
-                          class="form-control form-control-sm text-secondary"
-                          placeholder="Add Coupon"
-                          :disabled="!plan.checked"
-                          :title="inputCuponTitle(plan.couponId.valid)"
-                          :class="isValidCupon(plan.couponId.valid)"
-                          :value="plan.couponId.value"
-                          @input="
-                            onTypeCupon({
-                              value: $event.target.value,
-                              index,
-                            })
-                          "
-                          @keyup.enter="
-                            verifyCupon({
-                              index,
-                              couponId: plan.couponId,
-                              planId: plan.id,
-                            })
-                          "
-                        />
-                        <div class="input-group-append">
-                          <button
-                            class="btn btn-sm btn-outline-secondary"
-                            type="button"
-                            :disabled="
-                              !plan.checked ||
-                                btnAddCuponDisabledState(plan.couponId)
+                      <div v-else>
+                        <div class="input-group input-group-sm mt-1">
+                          <span
+                            @click="quitCoupon(index)"
+                            class="quit-cupon"
+                            title="Remove coupon"
+                            v-if="plan.couponId.valid"
+                          >
+                            <i class="fas fa-times"></i>
+                          </span>
+                          <input
+                            type="text"
+                            class="form-control form-control-sm text-secondary"
+                            placeholder="Add Coupon"
+                            :disabled="!plan.checked"
+                            :title="inputCuponTitle(plan.couponId.valid)"
+                            :class="isValidCupon(plan.couponId.valid)"
+                            :value="plan.couponId.value"
+                            @input="
+                              onTypeCupon({
+                                value: $event.target.value,
+                                index,
+                              })
                             "
-                            :title="
-                              plan.couponId.valid !== null
-                                ? 'Remove coupon'
-                                : 'Add coupon'
+                            @blur="
+                              onBlurInputCoupon({
+                                index,
+                                valid: plan.couponId.valid,
+                              })
                             "
-                            @click="
+                            @keyup.enter="
                               verifyCupon({
                                 index,
                                 couponId: plan.couponId,
                                 planId: plan.id,
                               })
                             "
-                          >
-                            <template
-                              v-if="
-                                loading && currentVerifyCuponPlan === plan.id
+                          />
+                          <div class="input-group-append">
+                            <button
+                              class="btn btn-sm btn-outline-secondary"
+                              type="button"
+                              :disabled="
+                                !plan.checked ||
+                                  btnAddCuponDisabledState(plan.couponId)
+                              "
+                              title="Add coupon"
+                              @click="
+                                verifyCupon({
+                                  index,
+                                  couponId: plan.couponId,
+                                  planId: plan.id,
+                                })
                               "
                             >
-                              <div
-                                class="spinner-border text-primary"
-                                role="status"
+                              <template
+                                v-if="
+                                  loading && currentVerifyCuponPlan === plan.id
+                                "
                               >
-                                <span class="sr-only">Loading...</span>
-                              </div>
-                            </template>
-
-                            <span v-else>{{
-                              plan.couponId.valid !== null ? 'Del' : 'Add'
-                            }}</span>
-                          </button>
+                                <div
+                                  class="spinner-border text-primary"
+                                  role="status"
+                                >
+                                  <span class="sr-only">Loading...</span>
+                                </div>
+                              </template>
+                              <span v-else>Add</span>
+                            </button>
+                          </div>
                         </div>
+                        <small
+                          v-if="plan.couponId.valid === false"
+                          class="form-text text-danger mt-0"
+                        >
+                          Invalid coupon
+                        </small>
                       </div>
                     </td>
                     <td class="users-td">
@@ -475,7 +490,25 @@ export default {
 
     /** manage "disabled" property in button "Add" cupon **/
     btnAddCuponDisabledState(couponId) {
-      return couponId.value.length < 4;
+      return couponId.value.length < 4 || couponId.valid !== null;
+    },
+
+    /** **/
+    onBlurInputCoupon({ index, valid }) {
+      if (valid !== false) {
+        return;
+      }
+
+      // reset
+      this.SET_CUPON({ index, value: '', period: this.paymentPeriod });
+      this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
+    },
+
+    /** quit cupon **/
+    quitCoupon(index) {
+      // reset
+      this.SET_CUPON({ index, value: '', period: this.paymentPeriod });
+      this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
     },
 
     /** set "title" property to input add cupon **/
@@ -494,13 +527,6 @@ export default {
     async verifyCupon({ couponId, index, planId }) {
       // invalid input data
       if (this.btnAddCuponDisabledState(couponId)) {
-        return;
-      }
-
-      // remove current coupon
-      if (couponId.valid !== null) {
-        this.SET_CUPON({ index, value: '', period: this.paymentPeriod });
-        this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
         return;
       }
 
@@ -636,9 +662,10 @@ export default {
                 const total = (plan.amount * plan.users) / 100;
 
                 // calculate total discount
-                discount = type === 'percent'
-                      ? (total * value) / 100
-                      : Number(String(value).slice(0, -2));
+                discount =
+                  type === 'percent'
+                    ? (total * value) / 100
+                    : Number(String(value).slice(0, -2));
 
                 couponId.value = plan.coupon.id;
                 couponId.valid = true;
@@ -684,8 +711,16 @@ export default {
       if (!data.value) {
         // quit coupon
         if (this.show[data.index].discount !== 0) {
-          this.SET_CUPON({ value: '', index: data.index, period: this.paymentPeriod });
-          this.SET_CUPON({ value: '', index: data.index, period: this.mirrorPeriod });
+          this.SET_CUPON({
+            value: '',
+            index: data.index,
+            period: this.paymentPeriod,
+          });
+          this.SET_CUPON({
+            value: '',
+            index: data.index,
+            period: this.mirrorPeriod,
+          });
         }
 
         // quit users
@@ -708,12 +743,11 @@ export default {
             mainPlan: null,
           });
         }
-
       }
     },
 
     /** on change users handler */
-    onChangeUsers({ event=null, value, plan, index }) {
+    onChangeUsers({ event = null, value, plan, index }) {
       // no negative numbers accepted
       if (Number(event.target.value) < 0) {
         value = 0;
@@ -959,5 +993,18 @@ export default {
 .spinner-border {
   width: 17px;
   height: 17px;
+}
+
+.quit-cupon {
+  position: absolute;
+  right: 80px;
+  z-index: 100;
+  width: 25px;
+  height: 29.8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.15);
 }
 </style>
