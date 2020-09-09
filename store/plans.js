@@ -96,7 +96,7 @@ export const mutations = {
     other[prop] = value;
 
     // changing "checked" property
-    if (prop === 'checked' && !value && current.discount !== 0) {
+/*    if (prop === 'checked' && !value && current.discount !== 0) {
       current.couponId.value = '';
       current.couponId.valid = null;
       current.discount = 0;
@@ -104,7 +104,7 @@ export const mutations = {
       other.couponId.value = '';
       other.couponId.valid = null;
       other.discount = 0;
-    }
+    }*/
   },
 
   SET_LAST_CHANGED_PLAN(state, id) {

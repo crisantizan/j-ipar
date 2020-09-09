@@ -680,10 +680,40 @@ export default {
     onCheckedPlan(data) {
       // data { value, index });
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
+
+      if (!data.value) {
+        // quit coupon
+        if (this.show[data.index].discount !== 0) {
+          this.SET_CUPON({ value: '', index: data.index, period: this.paymentPeriod });
+          this.SET_CUPON({ value: '', index: data.index, period: this.mirrorPeriod });
+        }
+
+        // quit users
+        if (this.show[data.index].users > 0) {
+          const plan = this.show[data.index];
+
+          this.UPDATE_SPECIAL_USERS({
+            value: 0,
+            oldValue: plan.users,
+            index: data.index,
+            period: this.paymentPeriod,
+            mainPlan: null,
+          });
+
+          this.UPDATE_SPECIAL_USERS({
+            value: 0,
+            oldValue: plan.users,
+            index: data.index,
+            period: this.mirrorPeriod,
+            mainPlan: null,
+          });
+        }
+
+      }
     },
 
     /** on change users handler */
-    onChangeUsers({ event, value, plan, index }) {
+    onChangeUsers({ event=null, value, plan, index }) {
       // no negative numbers accepted
       if (Number(event.target.value) < 0) {
         value = 0;
@@ -727,7 +757,6 @@ export default {
         const isCalifornia = plan.id === california.value.id;
         const otherPlan = isCalifornia ? immigration.value : california.value;
 
-        // const min = mainPlan.value.users - otherPlan.users;
         let mainValues = null;
 
         // update main plan
