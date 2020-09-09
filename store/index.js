@@ -1,6 +1,4 @@
 import gql from 'graphql-tag';
-// data saved locally
-// import data from '../data.json';
 
 export const state = () => ({
   loaded: false,

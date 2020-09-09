@@ -204,7 +204,10 @@
                           <button
                             class="btn btn-sm btn-outline-secondary"
                             type="button"
-                            :disabled="!plan.checked || btnAddCuponDisabledState(plan.couponId)"
+                            :disabled="
+                              !plan.checked ||
+                                btnAddCuponDisabledState(plan.couponId)
+                            "
                             :title="
                               plan.couponId.valid !== null
                                 ? 'Remove coupon'
@@ -580,8 +583,7 @@ export default {
     /** show plans filtered */
     getFilteredPlans() {
       const plans = [...this.plans];
-      // california: price_1GrnVtEHlNK1KgjMvTmvPR5f
-      // immigration: price_1GrnRoEHlNK1KgjMXEMUQh3q
+
       const checkedItems = [
         { name: 'california', id: 'price_1GrnVtEHlNK1KgjMvTmvPR5f' },
         { name: 'immigration', id: 'price_1GrnRoEHlNK1KgjMXEMUQh3q' },
@@ -615,13 +617,43 @@ export default {
                 totalChecked++;
               }
 
+              const isChecked = this.planIsMain(plan.id) || checked;
+
+              // default values
+              let discount = 0;
+              const couponId = { value: '', valid: null };
+
+              // load values of coupon applied
+              if (plan.coupon !== null && isChecked) {
+                const { percent_off, amount_off } = plan.coupon;
+
+                // type of cupon
+                const type = percent_off !== null ? 'percent' : 'amount';
+                // get value
+                const value = type === 'percent' ? percent_off : amount_off;
+
+                // plan total
+                const total = (plan.amount * plan.users) / 100;
+
+                // calculate total discount
+                discount = type === 'percent'
+                      ? (total * value) / 100
+                      : Number(String(value).slice(0, -2));
+
+                couponId.value = plan.coupon.id;
+                couponId.valid = true;
+              }
+
               return {
                 ...acc,
                 month: [
                   ...acc.month,
                   {
                     ...plan,
-                    checked: this.planIsMain(plan.id) || checked,
+                    checked: isChecked,
+                    discount,
+                    couponId,
+                    users: isChecked ? plan.users : 0,
                   },
                 ],
               };
