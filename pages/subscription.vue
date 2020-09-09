@@ -229,6 +229,7 @@
                                   index,
                                   couponId: plan.couponId,
                                   planId: plan.id,
+                                  input: $event.target.parentNode.previousElementSibling
                                 })
                               "
                             >
@@ -244,7 +245,7 @@
                                   <span class="sr-only">Loading...</span>
                                 </div>
                               </template>
-                              <span v-else>Add</span>
+                              <span v-else style="pointer-events: none;">Add</span>
                             </button>
                           </div>
                         </div>
@@ -524,7 +525,7 @@ export default {
     },
 
     /** verify cupon **/
-    async verifyCupon({ couponId, index, planId }) {
+    async verifyCupon({ couponId, index, planId, input=null }) {
       // invalid input data
       if (this.btnAddCuponDisabledState(couponId)) {
         return;
@@ -600,6 +601,12 @@ export default {
           value: false,
           period: this.mirrorPeriod,
         });
+
+        // set focus
+        if (input) {
+          input.focus();
+        }
+
       } finally {
         this.SET_LOADING(false, { root: true });
         this.currentVerifyCuponPlan = null;
