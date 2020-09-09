@@ -34,13 +34,41 @@ export const state = () => ({
 export const mutations = {
   SET_ALL(state, plans) {
     // add custom fields
-    state.all = plans.map(plan => ({
-      ...plan,
-      // manage cupon data
-      couponId: { value: '', valid: null },
-      // for apply cupon discount
-      discount: 0,
-    }));
+    state.all = plans.map(plan => {
+      // default values
+      let discount = 0;
+      const couponId = { value: '', valid: null };
+
+      // load values of coupon applied
+      if (plan.coupon !== null) {
+        const { percent_off, amount_off } = plan.coupon;
+
+        // type of cupon
+        const type = percent_off !== null ? 'percent' : 'amount';
+        // get value
+        const value = type === 'percent' ? percent_off : amount_off;
+
+        // plan total
+        const total = (plan.amount * plan.users) / 100;
+
+        // calculate total discount
+        discount = type === 'percent'
+            ? (total * value) / 100
+            : Number(String(value).slice(0, -2));
+
+        couponId.value = plan.coupon.id;
+        couponId.valid = true;
+      }
+
+      // whithout coupon
+      return {
+        ...plan,
+        // manage cupon data
+        couponId,
+        // for apply cupon discount
+        discount,
+      };
+    });
   },
 
   SET_MONTHLY(state, plans) {

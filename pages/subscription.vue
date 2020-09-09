@@ -204,7 +204,7 @@
                           <button
                             class="btn btn-sm btn-outline-secondary"
                             type="button"
-                            :disabled="btnAddCuponDisabledState(plan.couponId)"
+                            :disabled="!plan.checked || btnAddCuponDisabledState(plan.couponId)"
                             :title="
                               plan.couponId.valid !== null
                                 ? 'Remove coupon'
@@ -639,8 +639,8 @@ export default {
     /** copy monthly values to yearly */
     copyMonthlyValues(monthly, yearly) {
       return yearly.map((plan, index) => {
-        const { checked, users } = monthly[index];
-        return { ...plan, checked, users };
+        const { checked, users, coupon, discount, couponId } = monthly[index];
+        return { ...plan, checked, users, coupon, discount, couponId };
       });
     },
 

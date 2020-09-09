@@ -70,6 +70,7 @@ export const actions = {
               usageType
               checked
               users
+              coupon
             }
 
             paymentMethods: stripePaymentMethods {
