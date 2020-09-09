@@ -138,7 +138,7 @@
                 </div>
               </div>
 
-              <table class="table table-striped table-hover">
+              <table class="table table-striped table-hover table-plans">
                 <thead>
                   <tr>
                     <th>Package</th>
@@ -158,9 +158,10 @@
                     <td>
                       <div class="checkbox checkbox-success">
                         <input
-                          :id="plan.id"
                           type="checkbox"
+                          :id="plan.id"
                           :checked="plan.checked"
+                          :disabled="loading || subscribed"
                           @change="
                             onCheckedPlan({
                               value: !plan.checked,
@@ -173,11 +174,12 @@
                         </label>
                       </div>
 
-                      <div class="text-success" v-if="planIsMain(plan.id)">
-                        <b> Discount:</b> 5% for 12 months
+                      <div class="text-success" v-if="subscribed && plan.coupon && plan.checked">
+                        <!-- <b> Discount:</b> 5% for 12 months -->
+                        <b>{{ plan.coupon.name }}</b>
                       </div>
 
-                      <div v-else>
+                      <div v-if="!subscribed">
                         <div class="input-group input-group-sm mt-1">
                           <span
                             @click="quitCoupon(index)"
@@ -258,23 +260,25 @@
                       </div>
                     </td>
                     <td class="users-td">
-                      <input
-                        class="form-control form-control-sm"
-                        type="number"
-                        maxlength="3"
-                        min="0"
-                        size="3"
-                        :disabled="!plan.checked"
-                        :value="plan.users"
-                        @change="
-                          onChangeUsers({
-                            event: $event,
-                            plan: { ...plan },
-                            value: Number($event.target.value),
-                            index,
-                          })
-                        "
-                      />
+                      <div class="d-flex align-items-center">
+                        <input
+                          class="form-control form-control-sm"
+                          type="number"
+                          maxlength="3"
+                          min="0"
+                          size="3"
+                          :disabled="!plan.checked || subscribed"
+                          :value="plan.users"
+                          @change="
+                            onChangeUsers({
+                              event: $event,
+                              plan: { ...plan },
+                              value: Number($event.target.value),
+                              index,
+                            })
+                          "
+                        />
+                      </div>
                     </td>
                     <td class="text-center">
                       {{ plan.amount | slice(0, -2) | enUsFormatter }}
@@ -313,7 +317,7 @@
                 @click="subscribeUpdatePlan()"
                 :disabled="loading"
               >
-                Subscribe / Update
+                {{ subscribed ? 'Update' : 'Subscribe' }}
               </button>
             </div>
           </div>
@@ -343,6 +347,7 @@ export default {
       'planIsMain',
       'mainPlan',
       'getDefaultCheckedPlans',
+      'subscribed',
     ]),
     ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded', 'loading']),
@@ -425,6 +430,7 @@ export default {
       'REMOVE_PAYMENT_METHOD',
       'SET_CUPON',
       'SET_CUPON_STATE',
+      'SET_SUBSCRIBED',
     ]),
     ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
     ...mapMutations(['SET_LOADING']),
@@ -533,6 +539,8 @@ export default {
 
       try {
         this.SET_LOADING(true, { root: true });
+        this.$nuxt.$loading.start();
+
         this.currentVerifyCuponPlan = planId;
 
         const query = gql`
@@ -553,6 +561,7 @@ export default {
               redeemBy
               timesRedeemed
               valid
+              appliesTo
             }
           }
         `;
@@ -609,6 +618,7 @@ export default {
 
       } finally {
         this.SET_LOADING(false, { root: true });
+        this.$nuxt.$loading.finish();
         this.currentVerifyCuponPlan = null;
       }
     },
@@ -712,6 +722,10 @@ export default {
 
     /** on checked plan handler */
     onCheckedPlan(data) {
+      if (this.subscribed) {
+        return;
+      };
+
       // data { value, index });
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
 
@@ -860,6 +874,7 @@ export default {
       // execute request
       try {
         this.SET_LOADING(true, { root: true });
+        this.$nuxt.$loading.start();
 
         const mutation = gql`
           mutation($id: String!) {
@@ -880,6 +895,7 @@ export default {
         console.error(error);
       } finally {
         this.SET_LOADING(false, { root: true });
+        this.$nuxt.$loading.finish();
       }
     },
 
@@ -901,6 +917,7 @@ export default {
       // execute request
       try {
         this.SET_LOADING(true, { root: true });
+        this.$nuxt.$loading.start();
 
         const mutation = gql`
           mutation($id: String!) {
@@ -928,10 +945,16 @@ export default {
         console.error(error);
       } finally {
         this.SET_LOADING(false, { root: true });
+        this.$nuxt.$loading.finish();
       }
     },
 
     async subscribeUpdatePlan() {
+      if (this.subscribed) {
+        this.SET_SUBSCRIBED(false);
+        return;
+      }
+
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
         text: 'Are you sure you want to update your subscription?',
@@ -962,7 +985,9 @@ export default {
           return obj;
         });
 
-      this.addSubscription(plans);
+      this.$nuxt.$loading.start();
+      await this.addSubscription(plans);
+      this.$nuxt.$loading.finish();
     },
   },
 };
@@ -982,11 +1007,6 @@ export default {
 .credit-card-default {
   background-color: rgba(146, 153, 150, 0.1);
   border: 1px solid #919191;
-}
-
-.users-td {
-  display: flex;
-  justify-content: center;
 }
 
 .users-td input {
@@ -1013,5 +1033,9 @@ export default {
   align-items: center;
   justify-content: center;
   color: rgba(0, 0, 0, 0.15);
+}
+
+.table-plans td {
+  vertical-align: middle;
 }
 </style>

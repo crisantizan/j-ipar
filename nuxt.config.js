@@ -77,6 +77,10 @@ export default {
       { src: 'js/vendor.min.js' },
     ],
   },
+
+  loading: {
+    height: '5px',
+  },
   /*
    ** Global CSS
    */

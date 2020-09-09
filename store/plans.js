@@ -29,6 +29,7 @@ export const state = () => ({
     ],
   },
   lastChangedPlan: null,
+  subscribed: false,
 });
 
 export const mutations = {
@@ -146,6 +147,10 @@ export const mutations = {
     // remove element
     state.paymentMethods.splice(index, 1);
   },
+
+  SET_SUBSCRIBED(state, payload) {
+    state.subscribed = payload;
+  },
 };
 
 export const getters = {
@@ -225,6 +230,8 @@ export const getters = {
   paymentMethods(state) {
     return state.paymentMethods;
   },
+
+  subscribed: state => state.subscribed,
 };
 
 export const actions = {
@@ -274,6 +281,7 @@ export const actions = {
 
       // refresh payment methods
       console.log({ ...result });
+      commit('SET_SUBSCRIBED', true);
     } catch (err) {
       console.error(err);
     } finally {
