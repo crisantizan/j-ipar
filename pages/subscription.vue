@@ -174,7 +174,10 @@
                         </label>
                       </div>
 
-                      <div class="text-success" v-if="subscribed && plan.coupon && plan.checked">
+                      <div
+                        class="text-success"
+                        v-if="subscribed && plan.coupon && plan.checked"
+                      >
                         <!-- <b> Discount:</b> 5% for 12 months -->
                         <b>{{ plan.coupon.name }}</b>
                       </div>
@@ -231,7 +234,9 @@
                                   index,
                                   couponId: plan.couponId,
                                   plan: plan,
-                                  input: $event.target.parentNode.previousElementSibling
+                                  input:
+                                    $event.target.parentNode
+                                      .previousElementSibling,
                                 })
                               "
                             >
@@ -247,7 +252,9 @@
                                   <span class="sr-only">Loading...</span>
                                 </div>
                               </template>
-                              <span v-else style="pointer-events: none;">Add</span>
+                              <span v-else style="pointer-events: none;"
+                                >Add</span
+                              >
                             </button>
                           </div>
                         </div>
@@ -330,6 +337,7 @@
 <script>
 import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
+import { camelToSnakeCaseObj } from '@/helpers/utils';
 
 export default {
   data: () => ({
@@ -536,7 +544,7 @@ export default {
     },
 
     /** verify cupon **/
-    async verifyCupon({ couponId, index, plan, input=null }) {
+    async verifyCupon({ couponId, index, plan, input = null }) {
       // invalid input data
       if (this.btnAddCuponDisabledState(couponId)) {
         return;
@@ -578,7 +586,10 @@ export default {
         });
 
         // validate coupon
-        const isAssignable = this.cuponIsAssignable(result.data.verifyStripeCoupon.appliesTo, plan.product);
+        const isAssignable = this.cuponIsAssignable(
+          result.data.verifyStripeCoupon.appliesTo,
+          plan.product,
+        );
 
         const { valid, percentOff, amountOff } = result.data.verifyStripeCoupon;
 
@@ -589,7 +600,7 @@ export default {
           discount = {
             value: percentOff !== null ? percentOff : amountOff,
             type: percentOff !== null ? 'percent' : 'amount',
-          }
+          };
         }
 
         this.SET_CUPON_STATE({
@@ -605,7 +616,6 @@ export default {
           period: this.mirrorPeriod,
           discount,
         });
-
       } catch (err) {
         // invalid cupon
         this.SET_CUPON_STATE({
@@ -624,7 +634,6 @@ export default {
         if (input) {
           input.focus();
         }
-
       } finally {
         this.SET_LOADING(false, { root: true });
         this.$nuxt.$loading.finish();
@@ -733,7 +742,7 @@ export default {
     onCheckedPlan(data) {
       if (this.subscribed) {
         return;
-      };
+      }
 
       // data { value, index });
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
