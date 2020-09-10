@@ -699,7 +699,7 @@ export default {
               const couponId = { value: '', valid: null };
 
               // load values of coupon applied
-              if (plan.coupon !== null && isChecked) {
+              if (!!Object.keys(plan.coupon).length && isChecked) {
                 const { percent_off, amount_off } = plan.coupon;
 
                 // type of cupon
