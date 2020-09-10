@@ -436,6 +436,7 @@ export default {
       'CHANGE_DEFAULT_CUSTOMER',
       'ADD_PAYMENT_METHOD',
       'REMOVE_PAYMENT_METHOD',
+      'SET_FULL_CUPON',
       'SET_CUPON',
       'SET_CUPON_STATE',
       'SET_SUBSCRIBED',
@@ -602,6 +603,13 @@ export default {
             type: percentOff !== null ? 'percent' : 'amount',
           };
         }
+
+        delete result.data.verifyStripeCoupon.appliesTo;
+
+        this.SET_FULL_CUPON({
+          index,
+          value: camelToSnakeCaseObj(result.data.verifyStripeCoupon),
+        });
 
         this.SET_CUPON_STATE({
           index,

@@ -49,6 +49,13 @@ export const mutations = {
     state.period = period;
   },
 
+  SET_FULL_CUPON(state, { index, value }) {
+    const mirrorPeriod = state.period === 'month' ? 'year' : 'month';
+
+    state[state.period][index].coupon = value;
+    state[mirrorPeriod][index].coupon = value;
+  },
+
   SET_CUPON(state, { index, value, period }) {
     const plan = state[period][index];
 
