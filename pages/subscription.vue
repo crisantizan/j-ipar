@@ -161,7 +161,7 @@
                           type="checkbox"
                           :id="plan.id"
                           :checked="plan.checked"
-                          :disabled="loading || subscribed"
+                          :disabled="loading || plan.couponId.confirmed"
                           @change="
                             onCheckedPlan({
                               value: !plan.checked,
@@ -175,14 +175,20 @@
                       </div>
 
                       <div
-                        class="text-success"
-                        v-if="subscribed && plan.coupon && plan.checked"
+                        :class="[plan.couponId.confirmed ? 'text-success' : 'text-grey']"
+                        v-if="plan.couponId.valid && plan.checked"
                       >
                         <!-- <b> Discount:</b> 5% for 12 months -->
-                        <b>{{ plan.coupon.name }}</b>
+                        <div class="d-flex align-items-center">
+                          <b class="mr-1">{{ plan.coupon.name }}</b>
+
+                          <span v-if="!plan.couponId.confirmed" class="quit-cupon" title="Remove coupon" @click="quitCoupon(index)">
+                            <i class="fas fa-times text-danger"></i>
+                          </span>
+                        </div>
                       </div>
 
-                      <div v-if="!subscribed">
+                      <div v-else>
                         <div class="input-group input-group-sm mt-1">
                           <span
                             @click="quitCoupon(index)"
@@ -318,13 +324,13 @@
 
             <div class="text-right mb-3">
               <button
+                v-if="!!paymentMethods.length"
                 type="button"
                 class="btn btn-success"
-                v-if="!!paymentMethods.length"
                 @click="subscribeUpdatePlan()"
                 :disabled="loading"
               >
-                {{ subscribed ? 'Update' : 'Subscribe' }}
+                Subscribe / Update
               </button>
             </div>
           </div>
@@ -445,7 +451,8 @@ export default {
       'SET_CUPON',
       'SET_CUPON_STATE',
       'SET_SUBSCRIBED',
-      'SET_SUBSCRIPTION_DEFAULTS'
+      'SET_SUBSCRIPTION_DEFAULTS',
+      'CONFIRM_COUPONS'
     ]),
     ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
     ...mapMutations(['SET_LOADING']),
@@ -610,8 +617,6 @@ export default {
           };
         }
 
-        delete result.data.verifyStripeCoupon.appliesTo;
-
         this.SET_FULL_CUPON({
           index,
           value: camelToSnakeCaseObj(result.data.verifyStripeCoupon),
@@ -696,10 +701,10 @@ export default {
 
               // default values
               let discount = 0;
-              const couponId = { value: '', valid: null };
+              const couponId = { value: '', valid: null, confirmed: false };
 
               // load values of coupon applied
-              if (!!Object.keys(plan.coupon).length && isChecked) {
+              if (plan.coupon !== null && isChecked) {
                 const { percent_off, amount_off } = plan.coupon;
 
                 // type of cupon
@@ -718,6 +723,7 @@ export default {
 
                 couponId.value = plan.coupon.id;
                 couponId.valid = true;
+                couponId.confirmed = true;
               }
 
               return {
@@ -1019,6 +1025,7 @@ export default {
 
       this.$nuxt.$loading.start();
       await this.addSubscription(plans);
+      this.CONFIRM_COUPONS();
       this.$nuxt.$loading.finish();
     },
   },
@@ -1055,6 +1062,15 @@ export default {
 }
 
 .quit-cupon {
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.text-grey {
+  color: rgba(0,0,0,.4);
+}
+
+.quit-cupon-old {
   position: absolute;
   right: 80px;
   z-index: 100;

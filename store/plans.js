@@ -160,7 +160,7 @@ export const mutations = {
     state.subscribed = payload;
   },
 
-  /** current subscription default values **/
+  /** current subscription default values (TODO:: not used) **/
   SET_SUBSCRIPTION_DEFAULTS(state) {
     state.subscriptionDefaults = state.month.reduce((acc, plan, index) => {
       if (!plan.checked || plan.coupon === null) {
@@ -169,6 +169,20 @@ export const mutations = {
 
       return [...acc, { index, users: plan.users, cuponId: plan.coupon.id }]
     }, []);
+  },
+
+  CONFIRM_COUPONS(state) {
+    state.month.forEach(plan => {
+      if (plan.couponId.valid) {
+        plan.couponId.confirmed = true;
+      }
+    })
+
+    state.year.forEach(plan => {
+      if (plan.couponId.valid) {
+        plan.couponId.confirmed = true;
+      }
+    })
   },
 };
 
@@ -302,7 +316,7 @@ export const actions = {
 
       // refresh payment methods
       console.log({ ...result });
-      commit('SET_SUBSCRIBED', true);
+      // commit('SET_SUBSCRIBED', true);
     } catch (err) {
       console.error(err);
     } finally {
