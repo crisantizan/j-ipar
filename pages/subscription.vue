@@ -175,14 +175,23 @@
                       </div>
 
                       <div
-                        :class="[plan.couponId.confirmed ? 'text-success' : 'text-grey']"
+                        :class="[
+                          plan.couponId.confirmed
+                            ? 'text-success'
+                            : 'text-grey',
+                        ]"
                         v-if="plan.couponId.valid && plan.checked"
                       >
                         <!-- <b> Discount:</b> 5% for 12 months -->
                         <div class="d-flex align-items-center">
                           <b class="mr-1">{{ plan.coupon.name }}</b>
 
-                          <span v-if="!plan.couponId.confirmed" class="quit-cupon" title="Remove coupon" @click="quitCoupon(index)">
+                          <span
+                            v-if="!plan.couponId.confirmed"
+                            class="quit-cupon"
+                            title="Remove coupon"
+                            @click="quitCoupon(index)"
+                          >
                             <i class="fas fa-times text-danger"></i>
                           </span>
                         </div>
@@ -362,7 +371,7 @@ export default {
       'mainPlan',
       'getDefaultCheckedPlans',
       'subscribed',
-      'subscriptionDefaults'
+      'subscriptionDefaults',
     ]),
     ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded', 'loading']),
@@ -452,7 +461,7 @@ export default {
       'SET_CUPON_STATE',
       'SET_SUBSCRIBED',
       'SET_SUBSCRIPTION_DEFAULTS',
-      'CONFIRM_COUPONS'
+      'CONFIRM_COUPONS',
     ]),
     ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
     ...mapMutations(['SET_LOADING']),
@@ -703,8 +712,13 @@ export default {
               let discount = 0;
               const couponId = { value: '', valid: null, confirmed: false };
 
+              const hasCoupon =
+                plan.coupon === null
+                  ? false
+                  : !!Object.keys(plan.coupon).length;
+
               // load values of coupon applied
-              if (plan.coupon !== null && isChecked) {
+              if (hasCoupon && isChecked) {
                 const { percent_off, amount_off } = plan.coupon;
 
                 // type of cupon
@@ -1067,7 +1081,7 @@ export default {
 }
 
 .text-grey {
-  color: rgba(0,0,0,.4);
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .quit-cupon-old {
