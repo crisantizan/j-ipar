@@ -213,7 +213,7 @@
                               verifyCupon({
                                 index,
                                 couponId: plan.couponId,
-                                planId: plan.id,
+                                plan: plan,
                               })
                             "
                           />
@@ -230,7 +230,7 @@
                                 verifyCupon({
                                   index,
                                   couponId: plan.couponId,
-                                  planId: plan.id,
+                                  plan: plan,
                                   input: $event.target.parentNode.previousElementSibling
                                 })
                               "
@@ -530,8 +530,13 @@ export default {
       }
     },
 
+    /** validate if coupon is assignable to the current plan **/
+    cuponIsAssignable(appliesTo, planProd) {
+      return appliesTo === null || appliesTo.products.some(p => p === planProd);
+    },
+
     /** verify cupon **/
-    async verifyCupon({ couponId, index, planId, input=null }) {
+    async verifyCupon({ couponId, index, plan, input=null }) {
       // invalid input data
       if (this.btnAddCuponDisabledState(couponId)) {
         return;
@@ -541,7 +546,7 @@ export default {
         this.SET_LOADING(true, { root: true });
         this.$nuxt.$loading.start();
 
-        this.currentVerifyCuponPlan = planId;
+        this.currentVerifyCuponPlan = plan.id;
 
         const query = gql`
           query($couponId: String!) {
@@ -572,31 +577,35 @@ export default {
           variables: { couponId: couponId.value },
         });
 
+        // validate coupon
+        const isAssignable = this.cuponIsAssignable(result.data.verifyStripeCoupon.appliesTo, plan.product);
+
         const { valid, percentOff, amountOff } = result.data.verifyStripeCoupon;
 
-        const discountType = percentOff !== null ? 'percent' : 'amount';
-        const discountValue =
-          discountType === 'percent' ? percentOff : amountOff;
+        const isValid = valid && isAssignable;
+        let discount = null;
+
+        if (isValid) {
+          discount = {
+            value: percentOff !== null ? percentOff : amountOff,
+            type: percentOff !== null ? 'percent' : 'amount',
+          }
+        }
 
         this.SET_CUPON_STATE({
           index,
-          value: valid,
+          value: isValid,
           period: this.paymentPeriod,
-          discount: {
-            value: discountValue,
-            type: discountType,
-          },
+          discount,
         });
 
         this.SET_CUPON_STATE({
           index,
-          value: valid,
+          value: isValid,
           period: this.mirrorPeriod,
-          discount: {
-            value: discountValue,
-            type: discountType,
-          },
+          discount,
         });
+
       } catch (err) {
         // invalid cupon
         this.SET_CUPON_STATE({

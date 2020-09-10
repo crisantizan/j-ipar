@@ -81,20 +81,20 @@ export const actions = {
               invoiceSettings
             }
 
-             users {
-               id
-               firstName
-               middleName
-               lastName
-               email
-               tenantCode
-               isAttorney
-               admin
-               tenantCode
-               active
-               assignLibraries
-               librariesQuantity
-             }
+            users {
+              id
+              firstName
+              middleName
+              lastName
+              email
+              tenantCode
+              isAttorney
+              admin
+              tenantCode
+              active
+              assignLibraries
+              librariesQuantity
+            }
           }
         `,
       });
@@ -113,7 +113,6 @@ export const actions = {
       if (!!data.users.length) {
         commit('users/SET_LIBRARIES_QUANTITY', data.users[0].librariesQuantity);
       }
-
     } catch (error) {
       console.error(error);
     } finally {
