@@ -356,6 +356,7 @@ export default {
       'mainPlan',
       'getDefaultCheckedPlans',
       'subscribed',
+      'subscriptionDefaults'
     ]),
     ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded', 'loading']),
@@ -423,6 +424,10 @@ export default {
           const { month, year } = this.getFilteredPlans();
           this.SET_MONTHLY(month);
           this.SET_YEARLY(this.copyMonthlyValues(month, year));
+
+          if (!this.subscriptionDefaults.length) {
+            this.SET_SUBSCRIPTION_DEFAULTS();
+          }
         }
       },
     },
@@ -440,6 +445,7 @@ export default {
       'SET_CUPON',
       'SET_CUPON_STATE',
       'SET_SUBSCRIBED',
+      'SET_SUBSCRIPTION_DEFAULTS'
     ]),
     ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
     ...mapMutations(['SET_LOADING']),

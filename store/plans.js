@@ -30,6 +30,7 @@ export const state = () => ({
   },
   lastChangedPlan: null,
   subscribed: false,
+  subscriptionDefaults: [],
 });
 
 export const mutations = {
@@ -158,6 +159,17 @@ export const mutations = {
   SET_SUBSCRIBED(state, payload) {
     state.subscribed = payload;
   },
+
+  /** current subscription default values **/
+  SET_SUBSCRIPTION_DEFAULTS(state) {
+    state.subscriptionDefaults = state.month.reduce((acc, plan, index) => {
+      if (!plan.checked || plan.coupon === null) {
+        return acc;
+      }
+
+      return [...acc, { index, users: plan.users, cuponId: plan.coupon.id }]
+    }, []);
+  },
 };
 
 export const getters = {
@@ -239,6 +251,8 @@ export const getters = {
   },
 
   subscribed: state => state.subscribed,
+
+  subscriptionDefaults: state => state.subscriptionDefaults,
 };
 
 export const actions = {
