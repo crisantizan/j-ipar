@@ -676,10 +676,10 @@ export default {
     getFilteredPlans() {
       const plans = [...this.plans];
 
-      const checkedItems = [
-        { name: 'california', id: 'price_1GrnVtEHlNK1KgjMvTmvPR5f' },
-        { name: 'immigration', id: 'price_1GrnRoEHlNK1KgjMXEMUQh3q' },
-      ];
+      // const checkedItems = [
+      //   { name: 'california', id: 'price_1GrnVtEHlNK1KgjMvTmvPR5f' },
+      //   { name: 'immigration', id: 'price_1GrnRoEHlNK1KgjMXEMUQh3q' },
+      // ];
 
       /** sort values */
       const sorted = plans.sort((a, b) => {
@@ -687,29 +687,29 @@ export default {
           return -1;
         }
 
-        if (this.isDefaultCheckedUser(a)) {
-          return 1;
-        }
+        // if (this.isDefaultCheckedUser(a)) {
+        //   return 1;
+        // }
 
         return 0;
       });
 
-      let totalChecked = 0;
+      // let totalChecked = 0;
 
       // split in "month" and "year"
       return sorted.reduce(
         (acc, plan) => {
           switch (plan.interval) {
             case 'month':
-              const checked = this.defaultCheckedUsers.month.some(
-                v => v.id === plan.id,
-              );
+              // const checked = this.defaultCheckedUsers.month.some(
+              //   v => v.id === plan.id,
+              // );
 
-              if (checked && totalChecked < 3) {
-                totalChecked++;
-              }
+              // if (checked && totalChecked < 3) {
+              //   totalChecked++;
+              // }
 
-              const isChecked = this.planIsMain(plan.id) || checked;
+              // const isChecked = this.planIsMain(plan.id) || checked;
 
               // default values
               let discount = 0;
@@ -721,7 +721,7 @@ export default {
                   : !!Object.keys(plan.coupon).length;
 
               // load values of coupon applied
-              if (hasCoupon && isChecked) {
+              if (hasCoupon) {
                 const { percent_off, amount_off } = plan.coupon;
 
                 // type of cupon
@@ -749,10 +749,8 @@ export default {
                   ...acc.month,
                   {
                     ...plan,
-                    checked: isChecked,
                     discount,
                     couponId,
-                    users: isChecked ? plan.users : 0,
                   },
                 ],
               };
@@ -792,6 +790,7 @@ export default {
             index: data.index,
             period: this.paymentPeriod,
           });
+
           this.SET_CUPON({
             value: '',
             index: data.index,
