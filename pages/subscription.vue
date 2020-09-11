@@ -157,11 +157,12 @@
                   >
                     <td>
                       <div class="checkbox checkbox-success">
+                        <!-- :disabled="loading || plan.couponId.confirmed" -->
                         <input
                           type="checkbox"
                           :id="plan.id"
                           :checked="plan.checked"
-                          :disabled="loading || plan.couponId.confirmed"
+                          :disabled="loading"
                           @change="
                             onCheckedPlan({
                               value: !plan.checked,
@@ -340,7 +341,6 @@
         </div>
       </div>
     </div>
-    <pre>{{ defaultCheckedPlans }}</pre>
   </div>
 </template>
 
@@ -362,7 +362,7 @@ export default {
       const discount = calcPlanDiscount(plan);
 
       return discount > total ? 0 : total - discount;
-    }
+    },
   },
   computed: {
     ...mapGetters('plans', [
@@ -462,7 +462,7 @@ export default {
       'SET_CUPON_STATE',
       'CONFIRM_COUPONS',
     ]),
-    ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
+    ...mapActions('plans', ['getPaymentMethods', 'addSubscription', 'cancelSubscriptions']),
     ...mapMutations(['SET_LOADING']),
 
     /** create payment method (with apollo) */
@@ -635,7 +635,6 @@ export default {
           value: isValid,
           discount,
         });
-
       } catch (err) {
         // invalid cupon
         this.SET_CUPON_STATE({
@@ -689,7 +688,7 @@ export default {
                 discount = {
                   type: percent_off !== null ? 'percent' : 'amount',
                   value: percent_off !== null ? percent_off : amount_off,
-                }
+                };
 
                 couponId.value = plan.coupon.id;
                 couponId.valid = true;
@@ -832,6 +831,12 @@ export default {
       });
     },
 
+    getCurrentCheckedPlans() {
+      return this.show
+        .filter(plan => plan.checked)
+        .map(plan => plan.id);
+    },
+
     /** change default payment method (with apollo) */
     async changeDefaultPaymentMethod(id) {
       const { isConfirmed } = await Swal.fire({
@@ -961,6 +966,14 @@ export default {
       this.$nuxt.$loading.start();
       await this.addSubscription(plans);
       this.CONFIRM_COUPONS();
+
+      const currentCheckeds = this.getCurrentCheckedPlans()
+      const toDelete = this.defaultCheckedPlans.filter(id => !currentCheckeds.includes(id));
+
+      if (!!toDelete.length) {
+        await this.cancelSubscriptions(toDelete.map(id => ({ planId: id })));
+      }
+
       this.$nuxt.$loading.finish();
     },
   },
