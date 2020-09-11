@@ -361,7 +361,6 @@ export default {
       const discount = calcPlanDiscount(plan);
 
       return discount > total ? 0 : total - discount;
-      // return total - calcPlanDiscount(plan);
     }
   },
   computed: {
@@ -510,7 +509,6 @@ export default {
     onTypeCupon(data) {
       // data: { value, index }
       this.SET_CUPON(data);
-      // this.SET_CUPON({ ...data, period: this.mirrorPeriod });
     },
 
     /** input class according to cupon state **/
@@ -538,14 +536,12 @@ export default {
 
       // reset
       this.SET_CUPON({ index, value: '' });
-      // this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
     },
 
     /** quit cupon **/
     quitCoupon(index) {
       // reset
       this.SET_CUPON({ index, value: '' });
-      // this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
     },
 
     /** set "title" property to input add cupon **/
@@ -636,24 +632,12 @@ export default {
           discount,
         });
 
-        // this.SET_CUPON_STATE({
-        //   index,
-        //   value: isValid,
-        //   period: this.mirrorPeriod,
-        //   discount,
-        // });
       } catch (err) {
         // invalid cupon
         this.SET_CUPON_STATE({
           index,
           value: false,
         });
-
-        // this.SET_CUPON_STATE({
-        //   index,
-        //   value: false,
-        //   period: this.mirrorPeriod,
-        // });
 
         // set focus
         if (input) {
@@ -774,10 +758,6 @@ export default {
 
     /** on checked plan handler */
     onCheckedPlan(data) {
-      // if (this.subscribed) {
-      //   return;
-      // }
-
       // data { value, index });
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
 
@@ -788,12 +768,6 @@ export default {
             value: '',
             index: data.index,
           });
-
-          // this.SET_CUPON({
-          //   value: '',
-          //   index: data.index,
-          //   period: this.mirrorPeriod,
-          // });
         }
 
         // quit users
@@ -806,14 +780,6 @@ export default {
             index: data.index,
             mainPlan: null,
           });
-
-          // this.UPDATE_SPECIAL_USERS({
-          //   value: 0,
-          //   oldValue: plan.users,
-          //   index: data.index,
-          //   period: this.mirrorPeriod,
-          //   mainPlan: null,
-          // });
         }
       }
     },
@@ -840,9 +806,6 @@ export default {
         event.target.value = 0;
       }
 
-      // const mirrorPeriod = this.paymentPeriod === 'month' ? 'year' : 'month';
-      // const { immigration, california } = this.getDefaultCheckedPlans;
-
       // update from main plan
       if (this.planIsMain(plan.id)) {
         // const sum = immigration.value.users + california.value.users;
@@ -859,14 +822,6 @@ export default {
           index,
           mainPlan: null,
         });
-
-        // this.UPDATE_SPECIAL_USERS({
-        //   value,
-        //   oldValue: plan.users,
-        //   index,
-        //   period: this.mirrorPeriod,
-        //   mainPlan: null,
-        // });
 
         return;
       }
@@ -893,48 +848,6 @@ export default {
         index,
         mainPlan: mainValues,
       });
-
-      // this.UPDATE_SPECIAL_USERS({
-      //   value,
-      //   oldValue: plan.users,
-      //   index,
-      //   period: this.mirrorPeriod,
-      //   mainPlan: mainValues,
-      // });
-
-      // update from children plans (specials only)
-      // if (this.isDefaultCheckedUser(plan)) {
-      //   const mainPlan = this.mainPlan(this.paymentPeriod);
-
-      //   const isCalifornia = plan.id === california.value.id;
-      //   const otherPlan = isCalifornia ? immigration.value : california.value;
-
-      //   let mainValues = null;
-
-      //   // update main plan
-      //   if (value + otherPlan.users > mainPlan.value.users) {
-      //     mainValues = {
-      //       newValue: value + otherPlan.users,
-      //       index: mainPlan.index,
-      //     };
-      //   }
-
-      //   this.UPDATE_SPECIAL_USERS({
-      //     value,
-      //     oldValue: plan.users,
-      //     index,
-      //     period: this.paymentPeriod,
-      //     mainPlan: mainValues,
-      //   });
-
-      //   this.UPDATE_SPECIAL_USERS({
-      //     value,
-      //     oldValue: plan.users,
-      //     index,
-      //     period: mirrorPeriod,
-      //     mainPlan: mainValues,
-      //   });
-      // }
     },
 
     periodChange() {
@@ -947,8 +860,6 @@ export default {
           planToUncheck.push(plan.id);
         }
       });
-
-      // console.log(productsToSwitch);
     },
 
     /** change default payment method (with apollo) */

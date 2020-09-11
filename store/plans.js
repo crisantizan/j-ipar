@@ -1,16 +1,6 @@
 import gql from 'graphql-tag';
 import { calcPlanDiscount } from '@/helpers/utils';
 
-// const helpers = {
-//   calcTotalPaid(acc, plan) {
-//   if (!plan.checked) {
-//     return acc;
-//   }
-//   const totalPlan = (plan.amount * plan.users) / 100;
-//   return acc + (totalPlan - calcPlanDiscount(plan.discount));
-// },
-// };
-
 export const state = () => ({
   all: [],
   period: 'month',
@@ -42,7 +32,6 @@ export const mutations = {
   },
 
   SET_FULL_CUPON(state, { index, value }) {
-    // const mirrorPeriod = state.period === 'month' ? 'year' : 'month';
     state[state.period][index].coupon = value;
     state[this.getters['plans/mirrorPeriod']][index].coupon = value;
   },
@@ -81,14 +70,6 @@ export const mutations = {
 
     // apply cupon discount
     if (discount !== null) {
-      // const total = (plan.amount * plan.users) / 100;
-
-      // const discountTotal =
-      //   discount.type === 'percent'
-      //     ? (total * discount.value) / 100
-      //     : Number(String(discount.value).slice(0, -2));
-
-      // plan.discount = discountTotal;
       plan.discount = discount;
       mirrorPlan.discount = discount;
     }
@@ -207,7 +188,6 @@ export const getters = {
       const discount = calcPlanDiscount(plan);
 
       return acc + (discount > totalPlan ? 0 : totalPlan - calcPlanDiscount(plan));
-      // return acc + (totalPlan - calcPlanDiscount(plan));
     }, 0);
   },
 
@@ -283,7 +263,6 @@ export const actions = {
 
       // refresh payment methods
       console.log({ ...result });
-      // commit('SET_SUBSCRIBED', true);
     } catch (err) {
       console.error(err);
     } finally {
