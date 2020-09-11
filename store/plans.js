@@ -1,14 +1,15 @@
 import gql from 'graphql-tag';
+import { calcPlanDiscount } from '@/helpers/utils';
 
-const helpers = {
-  calcTotalPaid(acc, plan) {
-    if (!plan.checked) {
-      return acc;
-    }
-    const totalPlan = (plan.amount * plan.users) / 100;
-    return acc + (totalPlan - plan.discount);
-  },
-};
+// const helpers = {
+//   calcTotalPaid(acc, plan) {
+//   if (!plan.checked) {
+//     return acc;
+//   }
+//   const totalPlan = (plan.amount * plan.users) / 100;
+//   return acc + (totalPlan - calcPlanDiscount(plan.discount));
+// },
+// };
 
 export const state = () => ({
   all: [],
@@ -51,47 +52,55 @@ export const mutations = {
   },
 
   SET_FULL_CUPON(state, { index, value }) {
-    const mirrorPeriod = state.period === 'month' ? 'year' : 'month';
-
+    // const mirrorPeriod = state.period === 'month' ? 'year' : 'month';
     state[state.period][index].coupon = value;
-    state[mirrorPeriod][index].coupon = value;
+    state[this.getters['plans/mirrorPeriod']][index].coupon = value;
   },
 
-  SET_CUPON(state, { index, value, period }) {
-    const plan = state[period][index];
+  SET_CUPON(state, { index, value }) {
+    const plan = state[state.period][index];
+    const mirrorPlan = state[this.getters['plans/mirrorPeriod']][index];
 
     plan.couponId.value = value;
+    mirrorPlan.couponId.value = value;
 
     if (plan.couponId.valid !== null) {
       plan.couponId.valid = null;
+      mirrorPlan.couponId.valid = null;
     }
 
     // remove discount
-    if (plan.discount > 0) {
-      plan.discount = 0;
+    if (plan.discount !== null) {
+      plan.discount = null;
+      mirrorPlan.discount = null;
     }
   },
 
-  SET_CUPON_STATE(state, { index, value, period, discount = null }) {
+  SET_CUPON_STATE(state, { index, value, discount = null }) {
     // discount: { value: Number, type: 'percent' | 'amount' }
-    const plan = state[period][index];
+    const plan = state[state.period][index];
+    const mirrorPlan = state[this.getters['plans/mirrorPeriod']][index];
 
     plan.couponId.valid = value;
+    mirrorPlan.couponId.valid = value;
 
     if (value === false) {
       plan.couponId.value = '';
+      mirrorPlan.couponId.value = '';
     }
 
     // apply cupon discount
     if (discount !== null) {
-      const total = (plan.amount * plan.users) / 100;
+      // const total = (plan.amount * plan.users) / 100;
 
-      const discountTotal =
-        discount.type === 'percent'
-          ? (total * discount.value) / 100
-          : Number(String(discount.value).slice(0, -2));
+      // const discountTotal =
+      //   discount.type === 'percent'
+      //     ? (total * discount.value) / 100
+      //     : Number(String(discount.value).slice(0, -2));
 
-      plan.discount = discountTotal;
+      // plan.discount = discountTotal;
+      plan.discount = discount;
+      mirrorPlan.discount = discount;
     }
   },
 
@@ -99,10 +108,8 @@ export const mutations = {
   SET_CHECKED_OR_USERS(state, { prop, value, index }) {
     // current plan
     const current = state[state.period][index];
-
     // get other period
-    const otherPeriod = state.period === 'month' ? 'year' : 'month';
-    const other = state[otherPeriod][index];
+    const other = state[this.getters['plans/mirrorPeriod']][index];
 
     // set new value
     current[prop] = value;
@@ -114,7 +121,7 @@ export const mutations = {
   },
 
   UPDATE_USERS(state, { value, oldValue, index, mainPlan }) {
-    const mirrorPeriod = state.period === 'month' ? 'year' : 'month';
+    const mirrorPeriod = this.getters['plans/mirrorPeriod'];
 
     state[state.period][index].users = value;
     state[mirrorPeriod][index].users = value;
@@ -137,8 +144,8 @@ export const mutations = {
   CHANGE_DEFAULT_CUSTOMER(state, payload) {
     if (state.customer.invoiceSettings === null) {
       state.customer.invoiceSettings = {
-        default_payment_method: payload,   
-      }
+        default_payment_method: payload,
+      };
 
       return;
     }
@@ -179,7 +186,7 @@ export const mutations = {
         return acc;
       }
 
-      return [...acc, { index, users: plan.users, cuponId: plan.coupon.id }]
+      return [...acc, { index, users: plan.users, cuponId: plan.coupon.id }];
     }, []);
   },
 
@@ -188,13 +195,13 @@ export const mutations = {
       if (plan.couponId.valid) {
         plan.couponId.confirmed = true;
       }
-    })
+    });
 
     state.year.forEach(plan => {
       if (plan.couponId.valid) {
         plan.couponId.confirmed = true;
       }
-    })
+    });
   },
 };
 
@@ -207,12 +214,26 @@ export const getters = {
     return state.period;
   },
 
+  mirrorPeriod(state) {
+    return state.period === 'month' ? 'year' : 'month';
+  },
+
   show(state) {
     return state[state.period];
   },
 
   totalPaid(state) {
-    return state[state.period].reduce(helpers.calcTotalPaid, 0);
+    return state[state.period].reduce((acc, plan) => {
+      if (!plan.checked) {
+        return acc;
+      }
+
+      const totalPlan = (plan.amount * plan.users) / 100;
+      const discount = calcPlanDiscount(plan);
+
+      return acc + (discount > totalPlan ? 0 : totalPlan - calcPlanDiscount(plan));
+      // return acc + (totalPlan - calcPlanDiscount(plan));
+    }, 0);
   },
 
   defaultCheckedUsers(state) {

@@ -16,3 +16,18 @@ export function camelToSnakeCaseObj(obj) {
 		};
 	}, {});
 }
+
+/** calculate plan discount **/
+export function calcPlanDiscount(plan) {
+	if (plan.discount === null) {
+		return 0;
+	}
+
+	const { discount } = plan;
+
+	const total = (plan.amount * plan.users) / 100;
+
+	return discount.type === 'percent'
+		? (total * discount.value) / 100
+		: Number(String(discount.value).slice(0, -2));
+}

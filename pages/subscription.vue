@@ -306,16 +306,10 @@
                       {{ plan.amount | slice(0, -2) | enUsFormatter }}
                     </td>
                     <td class="text-center">
-                      {{ plan.discount | enUsFormatter }}
+                      {{ plan | calcDiscount | enUsFormatter }}
                     </td>
                     <td class="text-center">
-                      {{
-                        plan.amount
-                          | slice(0, -2)
-                          | multiply(plan.users)
-                          | subtract(plan.discount)
-                          | enUsFormatter
-                      }}
+                      {{ plan | calcTotalPlan | enUsFormatter }}
                     </td>
                   </tr>
 
@@ -352,12 +346,24 @@
 <script>
 import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
-import { camelToSnakeCaseObj } from '@/helpers/utils';
+import { camelToSnakeCaseObj, calcPlanDiscount } from '@/helpers/utils';
 
 export default {
   data: () => ({
     currentVerifyCuponPlan: null,
   }),
+  filters: {
+    calcDiscount(plan) {
+      return calcPlanDiscount(plan);
+    },
+    calcTotalPlan(plan) {
+      const total = (plan.amount * plan.users) / 100;
+      const discount = calcPlanDiscount(plan);
+
+      return discount > total ? 0 : total - discount;
+      // return total - calcPlanDiscount(plan);
+    }
+  },
   computed: {
     ...mapGetters('plans', [
       'show',
@@ -513,8 +519,8 @@ export default {
     /** update cupon value on type **/
     onTypeCupon(data) {
       // data: { value, index }
-      this.SET_CUPON({ ...data, period: this.paymentPeriod });
-      this.SET_CUPON({ ...data, period: this.mirrorPeriod });
+      this.SET_CUPON(data);
+      // this.SET_CUPON({ ...data, period: this.mirrorPeriod });
     },
 
     /** input class according to cupon state **/
@@ -541,15 +547,15 @@ export default {
       }
 
       // reset
-      this.SET_CUPON({ index, value: '', period: this.paymentPeriod });
-      this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
+      this.SET_CUPON({ index, value: '' });
+      // this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
     },
 
     /** quit cupon **/
     quitCoupon(index) {
       // reset
-      this.SET_CUPON({ index, value: '', period: this.paymentPeriod });
-      this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
+      this.SET_CUPON({ index, value: '' });
+      // this.SET_CUPON({ index, value: '', period: this.mirrorPeriod });
     },
 
     /** set "title" property to input add cupon **/
@@ -637,29 +643,27 @@ export default {
         this.SET_CUPON_STATE({
           index,
           value: isValid,
-          period: this.paymentPeriod,
           discount,
         });
 
-        this.SET_CUPON_STATE({
-          index,
-          value: isValid,
-          period: this.mirrorPeriod,
-          discount,
-        });
+        // this.SET_CUPON_STATE({
+        //   index,
+        //   value: isValid,
+        //   period: this.mirrorPeriod,
+        //   discount,
+        // });
       } catch (err) {
         // invalid cupon
         this.SET_CUPON_STATE({
           index,
           value: false,
-          period: this.paymentPeriod,
         });
 
-        this.SET_CUPON_STATE({
-          index,
-          value: false,
-          period: this.mirrorPeriod,
-        });
+        // this.SET_CUPON_STATE({
+        //   index,
+        //   value: false,
+        //   period: this.mirrorPeriod,
+        // });
 
         // set focus
         if (input) {
@@ -712,7 +716,8 @@ export default {
               // const isChecked = this.planIsMain(plan.id) || checked;
 
               // default values
-              let discount = 0;
+              // let discount = 0;
+              let discount = null;
               const couponId = { value: '', valid: null, confirmed: false };
 
               const hasCoupon =
@@ -725,18 +730,22 @@ export default {
                 const { percent_off, amount_off } = plan.coupon;
 
                 // type of cupon
-                const type = percent_off !== null ? 'percent' : 'amount';
+                // const type = percent_off !== null ? 'percent' : 'amount';
                 // get value
-                const value = type === 'percent' ? percent_off : amount_off;
+                // const value = type === 'percent' ? percent_off : amount_off;
 
                 // plan total
-                const total = (plan.amount * plan.users) / 100;
+                // const total = (plan.amount * plan.users) / 100;
 
                 // calculate total discount
-                discount =
-                  type === 'percent'
-                    ? (total * value) / 100
-                    : Number(String(value).slice(0, -2));
+                discount = {
+                  type: percent_off !== null ? 'percent' : 'amount',
+                  value: percent_off !== null ? percent_off : amount_off,
+                }
+                // discount =
+                //   type === 'percent'
+                //     ? (total * value) / 100
+                //     : Number(String(value).slice(0, -2));
 
                 couponId.value = plan.coupon.id;
                 couponId.valid = true;
