@@ -289,7 +289,7 @@
                           maxlength="3"
                           min="0"
                           size="3"
-                          :disabled="!plan.checked || subscribed"
+                          :disabled="!plan.checked"
                           :value="plan.users"
                           @change="
                             onChangeUsers({
@@ -371,13 +371,9 @@ export default {
       'totalPaid',
       'customer',
       'paymentMethods',
-      'defaultCheckedUsers',
-      'isDefaultCheckedUser',
       'planIsMain',
       'mainPlan',
-      'getDefaultCheckedPlans',
-      'subscribed',
-      'subscriptionDefaults',
+      'coreIds',
     ]),
     ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded', 'loading']),
@@ -445,10 +441,6 @@ export default {
           const { month, year } = this.getFilteredPlans();
           this.SET_MONTHLY(month);
           this.SET_YEARLY(this.copyMonthlyValues(month, year));
-
-          if (!this.subscriptionDefaults.length) {
-            this.SET_SUBSCRIPTION_DEFAULTS();
-          }
         }
       },
     },
@@ -465,8 +457,6 @@ export default {
       'SET_FULL_CUPON',
       'SET_CUPON',
       'SET_CUPON_STATE',
-      'SET_SUBSCRIBED',
-      'SET_SUBSCRIPTION_DEFAULTS',
       'CONFIRM_COUPONS',
     ]),
     ...mapActions('plans', ['getPaymentMethods', 'addSubscription']),
@@ -797,14 +787,13 @@ export default {
           this.SET_CUPON({
             value: '',
             index: data.index,
-            period: this.paymentPeriod,
           });
 
-          this.SET_CUPON({
-            value: '',
-            index: data.index,
-            period: this.mirrorPeriod,
-          });
+          // this.SET_CUPON({
+          //   value: '',
+          //   index: data.index,
+          //   period: this.mirrorPeriod,
+          // });
         }
 
         // quit users
@@ -1058,11 +1047,6 @@ export default {
     },
 
     async subscribeUpdatePlan() {
-      if (this.subscribed) {
-        this.SET_SUBSCRIBED(false);
-        return;
-      }
-
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
         text: 'Are you sure you want to update your subscription?',

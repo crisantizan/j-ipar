@@ -18,17 +18,7 @@ export const state = () => ({
   year: [],
   paymentMethods: [],
   customer: null,
-  defaultCheckedUsers: {
-    core: ['price_1Gv7zkEHlNK1KgjMGy4WHzUf', 'price_1Gv80DEHlNK1KgjMaPRisapB'],
-    month: [
-      { name: 'california', id: 'price_1GrnVtEHlNK1KgjMvTmvPR5f' },
-      { name: 'immigration', id: 'price_1GrnRoEHlNK1KgjMXEMUQh3q' },
-    ],
-    year: [
-      { name: 'california', id: 'price_1GrnVtEHlNK1KgjMs3hjm4MU' },
-      { name: 'immigration', id: 'price_1GrnTXEHlNK1KgjMULxeVjhQ' },
-    ],
-  },
+  coreIds: ['price_1Gv7zkEHlNK1KgjMGy4WHzUf', 'price_1Gv80DEHlNK1KgjMaPRisapB'],
   lastChangedPlan: null,
   subscribed: false,
   subscriptionDefaults: [],
@@ -175,21 +165,6 @@ export const mutations = {
     state.paymentMethods.splice(index, 1);
   },
 
-  SET_SUBSCRIBED(state, payload) {
-    state.subscribed = payload;
-  },
-
-  /** current subscription default values (TODO:: not used) **/
-  SET_SUBSCRIPTION_DEFAULTS(state) {
-    state.subscriptionDefaults = state.month.reduce((acc, plan, index) => {
-      if (!plan.checked || plan.coupon === null) {
-        return acc;
-      }
-
-      return [...acc, { index, users: plan.users, cuponId: plan.coupon.id }];
-    }, []);
-  },
-
   CONFIRM_COUPONS(state) {
     state.month.forEach(plan => {
       if (plan.couponId.valid) {
@@ -236,56 +211,19 @@ export const getters = {
     }, 0);
   },
 
-  defaultCheckedUsers(state) {
-    return state.defaultCheckedUsers;
-  },
-
-  getDefaultCheckedPlans(state) {
-    // by period selected
-    const [california, immigration] = state.defaultCheckedUsers[state.period];
-
-    const californiaIndex = state[state.period].findIndex(
-      v => v.id === california.id,
-    );
-
-    const immigrationIndex = state[state.period].findIndex(
-      v => v.id === immigration.id,
-    );
-
-    return {
-      california: {
-        value: state[state.period][californiaIndex],
-        index: californiaIndex,
-      },
-      immigration: {
-        value: state[state.period][immigrationIndex],
-        index: immigrationIndex,
-      },
-    };
+  coreIds(state) {
+    return state.coreIds;
   },
 
   planIsMain(state) {
-    return id => state.defaultCheckedUsers.core.includes(id);
+    return id => state.coreIds.includes(id);
   },
 
   mainPlan(state) {
-    const ids = state.defaultCheckedUsers.core;
-
     return period => {
-      const index = state[period].findIndex(v => ids.includes(v.id));
+      const index = state[period].findIndex(v => state.coreIds.includes(v.id));
+
       return { index, value: state[period][index] };
-    };
-  },
-
-  isDefaultCheckedUser({ defaultCheckedUsers, period }, getters) {
-    return plan => {
-      const index = getters.show.findIndex(v => v.id === plan.id);
-
-      if (index === -1) {
-        return false;
-      }
-
-      return defaultCheckedUsers[period].some(v => v.id === plan.id);
     };
   },
 
@@ -296,10 +234,6 @@ export const getters = {
   paymentMethods(state) {
     return state.paymentMethods;
   },
-
-  subscribed: state => state.subscribed,
-
-  subscriptionDefaults: state => state.subscriptionDefaults,
 };
 
 export const actions = {
