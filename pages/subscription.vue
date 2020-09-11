@@ -795,18 +795,15 @@ export default {
         return;
       }
 
+      // children plans change
+
       const mainPlan = this.mainPlan(this.paymentPeriod);
       let mainValues = null;
 
-      const sum = this.getCheckedSum({
-        planMainId: mainPlan.value.id,
-        currentPlanId: plan.id,
-      });
-
-      // update main plan
-      if (value + sum > mainPlan.value.users) {
+      // update main when there'is increment
+      if (value > plan.users) {
         mainValues = {
-          newValue: value + sum,
+          newValue: mainPlan.value.users + (value - plan.users),
           index: mainPlan.index,
         };
       }
