@@ -131,7 +131,14 @@ export const mutations = {
   },
 
   CHANGE_DEFAULT_CUSTOMER(state, payload) {
-    // TODO:: whitout card throw error, verify
+    if (state.customer.invoiceSettings === null) {
+      state.customer.invoiceSettings = {
+        default_payment_method: payload,   
+      }
+
+      return;
+    }
+
     state.customer.invoiceSettings.default_payment_method = payload;
   },
 

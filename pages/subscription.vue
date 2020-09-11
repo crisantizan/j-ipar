@@ -470,6 +470,7 @@ export default {
     async createPaymentMethod(stripe, card) {
       try {
         this.SET_LOADING(true, { root: true });
+        this.$nuxt.$loading.start();
 
         // get stripe payment method
         const { paymentMethod } = await stripe.createPaymentMethod({
@@ -496,6 +497,7 @@ export default {
           id: paymentMethod.id,
           card: paymentMethod.card,
         });
+
         // set as default
         this.CHANGE_DEFAULT_CUSTOMER(paymentMethod.id);
 
@@ -504,6 +506,7 @@ export default {
         console.error(error);
       } finally {
         this.SET_LOADING(false, { root: true });
+        this.$nuxt.$loading.finish();
       }
     },
 
