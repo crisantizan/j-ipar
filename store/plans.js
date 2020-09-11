@@ -187,7 +187,9 @@ export const getters = {
       const totalPlan = (plan.amount * plan.users) / 100;
       const discount = calcPlanDiscount(plan);
 
-      return acc + (discount > totalPlan ? 0 : totalPlan - calcPlanDiscount(plan));
+      return (
+        acc + (discount > totalPlan ? 0 : totalPlan - calcPlanDiscount(plan))
+      );
     }, 0);
   },
 
@@ -217,6 +219,31 @@ export const getters = {
 };
 
 export const actions = {
+  async cancelSubscriptions({ commit, state }, plans) {
+    // apollo client
+    const client = this.app.apolloProvider.defaultClient;
+
+    try {
+      commit('SET_LOADING', true, { root: true });
+
+      const result = await client.mutate({
+        mutation: gql`
+          mutation($plans: Array!) {
+            stripeSubscriptionCancel(plans: $plans) {
+              id
+            }
+          }
+        `,
+        fetchPolicy: 'no-cache',
+        variables: { plans },
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      commit('SET_LOADING', false, { root: true });
+    }
+  },
+
   async addSubscription({ commit, state }, plans) {
     // apollo client
     const client = this.app.apolloProvider.defaultClient;
@@ -261,7 +288,6 @@ export const actions = {
         variables: { plans },
       });
 
-      // refresh payment methods
       console.log({ ...result });
     } catch (err) {
       console.error(err);
