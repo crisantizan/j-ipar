@@ -11,7 +11,10 @@ export const state = () => ({
   coreIds: ['price_1Gv7zkEHlNK1KgjMGy4WHzUf', 'price_1Gv80DEHlNK1KgjMaPRisapB'],
   lastChangedPlan: null,
   subscribed: false,
-  subscriptionDefaults: [],
+  defaultCheckedPlans: {
+    month: [],
+    year: [],
+  },
 });
 
 export const mutations = {
@@ -25,6 +28,18 @@ export const mutations = {
 
   SET_YEARLY(state, plans) {
     state.year = plans;
+  },
+
+  SET_DEFAULT_CHECKED_PLANS(state) {
+    state.defaultCheckedPlans[state.period] = state[state.period]
+      .filter(plan => plan.checked)
+      .map(plan => ({ id: plan.id }));
+
+    state.defaultCheckedPlans[this.getters['plans/mirrorPeriod']] = state[
+      this.getters['plans/mirrorPeriod']
+    ]
+      .filter(plan => plan.checked)
+      .map(plan => ({ id: plan.id }));
   },
 
   SET_PERIOD(state, period) {
@@ -176,6 +191,10 @@ export const getters = {
 
   show(state) {
     return state[state.period];
+  },
+
+  defaultCheckedPlans(state) {
+    return state.defaultCheckedPlans;
   },
 
   totalPaid(state) {

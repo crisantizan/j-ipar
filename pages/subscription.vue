@@ -340,6 +340,7 @@
         </div>
       </div>
     </div>
+    <pre>{{ defaultCheckedPlans }}</pre>
   </div>
 </template>
 
@@ -367,6 +368,7 @@ export default {
     ...mapGetters('plans', [
       'show',
       'plans',
+      'defaultCheckedPlans',
       'totalPaid',
       'customer',
       'paymentMethods',
@@ -440,6 +442,7 @@ export default {
           const { month, year } = this.getFilteredPlans();
           this.SET_MONTHLY(month);
           this.SET_YEARLY(this.copyMonthlyValues(month, year));
+          this.SET_DEFAULT_CHECKED_PLANS();
         }
       },
     },
@@ -448,6 +451,7 @@ export default {
     ...mapMutations('plans', [
       'SET_MONTHLY',
       'SET_YEARLY',
+      'SET_DEFAULT_CHECKED_PLANS',
       'SET_CHECKED_OR_USERS',
       'UPDATE_USERS',
       'CHANGE_DEFAULT_CUSTOMER',
@@ -654,43 +658,21 @@ export default {
     getFilteredPlans() {
       const plans = [...this.plans];
 
-      // const checkedItems = [
-      //   { name: 'california', id: 'price_1GrnVtEHlNK1KgjMvTmvPR5f' },
-      //   { name: 'immigration', id: 'price_1GrnRoEHlNK1KgjMXEMUQh3q' },
-      // ];
-
       /** sort values */
       const sorted = plans.sort((a, b) => {
         if (this.planIsMain(a.id)) {
           return -1;
         }
 
-        // if (this.isDefaultCheckedUser(a)) {
-        //   return 1;
-        // }
-
         return 0;
       });
-
-      // let totalChecked = 0;
 
       // split in "month" and "year"
       return sorted.reduce(
         (acc, plan) => {
           switch (plan.interval) {
             case 'month':
-              // const checked = this.defaultCheckedUsers.month.some(
-              //   v => v.id === plan.id,
-              // );
-
-              // if (checked && totalChecked < 3) {
-              //   totalChecked++;
-              // }
-
-              // const isChecked = this.planIsMain(plan.id) || checked;
-
               // default values
-              // let discount = 0;
               let discount = null;
               const couponId = { value: '', valid: null, confirmed: false };
 
@@ -703,23 +685,11 @@ export default {
               if (hasCoupon) {
                 const { percent_off, amount_off } = plan.coupon;
 
-                // type of cupon
-                // const type = percent_off !== null ? 'percent' : 'amount';
-                // get value
-                // const value = type === 'percent' ? percent_off : amount_off;
-
-                // plan total
-                // const total = (plan.amount * plan.users) / 100;
-
                 // calculate total discount
                 discount = {
                   type: percent_off !== null ? 'percent' : 'amount',
                   value: percent_off !== null ? percent_off : amount_off,
                 }
-                // discount =
-                //   type === 'percent'
-                //     ? (total * value) / 100
-                //     : Number(String(value).slice(0, -2));
 
                 couponId.value = plan.coupon.id;
                 couponId.valid = true;
