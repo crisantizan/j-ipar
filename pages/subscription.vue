@@ -14,7 +14,7 @@
               </div>
 
               <!-- We'll put the error messages in this element -->
-              <div id="card-errors" role="alert" style="color: red;"></div>
+              <div id="card-errors" role="alert" style="color: red"></div>
 
               <div class="text-right">
                 <button
@@ -54,7 +54,7 @@
                 <span
                   v-if="
                     paymentMethod.id ===
-                      customer.invoiceSettings.default_payment_method
+                    customer.invoiceSettings.default_payment_method
                   "
                   >Active</span
                 >
@@ -68,7 +68,7 @@
                     <i class="fa fa-cc-visa fa-2x"></i>
                     <!-- {{ paymentMethod.card.brand }} -->
                   </span>
-                  <span style="font-size: larger;"
+                  <span style="font-size: larger"
                     >**** **** **** {{ paymentMethod.card.last4 }}</span
                   >
                   <br />
@@ -83,7 +83,7 @@
                       href="#"
                       v-if="
                         paymentMethod.id !=
-                          customer.invoiceSettings.default_payment_method
+                        customer.invoiceSettings.default_payment_method
                       "
                       @click="changeDefaultPaymentMethod(paymentMethod.id)"
                       >Set Default</a
@@ -241,7 +241,7 @@
                               type="button"
                               :disabled="
                                 !plan.checked ||
-                                  btnAddCuponDisabledState(plan.couponId)
+                                btnAddCuponDisabledState(plan.couponId)
                               "
                               title="Add coupon"
                               @click="
@@ -267,7 +267,7 @@
                                   <span class="sr-only">Loading...</span>
                                 </div>
                               </template>
-                              <span v-else style="pointer-events: none;"
+                              <span v-else style="pointer-events: none"
                                 >Add</span
                               >
                             </button>
@@ -452,7 +452,7 @@ export default {
       'SET_MONTHLY',
       'SET_YEARLY',
       'SET_CHECKED_OR_USERS',
-      'UPDATE_SPECIAL_USERS',
+      'UPDATE_USERS',
       'CHANGE_DEFAULT_CUSTOMER',
       'ADD_PAYMENT_METHOD',
       'REMOVE_PAYMENT_METHOD',
@@ -775,9 +775,9 @@ export default {
 
     /** on checked plan handler */
     onCheckedPlan(data) {
-      if (this.subscribed) {
-        return;
-      }
+      // if (this.subscribed) {
+      //   return;
+      // }
 
       // data { value, index });
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
@@ -802,23 +802,36 @@ export default {
         if (this.show[data.index].users > 0) {
           const plan = this.show[data.index];
 
-          this.UPDATE_SPECIAL_USERS({
+          this.UPDATE_USERS({
             value: 0,
             oldValue: plan.users,
             index: data.index,
-            period: this.paymentPeriod,
             mainPlan: null,
           });
 
-          this.UPDATE_SPECIAL_USERS({
-            value: 0,
-            oldValue: plan.users,
-            index: data.index,
-            period: this.mirrorPeriod,
-            mainPlan: null,
-          });
+          // this.UPDATE_SPECIAL_USERS({
+          //   value: 0,
+          //   oldValue: plan.users,
+          //   index: data.index,
+          //   period: this.mirrorPeriod,
+          //   mainPlan: null,
+          // });
         }
       }
+    },
+
+    /** get sum of checked plans **/
+    getCheckedSum({ planMainId, currentPlanId = null }) {
+      return this.show.reduce((sum, plan) => {
+        if (
+          planMainId === plan.id ||
+          (currentPlanId !== null && currentPlanId === plan.id)
+        ) {
+          return sum;
+        }
+
+        return sum + plan.users;
+      }, 0);
     },
 
     /** on change users handler */
@@ -829,69 +842,101 @@ export default {
         event.target.value = 0;
       }
 
-      const mirrorPeriod = this.paymentPeriod === 'month' ? 'year' : 'month';
-      const { immigration, california } = this.getDefaultCheckedPlans;
+      // const mirrorPeriod = this.paymentPeriod === 'month' ? 'year' : 'month';
+      // const { immigration, california } = this.getDefaultCheckedPlans;
 
       // update from main plan
       if (this.planIsMain(plan.id)) {
-        const sum = immigration.value.users + california.value.users;
+        // const sum = immigration.value.users + california.value.users;
+        const sum = this.getCheckedSum({ planMainId: plan.id });
+
         if (value < sum) {
           value = sum;
           event.target.value = sum;
         }
 
-        this.UPDATE_SPECIAL_USERS({
+        this.UPDATE_USERS({
           value,
           oldValue: plan.users,
           index,
-          period: this.paymentPeriod,
           mainPlan: null,
         });
 
-        this.UPDATE_SPECIAL_USERS({
-          value,
-          oldValue: plan.users,
-          index,
-          period: mirrorPeriod,
-          mainPlan: null,
-        });
+        // this.UPDATE_SPECIAL_USERS({
+        //   value,
+        //   oldValue: plan.users,
+        //   index,
+        //   period: this.mirrorPeriod,
+        //   mainPlan: null,
+        // });
 
         return;
       }
 
-      // update from children plans (specials only)
-      if (this.isDefaultCheckedUser(plan)) {
-        const mainPlan = this.mainPlan(this.paymentPeriod);
+      const mainPlan = this.mainPlan(this.paymentPeriod);
+      let mainValues = null;
 
-        const isCalifornia = plan.id === california.value.id;
-        const otherPlan = isCalifornia ? immigration.value : california.value;
+      const sum = this.getCheckedSum({
+        planMainId: mainPlan.value.id,
+        currentPlanId: plan.id,
+      });
 
-        let mainValues = null;
-
-        // update main plan
-        if (value + otherPlan.users > mainPlan.value.users) {
-          mainValues = {
-            newValue: value + otherPlan.users,
-            index: mainPlan.index,
-          };
-        }
-
-        this.UPDATE_SPECIAL_USERS({
-          value,
-          oldValue: plan.users,
-          index,
-          period: this.paymentPeriod,
-          mainPlan: mainValues,
-        });
-
-        this.UPDATE_SPECIAL_USERS({
-          value,
-          oldValue: plan.users,
-          index,
-          period: mirrorPeriod,
-          mainPlan: mainValues,
-        });
+      // update main plan
+      if (value + sum > mainPlan.value.users) {
+        mainValues = {
+          newValue: value + sum,
+          index: mainPlan.index,
+        };
       }
+
+      this.UPDATE_USERS({
+        value,
+        oldValue: plan.users,
+        index,
+        mainPlan: mainValues,
+      });
+
+      // this.UPDATE_SPECIAL_USERS({
+      //   value,
+      //   oldValue: plan.users,
+      //   index,
+      //   period: this.mirrorPeriod,
+      //   mainPlan: mainValues,
+      // });
+
+      // update from children plans (specials only)
+      // if (this.isDefaultCheckedUser(plan)) {
+      //   const mainPlan = this.mainPlan(this.paymentPeriod);
+
+      //   const isCalifornia = plan.id === california.value.id;
+      //   const otherPlan = isCalifornia ? immigration.value : california.value;
+
+      //   let mainValues = null;
+
+      //   // update main plan
+      //   if (value + otherPlan.users > mainPlan.value.users) {
+      //     mainValues = {
+      //       newValue: value + otherPlan.users,
+      //       index: mainPlan.index,
+      //     };
+      //   }
+
+      //   this.UPDATE_SPECIAL_USERS({
+      //     value,
+      //     oldValue: plan.users,
+      //     index,
+      //     period: this.paymentPeriod,
+      //     mainPlan: mainValues,
+      //   });
+
+      //   this.UPDATE_SPECIAL_USERS({
+      //     value,
+      //     oldValue: plan.users,
+      //     index,
+      //     period: mirrorPeriod,
+      //     mainPlan: mainValues,
+      //   });
+      // }
     },
 
     periodChange() {

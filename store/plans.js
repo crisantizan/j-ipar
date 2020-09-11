@@ -113,12 +113,16 @@ export const mutations = {
     state.lastChangedPlan = id;
   },
 
-  UPDATE_SPECIAL_USERS(state, { value, oldValue, index, period, mainPlan }) {
-    state[period][index].users = value;
+  UPDATE_USERS(state, { value, oldValue, index, mainPlan }) {
+    const mirrorPeriod = state.period === 'month' ? 'year' : 'month';
+
+    state[state.period][index].users = value;
+    state[mirrorPeriod][index].users = value;
 
     // update main value
     if (mainPlan !== null) {
-      state[period][mainPlan.index].users = mainPlan.newValue;
+      state[state.period][mainPlan.index].users = mainPlan.newValue;
+      state[mirrorPeriod][mainPlan.index].users = mainPlan.newValue;
     }
   },
 
