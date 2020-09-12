@@ -726,14 +726,6 @@ export default {
       );
     },
 
-    /** copy monthly values to yearly */
-    copyMonthlyValues(monthly, yearly) {
-      return yearly.map((plan, index) => {
-        const { checked, users, coupon, discount, couponId } = monthly[index];
-        return { ...plan, checked, users, coupon, discount, couponId };
-      });
-    },
-
     copyValues(from, to) {
       return to.map((plan, index) => {
         const { checked, users, coupon, discount, couponId } = from[index];
@@ -816,13 +808,26 @@ export default {
       const mainPlan = this.mainPlan(this.paymentPeriod);
       let mainValues = null;
 
-      // update main when there'is increment
-      if (value > plan.users) {
+      const sum = this.getCheckedSum({
+        planMainId: mainPlan.value.id,
+        currentPlanId: plan.id,
+      });
+
+      // update main plan
+      if (value + sum > mainPlan.value.users) {
         mainValues = {
-          newValue: mainPlan.value.users + (value - plan.users),
+          newValue: value + sum,
           index: mainPlan.index,
         };
       }
+
+      // // update main when there'is increment
+      // if (value > plan.users) {
+      //   mainValues = {
+      //     newValue: mainPlan.value.users + (value - plan.users),
+      //     index: mainPlan.index,
+      //   };
+      // }
 
       this.UPDATE_USERS({
         value,
@@ -977,23 +982,28 @@ export default {
         });
 
       this.$nuxt.$loading.start();
+
+      // execute request
       await this.addSubscription(plans);
+      // apply changes in template
       this.CONFIRM_COUPONS();
 
+      // subscriptions to delete
       let toDelete = [];
 
-      const currentCheckeds = this.getCurrentCheckedPlans()
+      const currentCheckeds = this.getCurrentCheckedPlans();
+
+      // plans uncheckeds
       const unCheckeds = this.defaultCheckedPlans.filter(id => !currentCheckeds.includes(id));
 
       // delete uncheckeds plans
       if (!!unCheckeds.length) {
-        console.log('Eliminar planes deseleccionados...');
         toDelete.push(...unCheckeds.map(id => ({ planId: id })))
       }
 
       // remove old period subscription
       if (this.paymentPeriod !== this.defaultPeriod) {
-        console.log('Eliminar planes del otro periodo...');
+        // set the current period as default
         this.SET_DEFAULT_PERIOD(this.paymentPeriod);
         toDelete.push(...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })));
       }
