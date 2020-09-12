@@ -4,6 +4,7 @@ import { calcPlanDiscount } from '@/helpers/utils';
 export const state = () => ({
   all: [],
   period: 'month',
+  defaultPeriod: 'month',
   month: [],
   year: [],
   paymentMethods: [],
@@ -24,6 +25,7 @@ export const mutations = {
     // set default period
     plans.forEach(plan => {
       if (state.coreIds.includes(plan.id) && plan.checked) {
+        state.defaultPeriod = plan.interval;
         state.period = plan.interval;
         return;
       }
@@ -36,6 +38,10 @@ export const mutations = {
 
   SET_YEARLY(state, plans) {
     state.year = plans;
+  },
+
+  SET_DEFAULT_PERIOD(state, period) {
+    state.defaultPeriod = period;
   },
 
   SET_DEFAULT_CHECKED_PLANS(state) {
@@ -193,12 +199,20 @@ export const getters = {
     return state.period;
   },
 
+  defaultPeriod(state) {
+    return state.defaultPeriod;
+  },
+
   mirrorPeriod(state) {
     return state.period === 'month' ? 'year' : 'month';
   },
 
   show(state) {
     return state[state.period];
+  },
+
+  mirrorSubscriptionPlans(state, getters) {
+    return state[getters.mirrorPeriod];
   },
 
   defaultCheckedPlans(state) {

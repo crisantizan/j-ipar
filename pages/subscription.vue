@@ -366,7 +366,10 @@ export default {
   },
   computed: {
     ...mapGetters('plans', [
+      'defaultPeriod',
+      'mirrorPeriod',
       'show',
+      'mirrorSubscriptionPlans',
       'plans',
       'defaultCheckedPlans',
       'totalPaid',
@@ -386,10 +389,6 @@ export default {
       set(period) {
         this.$store.commit('plans/SET_PERIOD', period);
       },
-    },
-
-    mirrorPeriod() {
-      return this.paymentPeriod === 'month' ? 'year' : 'month';
     },
   },
   mounted() {
@@ -440,8 +439,15 @@ export default {
         // set monthly and yearly plans, one time
         if (val && !this.show.length) {
           const { month, year } = this.getFilteredPlans();
-          this.SET_MONTHLY(month);
-          this.SET_YEARLY(this.copyMonthlyValues(month, year));
+
+          if (this.defaultPeriod === 'month') {
+            this.SET_MONTHLY(month);
+            this.SET_YEARLY(this.copyValues(month, year));
+          } else {
+            this.SET_YEARLY(year);
+            this.SET_MONTHLY(this.copyValues(year, month));
+          }
+
           this.SET_DEFAULT_CHECKED_PLANS();
         }
       },
@@ -461,6 +467,7 @@ export default {
       'SET_CUPON',
       'SET_CUPON_STATE',
       'CONFIRM_COUPONS',
+      'SET_DEFAULT_PERIOD',
     ]),
     ...mapActions('plans', ['getPaymentMethods', 'addSubscription', 'cancelSubscriptions']),
     ...mapMutations(['SET_LOADING']),
@@ -666,11 +673,13 @@ export default {
         return 0;
       });
 
+      const mirrorPeriod = this.defaultPeriod === 'month' ? 'year' : 'month';
+
       // split in "month" and "year"
       return sorted.reduce(
         (acc, plan) => {
           switch (plan.interval) {
-            case 'month':
+            case this.defaultPeriod:
               // default values
               let discount = null;
               const couponId = { value: '', valid: null, confirmed: false };
@@ -697,8 +706,8 @@ export default {
 
               return {
                 ...acc,
-                month: [
-                  ...acc.month,
+                [this.defaultPeriod]: [
+                  ...acc[this.defaultPeriod],
                   {
                     ...plan,
                     discount,
@@ -710,7 +719,7 @@ export default {
 
             // yearly
             default:
-              return { ...acc, year: [...acc.year, plan] };
+              return { ...acc, [mirrorPeriod]: [...acc[mirrorPeriod], plan] };
           }
         },
         { month: [], year: [] },
@@ -721,6 +730,13 @@ export default {
     copyMonthlyValues(monthly, yearly) {
       return yearly.map((plan, index) => {
         const { checked, users, coupon, discount, couponId } = monthly[index];
+        return { ...plan, checked, users, coupon, discount, couponId };
+      });
+    },
+
+    copyValues(from, to) {
+      return to.map((plan, index) => {
+        const { checked, users, coupon, discount, couponId } = from[index];
         return { ...plan, checked, users, coupon, discount, couponId };
       });
     },
@@ -964,11 +980,27 @@ export default {
       await this.addSubscription(plans);
       this.CONFIRM_COUPONS();
 
-      const currentCheckeds = this.getCurrentCheckedPlans()
-      const toDelete = this.defaultCheckedPlans.filter(id => !currentCheckeds.includes(id));
+      let toDelete = [];
 
+      const currentCheckeds = this.getCurrentCheckedPlans()
+      const unCheckeds = this.defaultCheckedPlans.filter(id => !currentCheckeds.includes(id));
+
+      // delete uncheckeds plans
+      if (!!unCheckeds.length) {
+        console.log('Eliminar planes deseleccionados...');
+        toDelete.push(...unCheckeds.map(id => ({ planId: id })))
+      }
+
+      // remove old period subscription
+      if (this.paymentPeriod !== this.defaultPeriod) {
+        console.log('Eliminar planes del otro periodo...');
+        this.SET_DEFAULT_PERIOD(this.paymentPeriod);
+        toDelete.push(...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })));
+      }
+
+      // remove subscriptions
       if (!!toDelete.length) {
-        await this.cancelSubscriptions(toDelete.map(id => ({ planId: id })));
+        await this.cancelSubscriptions(toDelete);
       }
 
       this.$nuxt.$loading.finish();
