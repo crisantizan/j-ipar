@@ -20,6 +20,14 @@ export const state = () => ({
 export const mutations = {
   SET_ALL(state, plans) {
     state.all = plans;
+
+    // set default period
+    plans.forEach(plan => {
+      if (state.coreIds.includes(plan.id) && plan.checked) {
+        state.period = plan.interval;
+        return;
+      }
+    });
   },
 
   SET_MONTHLY(state, plans) {
