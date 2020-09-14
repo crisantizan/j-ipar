@@ -704,6 +704,12 @@ export default {
                 couponId.confirmed = true;
               }
 
+              let checked = plan.checked;
+              // set Core plan as checked
+              if (this.planIsMain(plan.id) && !plan.checked) {
+                checked = true;
+              }
+
               return {
                 ...acc,
                 [this.defaultPeriod]: [
@@ -712,6 +718,7 @@ export default {
                     ...plan,
                     discount,
                     couponId,
+                    checked,
                   },
                 ],
               };
