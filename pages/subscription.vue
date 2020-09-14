@@ -162,7 +162,7 @@
                           type="checkbox"
                           :id="plan.id"
                           :checked="plan.checked"
-                          :disabled="loading"
+                          :disabled="loading || !plan.active"
                           @change="
                             onCheckedPlan({
                               value: !plan.checked,
@@ -705,9 +705,13 @@ export default {
               }
 
               let checked = plan.checked;
+              let active = plan.active;
+
               // set Core plan as checked
-              if (this.planIsMain(plan.id) && !plan.checked) {
-                checked = true;
+              if (this.planIsMain(plan.id)) {
+                active = false;
+
+                !plan.checked && (checked = false);
               }
 
               return {
@@ -719,6 +723,7 @@ export default {
                     discount,
                     couponId,
                     checked,
+                    active,
                   },
                 ],
               };
@@ -735,8 +740,8 @@ export default {
 
     copyValues(from, to) {
       return to.map((plan, index) => {
-        const { checked, users, coupon, discount, couponId } = from[index];
-        return { ...plan, checked, users, coupon, discount, couponId };
+        const { checked, users, coupon, discount, couponId, active } = from[index];
+        return { ...plan, checked, users, coupon, discount, couponId, active };
       });
     },
 
