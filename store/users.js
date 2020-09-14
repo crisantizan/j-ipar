@@ -43,10 +43,20 @@ export const getters = {
   },
 
   libraries: (state, getters) => {
-    return Object.entries(getters.librariesQuantity).reduce(
-      (acc, [key, value]) => {
-        if (value > 0) {
-          return { ...acc, [key]: value };
+    const libraries = getters.librariesQuantity;
+
+    const sorted = Object.keys(libraries).sort((a, b) => {
+      if (a === 'Core') {
+        return -1;
+      }
+
+      return 1;
+    });
+
+    return sorted.reduce(
+      (acc, key) => {
+        if (libraries[key] > 0) {
+          return { ...acc, [key]: libraries[key] };
         }
 
         return acc;
