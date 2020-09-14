@@ -1,3 +1,7 @@
+.vgt-responsive {
+  height: calc(100vh - 275px);
+}
+
 .my-table {
   border: none !important;
 }

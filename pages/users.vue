@@ -1,7 +1,7 @@
 <template>
   <div
     class="d-flex align-items-center"
-    style="min-height: calc(100vh - 69.6px);"
+    style="height: calc(100vh - 69.6px);"
   >
     <vue-datatable
       :columns="columns"

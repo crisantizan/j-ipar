@@ -24,7 +24,7 @@
         styleClass="vgt-table my-table table-hover"
         :columns="$props.columns"
         :rows="$props.rows"
-        max-height="calc(100vh - 275px)"
+        height="calc(100vh - 275px)"
         :row-style-class="$props.rowStyleClass"
         :pagination-options="{
           mode: 'pages',
