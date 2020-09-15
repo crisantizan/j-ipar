@@ -100,13 +100,15 @@ export const getters = {
       return acc;
     }, {});
 
-    obj['Prima Facie'] = Object.keys(getters.librariesQuantity).reduce((acc, key) => {
-      if (key !== 'Prima Facie') {
-        return acc + getters.librariesQuantity[key];
-      }
+    // obj['Prima Facie'] = Object.keys(getters.librariesQuantity).reduce((acc, key) => {
+    //   if (key !== 'Prima Facie') {
+    //     return acc + getters.librariesQuantity[key];
+    //   }
 
-      return acc;
-    }, 0);
+    //   return acc;
+    // }, 0);
+
+    obj['Prima Facie'] = getters.users.reduce((acc, user) => user.active ? acc + 1 : acc, 0);
 
     return obj;
   },

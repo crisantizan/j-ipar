@@ -471,6 +471,18 @@ export default {
 
     /* disable dropdown actions items */
     dropdownActionItemIsDisabled(action, isActive) {
+      // const tt = Object.keys(this.librariesQuantity).reduce((acc, key) => {
+      //   if (key !== 'Prima Facie') {
+      //     return acc + this.librariesQuantity[key];
+      //   }
+
+      //   return acc;
+      // }, 0);
+      // // acction: disabled, isActive: false
+      // if (action === 'disable' && !isActive && this.selected['Prima Facie'] === tt) {
+      //   return true;
+      // }
+
       return action !== 'disable' && !isActive;
     },
 
