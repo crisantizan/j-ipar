@@ -111,7 +111,18 @@ export const actions = {
 
       // set libraries quantity
       if (!!data.users.length) {
-        commit('users/SET_LIBRARIES_QUANTITY', data.users[0].librariesQuantity);
+        const libraries = data.users[0].librariesQuantity;
+
+        const obj = Object.keys(libraries).reduce((acc, key) => {
+          if (key !== 'Core') {
+            return {...acc, [key]: libraries[key]};
+          }
+
+          // change "Core" key to "Prima Facie"
+          return { ...acc, 'Prima Facie': libraries[key] };
+        }, {});
+
+        commit('users/SET_LIBRARIES_QUANTITY', obj);
       }
     } catch (error) {
       console.error(error);

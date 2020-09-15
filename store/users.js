@@ -46,7 +46,7 @@ export const getters = {
     const libraries = getters.librariesQuantity;
 
     const sorted = Object.keys(libraries).sort((a, b) => {
-      if (a === 'Core') {
+      if (a === 'Prima Facie') {
         return -1;
       }
 
@@ -72,7 +72,7 @@ export const getters = {
       return {};
     }
 
-    const availables = [...Object.keys(state.users[0].assignLibraries), 'Core'];
+    const availables = [...Object.keys(state.users[0].assignLibraries), 'Prima Facie'];
 
     return keys.reduce((acc, key) => {
       if (availables.includes(key)) {
@@ -100,8 +100,8 @@ export const getters = {
       return acc;
     }, {});
 
-    obj.Core = Object.keys(getters.librariesQuantity).reduce((acc, key) => {
-      if (key !== 'Core') {
+    obj['Prima Facie'] = Object.keys(getters.librariesQuantity).reduce((acc, key) => {
+      if (key !== 'Prima Facie') {
         return acc + getters.librariesQuantity[key];
       }
 
