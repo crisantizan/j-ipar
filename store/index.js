@@ -106,8 +106,6 @@ export const actions = {
       commit('plans/SET_ALL', data.plans);
       commit('plans/SET_CUSTOMER', data.customer);
       commit('plans/SET_PAYMENT_METHODS', data.paymentMethods);
-      // users module
-      commit('users/SET_USERS', data.users);
 
       // set libraries quantity
       if (!!data.users.length) {
@@ -123,6 +121,9 @@ export const actions = {
         }, {});
 
         commit('users/SET_LIBRARIES_QUANTITY', obj);
+
+        // users module
+        commit('users/SET_USERS', data.users.slice(0, obj['Prima Facie']));
       }
     } catch (error) {
       console.error(error);
