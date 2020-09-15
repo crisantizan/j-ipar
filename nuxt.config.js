@@ -118,6 +118,7 @@ export default {
   },
   router: {
     linkExactActiveClass: 'active',
+    middleware: ['authenticated'],
   },
   pageTransition: 'page',
   /*

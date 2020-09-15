@@ -1,11 +1,16 @@
 import gql from 'graphql-tag';
 
 export const state = () => ({
+  authenticated: false,
   loaded: false,
   loading: false,
 });
 
 export const mutations = {
+  SET_AUTHENTICATED(state, payload) {
+    state.authenticated = payload;
+  },
+
   SET_LOADED(state, loaded) {
     state.loaded = loaded;
   },
@@ -113,7 +118,7 @@ export const actions = {
 
         const obj = Object.keys(libraries).reduce((acc, key) => {
           if (key !== 'Core') {
-            return {...acc, [key]: libraries[key]};
+            return { ...acc, [key]: libraries[key] };
           }
 
           // change "Core" key to "Prima Facie"
@@ -130,5 +135,29 @@ export const actions = {
     } finally {
       commit('SET_LOADING', false);
     }
+  },
+
+  whoami({ commit, state }) {
+    return new Promise(async (resolve, reject) => {
+      // apollo client
+      const client = this.app.apolloProvider.defaultClient;
+
+      try {
+        const { data } = await client.query({
+          query: gql`
+            query {
+              whoAmI {
+                id
+                firstName
+              }
+            }
+          `,
+        });
+        
+        resolve(true);
+      } catch (error) {
+        resolve(false);
+      }
+    });
   },
 };
