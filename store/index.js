@@ -141,6 +141,7 @@ export const actions = {
     return new Promise(async (resolve, reject) => {
       // apollo client
       const client = this.app.apolloProvider.defaultClient;
+      // console.log(client);
 
       try {
         const { data } = await client.query({
@@ -156,6 +157,7 @@ export const actions = {
         
         resolve(true);
       } catch (error) {
+        console.log(error);
         resolve(false);
       }
     });

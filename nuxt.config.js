@@ -110,10 +110,7 @@ export default {
   modules: ['@nuxtjs/apollo'],
   apollo: {
     clientConfigs: {
-      default: {
-        httpEndpoint:
-          'https://graph-staging.primafacieapp.com/graphql?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6Imp1ZmVvcjkzM0BnbWFpbC5jb20iLCJ1c2VySWQiOjEsInNlc3Npb25JZCI6ImIxNTRlZWM2LTVlZGQtNDU4Mi04Mjc1LWE2YjVmMjdmNWJjYyIsImlhdCI6MTU5OTg1MTQyOSwiZXhwIjoxNjAwNDU2MjI5fQ.zW31aCsbDk5YOM0soBOf_6Aanu2Y_W3A9ipW1B86-UI',
-      },
+      default: '~/plugins/apollo-config.js',
     },
   },
   router: {
