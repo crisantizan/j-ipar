@@ -23,9 +23,6 @@ export default async function ({ app, store, redirect, route }) {
 			const isAuth = await store.dispatch('whoami');
 
 			if (!isAuth) {
-				// remove token from apollo, is invalid
-				await app.$apolloHelpers.onLogout();
-				process.token = null;
 				store.commit('SET_TOKEN', '');
 
 				// redirect
