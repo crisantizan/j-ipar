@@ -23,6 +23,7 @@ export default async function ({ app, store, redirect, route }) {
 			const isAuth = await store.dispatch('whoami');
 
 			if (!isAuth) {
+				process.token = null;
 				store.commit('SET_TOKEN', '');
 
 				// redirect
