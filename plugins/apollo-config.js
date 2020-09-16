@@ -1,8 +1,12 @@
 const customFetch = (uri, options) => {
-	console.log(options);
-	const x = options.headers.authorization.split(' ')[1];
+	// add token if there's
+	if (!!options.headers.authorization) {
+		const token = options.headers.authorization.split(' ')[1];
 
-	return fetch(`${uri}?token=${x}`, options);
+		uri = `${uri}?token=${token}`
+	}
+
+	return fetch(uri, options);
 };
 
 export default () => {

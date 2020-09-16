@@ -4,6 +4,7 @@ export const state = () => ({
   authenticated: false,
   loaded: false,
   loading: false,
+  token: '',
 });
 
 export const mutations = {
@@ -18,6 +19,10 @@ export const mutations = {
   SET_LOADING(state, loading) {
     state.loading = loading;
   },
+
+  SET_TOKEN(state, token) {
+    state.token = token;
+  }
 };
 
 export const getters = {

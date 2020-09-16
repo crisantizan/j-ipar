@@ -9,14 +9,21 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 export default {
   components: {
     navbar: () => import('~/components/Navbar'),
   },
+  computed: {
+    ...mapState(['token']),
+  },
   created() {
-    this.getAll();
+    // save token locally (in cookie)
+    if (!this.$apolloHelpers.getToken() && !!this.token) {
+      console.log('Set token...');
+      this.$apolloHelpers.onLogin(this.token);
+    }
   },
   methods: {
     ...mapActions(['getAll']),

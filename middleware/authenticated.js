@@ -1,22 +1,56 @@
-export default async function ({app, store, redirect, route}) {
-	if (!app.$apolloHelpers.getToken()) {
-		console.log('Añadiendo token');
-		await app.$apolloHelpers.onLogin('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6Imp1ZmVvcjkzM0BnbWFpbC5jb20iLCJ1c2VySWQiOjEsInNlc3Npb25JZCI6Ijk0ZjhjNDMzLTNhNjMtNGNkNC05YjM3LTcwOTlkMWEyZWNmMCIsImlhdCI6MTYwMDIyNDkxMiwiZXhwIjoxNjAwODI5NzEyfQ.HHV4vot1_C3OB6mAFA2tT5zFulr9ZfjXx6D3650O1v4')
-	}
+export default async function ({ app, store, redirect, route }) {
+	if (process.server) {
+		// not token provided
+		if (!app.$apolloHelpers.getToken() && !process.token) {
+			// if not token in URL
+			if (!route.query.token) {
+				store.commit('SET_TOKEN', '');
+				// redirect to /access-denied
+				route.path !== '/access-denied' && redirect('/access-denied');
+				return;
+			}
 
-	if (!store.state.authenticated) {
-			await app.$apolloHelpers.onLogin('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6Imp1ZmVvcjkzM0BnbWFpbC5jb20iLCJ1c2VySWQiOjEsInNlc3Npb25JZCI6Ijk0ZjhjNDMzLTNhNjMtNGNkNC05YjM3LTcwOTlkMWEyZWNmMCIsImlhdCI6MTYwMDIyNDkxMiwiZXhwIjoxNjAwODI5NzEyfQ.HHV4vot1_C3OB6mAFA2tT5zFulr9ZfjXx6D3650O1v4')
+			// get token in URL
+			const { token } = route.query;
+			// set token in apollo (as cookie)
+			await app.$apolloHelpers.onLogin(token);
+		}
+
+		if (!store.state.authenticated) {
+			// set token in apollo
+			await app.$apolloHelpers.onLogin(app.$apolloHelpers.getToken() || process.token);
+
 			const isAuth = await store.dispatch('whoami');
 
-			if (!isAuth && route.path !== '/access-denied') {
-				return redirect('/access-denied')
+			if (!isAuth) {
+				// remove token from apollo, is invalid
+				await app.$apolloHelpers.onLogout();
+				process.token = null;
+				store.commit('SET_TOKEN', '');
+
+				// redirect
+				route.path !== '/access-denied' && redirect('/access-denied');
+				return;
 			}
 
 			store.commit('SET_AUTHENTICATED', isAuth);
-	}
 
-	if (store.state.authenticated && route.path === '/access-denied') {
-		return redirect('/');
+			// get data
+			await store.dispatch('getAll');
+
+			// set token to use in client
+			store.commit('SET_TOKEN', app.$apolloHelpers.getToken() || process.token);
+			process.token = null;
+		}
+
+		// authenticated
+		if (store.state.authenticated) {
+			process.token = app.$apolloHelpers.getToken();		
+
+			// redirect to home
+			route.path === '/access-denied' && redirect('/');
+			return;
+		}
 	}
 
 	return;
