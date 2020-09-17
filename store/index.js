@@ -22,7 +22,7 @@ export const mutations = {
 
   SET_TOKEN(state, token) {
     state.token = token;
-  }
+  },
 };
 
 export const getters = {
@@ -46,6 +46,15 @@ export const actions = {
       const { data } = await client.query({
         query: gql`
           query {
+            tenant {
+              id
+              name
+              logoUrl
+              billingAddress
+              billingFirstName
+              billingLastName
+            }
+
             invoices: stripeInvoices {
               id
               created
@@ -110,6 +119,8 @@ export const actions = {
       });
 
       commit('SET_LOADED', true);
+      // tenant module
+      commit('tenant/SET_TENANT', data.tenant);
       // invoices module
       commit('invoices/SET_INVOICES', data.invoices);
       // plans module
@@ -159,7 +170,7 @@ export const actions = {
             }
           `,
         });
-        
+
         resolve(true);
       } catch (error) {
         console.log(error);
