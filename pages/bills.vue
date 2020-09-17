@@ -1,7 +1,32 @@
 <template>
-  <div class="card-box mt-2">
-    <h4>Invoices list</h4>
-    <datatable :headers="headers" :columns="invoices" />
+  <div class="d-flex align-items-center" style="height: calc(100vh - 69.6px);">
+    <vue-datatable
+      :columns="columns"
+      :rows="invoices"
+      class="w-100"
+      :pagination="{
+        enabled: true,
+        perPageDropdown: [5, 10, 15, 20, 50, 100],
+        perPage: 100,
+      }"
+    >
+      <template slot="table-row" slot-scope="props">
+        <!-- generate PDF button -->
+        <template v-if="props.column.field === 'invoicePdf'">
+          <a
+            class="btn btn-link btn-sm"
+            :href="props.row.invoicePdf"
+            target="_blank"
+            title="Download PDF"
+            ><i class="fas fa-download"></i
+          ></a>
+        </template>
+        <!-- print default data -->
+        <span v-else>
+          {{ props.formattedRow[props.column.field] }}
+        </span>
+      </template>
+    </vue-datatable>
   </div>
 </template>
 
@@ -12,44 +37,49 @@ import { enUsFormatter } from '../helpers/number-format';
 
 export default {
   components: {
-    datatable: () => import('~/components/Datatable'),
+    VueDatatable: () => import('@/components/vue-datatable/Table'),
   },
   data: () => ({
     // datatable headers
-    headers: [
+    columns: [
       {
-        title: 'Date',
+        label: 'Date',
         field: 'created',
-        sortable: true,
-        formatter(data) {
-          return dayjs(data).format('YYYY/MM/DD');
-        },
+        hidden: false,
+        toggle: true,
+        type: 'date',
+        tdClass: 'text-left',
+        thClass: 'text-left',
+        formatFn: val => dayjs(val).format('YYYY/MM/DD'),
       },
       {
-        title: 'Email',
+        label: 'Email',
         field: 'customerEmail',
-        sortable: true,
+        hidden: false,
+        toggle: true,
       },
       {
-        title: 'Payment Method',
+        label: 'Payment Method',
         field: 'defaultPaymentMethod',
-        sortable: true,
+        hidden: false,
+        toggle: true,
       },
       {
-        title: 'PDF',
+        label: 'PDF',
         field: 'invoicePdf',
-        sortable: true,
-        align: 'center',
-        formatter: data => {
-          return `<a class="btn btn-link btn-sm" href="${data}" target="_blank" title="Download PDF"><i class="fas fa-download"></i></a>`;
-        },
+        hidden: false,
+        toggle: true,
+        sortable: false,
+        tdClass: 'text-center',
+        thClass: 'text-center',
       },
       {
-        title: 'Total',
+        label: 'Total',
         field: 'total',
-        sortable: true,
-        align: 'right',
-        formatter: value => enUsFormatter.format(value),
+        hidden: false,
+        toggle: true,
+        type: 'number',
+        formatFn: value => enUsFormatter.format(value),
       },
     ],
   }),
