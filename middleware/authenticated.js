@@ -1,3 +1,5 @@
+const TOKEN_LENGTH = 311;
+
 export default async function ({ app, store, redirect, route }) {
 	if (process.server) {
 		// not token provided
@@ -10,10 +12,14 @@ export default async function ({ app, store, redirect, route }) {
 				return;
 			}
 
-			// get token in URL
-			const { token } = route.query;
-			// set token in apollo (as cookie)
-			await app.$apolloHelpers.onLogin(token);
+			// validate token length
+			if (route.query.token.length !== TOKEN_LENGTH) {
+				// redirect to /access-denied
+				route.path !== '/access-denied' && redirect('/access-denied');
+				return;
+			}
+
+			process.token = route.query.token;
 		}
 
 		if (!store.state.authenticated) {
@@ -41,12 +47,20 @@ export default async function ({ app, store, redirect, route }) {
 			process.token = null;
 		}
 
-		// authenticated
+		// authenticated, access granted
 		if (store.state.authenticated) {
 			process.token = app.$apolloHelpers.getToken();		
 
 			// redirect to home
-			route.path === '/access-denied' && redirect('/');
+			if (route.path === '/access-denied') {
+				return redirect('/');
+			}
+
+			// remove query
+			if (Object.keys(route.query).length > 0) {
+				return redirect(route.path);
+			}
+
 			return;
 		}
 	}
