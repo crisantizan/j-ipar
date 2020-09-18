@@ -169,6 +169,7 @@ export const actions = {
               }
             }
           `,
+          fetchPolicy: 'no-cache',
         });
 
         resolve(true);

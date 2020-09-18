@@ -1,19 +1,12 @@
-const TOKEN_LENGTH = 311;
-
 export default async function ({ app, store, redirect, route }) {
+	/** SERVER SIDE **/
+
 	if (process.server) {
 		// not token provided
 		if (!app.$apolloHelpers.getToken() && !process.token) {
 			// if not token in URL
 			if (!route.query.token) {
 				store.commit('SET_TOKEN', '');
-				// redirect to /access-denied
-				route.path !== '/access-denied' && redirect('/access-denied');
-				return;
-			}
-
-			// validate token length
-			if (route.query.token.length !== TOKEN_LENGTH) {
 				// redirect to /access-denied
 				route.path !== '/access-denied' && redirect('/access-denied');
 				return;
@@ -63,6 +56,28 @@ export default async function ({ app, store, redirect, route }) {
 
 			return;
 		}
+
+		return;
+	}
+
+	/** CLIENT SIDE **/
+
+	// no validation in /access-denied
+	if (route.path === '/access-denied') {
+		return;
+	}
+
+	// no token, redirect
+	if (!app.$apolloHelpers.getToken()) {
+		return redirect('/access-denied');
+	}
+
+	// there's token, validate
+	const isAuth = await store.dispatch('whoami');
+
+	// invalid token
+	if (!isAuth) {
+		return redirect('/access-denied');
 	}
 
 	return;
