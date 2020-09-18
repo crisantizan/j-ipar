@@ -6,7 +6,7 @@
     <vue-datatable
       :columns="columns"
       :rows="showedUsers"
-      class="w-100"
+      class="users-table"
       :pagination="{
         enabled: true,
         perPageDropdown: [5, 10, 15, 20, 50, 100],

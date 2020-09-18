@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="table-wrapper">
+    <div class="table-wrapper w-100">
       <!-- style="min-height: calc(100vh - 95px);" -->
       <!-- custom header -->
       <div class="d-flex justify-content-between align-items-center mb-2">
@@ -21,7 +21,7 @@
       <!-- end custom header -->
 
       <vue-good-table
-        styleClass="vgt-table my-table table-hover"
+        :styleClass="$_styleClass"
         :columns="$props.columns"
         :rows="$props.rows"
         height="calc(100vh - 275px)"
@@ -85,6 +85,10 @@ export default {
       type: [String, Function],
       default: '',
     },
+    styleClass: {
+      type: String,
+      default: '',
+    }
   },
   data: () => ({
     /** search value */
@@ -94,6 +98,10 @@ export default {
     /** get columns "toggleables" */
     toggleColumnList() {
       return this.$props.columns.filter(column => column.toggle);
+    },
+
+    $_styleClass() {
+      return `vgt-table my-table table-hover ${this.$props.styleClass}`;
     },
   },
 };

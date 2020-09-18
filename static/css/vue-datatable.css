@@ -1,5 +1,11 @@
-.vgt-responsive {
+/* users table height */
+.users-table .vgt-responsive {
   height: calc(100vh - 275px);
+}
+
+/* bills table height */
+.bills-table .vgt-responsive {
+ height: calc(100vh - 208px); 
 }
 
 .my-table {

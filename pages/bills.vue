@@ -3,13 +3,14 @@
     <vue-datatable
       :columns="columns"
       :rows="invoices"
-      class="w-100"
+      class="bills-table"
       :pagination="{
         enabled: true,
         perPageDropdown: [5, 10, 15, 20, 50, 100],
         perPage: 100,
       }"
     >
+      <!-- 210 -->
       <template slot="table-row" slot-scope="props">
         <!-- generate PDF button -->
         <template v-if="props.column.field === 'invoicePdf'">
