@@ -1,9 +1,6 @@
 <template>
-  <div
-    class="d-flex align-items-center"
-    style="height: calc(100vh - 69.6px);"
-  >
-    <vue-datatable
+  <div class="d-flex align-items-center" style="height: calc(100vh - 69.6px)">
+    <datatable
       :columns="columns"
       :rows="showedUsers"
       class="users-table"
@@ -42,7 +39,10 @@
               :class="{
                 'text-danger': selected[key] === librariesQuantity[key],
               }"
-              style="font-size: 14px; background: linear-gradient(#f4f5f8,#f1f3f6);"
+              style="
+                font-size: 14px;
+                background: linear-gradient(#f4f5f8, #f1f3f6);
+              "
             >
               {{ selected[key] }}/{{ librariesQuantity[key] }} {{ key }}
             </div>
@@ -119,7 +119,7 @@
                 :checked="isChecked(props.row.index, libraryKey)"
                 :disabled="
                   isDisabled(props.row.index, libraryKey) ||
-                    !props.formattedRow.active
+                  !props.formattedRow.active
                 "
                 @change="
                   onChange({
@@ -208,7 +208,7 @@
           {{ props.formattedRow[props.column.field] }}
         </span>
       </template>
-    </vue-datatable>
+    </datatable>
 
     <!-- Modal -->
     <div
@@ -223,9 +223,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="editUserModalLabel">
-              Edit user data
-            </h5>
+            <h5 class="modal-title" id="editUserModalLabel">Edit user data</h5>
             <button
               type="button"
               class="close"
@@ -235,9 +233,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
-            ...
-          </div>
+          <div class="modal-body">...</div>
           <div class="modal-footer">
             <button
               type="button"
@@ -260,8 +256,9 @@ import { generateCheckboxHTML } from '../helpers/generate-html';
 
 export default {
   components: {
-    VueDatatable: () => import('@/components/vue-datatable/Table'),
+    Datatable: () => import('@/components/Table'),
   },
+
   data() {
     const self = this;
 
@@ -272,29 +269,36 @@ export default {
           field: 'id',
           hidden: true,
         },
+
         {
           field: 'index',
           hidden: true,
         },
+
         {
           field: 'active',
           hidden: true,
         },
+
         {
           field: 'lastName',
           hidden: true,
         },
+
         {
           field: 'middleName',
           hidden: true,
         },
+
         {
           field: 'firstName',
           label: 'Name',
           hidden: false,
           toggle: true,
         },
+
         { field: 'email', label: 'Email', hidden: false, toggle: true },
+
         {
           field: 'admin',
           label: 'Role',
@@ -305,6 +309,7 @@ export default {
           thClass: 'text-left',
           formatFn: isAdmin => (isAdmin ? 'Admin' : 'User'),
         },
+
         {
           field: 'isAttorney',
           label: 'Is Attorney',
@@ -314,6 +319,7 @@ export default {
           type: 'boolean',
           thClass: 'text-center',
         },
+
         {
           field: 'assignLibraries',
           label: 'Libraries',
@@ -321,6 +327,7 @@ export default {
           toggle: true,
           hidden: false,
         },
+
         {
           field: 'actions',
           sortable: false,
@@ -335,21 +342,25 @@ export default {
           label: 'Edit',
           icon: 'fas fa-user-edit',
         },
+
         {
           action: 'disable',
           label: 'Disable',
           icon: 'fas fa-thumbs-down',
         },
+
         {
           action: 'resetPassword',
           label: 'Reset Password',
           icon: 'fas fa-key',
         },
+
         {
           action: 'resendEmail',
           label: 'Resend Email',
           icon: 'fas fa-paper-plane',
         },
+
         {
           action: 'relations',
           label: 'Relations',
@@ -359,6 +370,7 @@ export default {
       showDisabledUsers: false,
     };
   },
+
   computed: {
     ...mapGetters('users', [
       'users',
@@ -377,12 +389,14 @@ export default {
       return this.users;
     },
   },
+
   methods: {
     ...mapMutations('users', [
       'SET_CHECKED',
       'SET_IS_ATTORNEY_CHECKED',
       'SET_ACTIVE',
     ]),
+
     /** generate custom checkbox id */
     generateCheckboxId(library, id) {
       return `checkLib${library}${id}`;
@@ -471,18 +485,6 @@ export default {
 
     /* disable dropdown actions items */
     dropdownActionItemIsDisabled(action, isActive) {
-      // const tt = Object.keys(this.librariesQuantity).reduce((acc, key) => {
-      //   if (key !== 'Prima Facie') {
-      //     return acc + this.librariesQuantity[key];
-      //   }
-
-      //   return acc;
-      // }, 0);
-      // // acction: disabled, isActive: false
-      // if (action === 'disable' && !isActive && this.selected['Prima Facie'] === tt) {
-      //   return true;
-      // }
-
       return action !== 'disable' && !isActive;
     },
 
