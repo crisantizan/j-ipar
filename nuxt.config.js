@@ -11,7 +11,12 @@ export default {
   target: 'server',
   /** Environment variables **/
   env: {
-    BASE_IMAGE_URL: 'https://s3-us-west-2.amazonaws.com/prima-pictures',
+    BASE_IMAGE_URL:
+      process.env.BASE_IMAGE_URL ||
+      'https://s3-us-west-2.amazonaws.com/prima-pictures',
+    GRAPHQL_URL:
+      process.env.GRAPHQL_URL ||
+      'https://graph-staging.primafacieapp.com/graphql',
   },
   /*
    ** Headers of the page
@@ -30,11 +35,6 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      // {
-      //   rel: 'stylesheet',
-      //   href:
-      //     'https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css',
-      // },
       {
         href:
           'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
@@ -58,12 +58,6 @@ export default {
         src: 'https://kit.fontawesome.com/2d17bb5b4e.js',
         crossorigin: 'anonymous',
       },
-      // {
-      //   src: 'https://code.jquery.com/jquery-3.5.1.slim.min.js',
-      //   integrity:
-      //     'sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj',
-      //   crossorigin: 'anonymous',
-      // },
       {
         src:
           'https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js',
@@ -71,10 +65,6 @@ export default {
           'sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo',
         crossorigin: 'anonymous',
       },
-      // {
-      //   src:
-      //     'https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js',
-      // },
       { src: 'https://js.stripe.com/v3/' },
       { src: 'https://cdn.jsdelivr.net/npm/sweetalert2@9' },
       { src: 'https://cdn.jsdelivr.net/npm/promise-polyfill' },

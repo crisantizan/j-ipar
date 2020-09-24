@@ -12,7 +12,7 @@ const customFetch = (uri, options) => {
 export default () => {
 	return {
 		httpLinkOptions: {
-			uri: 'https://graph-staging.primafacieapp.com/graphql',
+			uri: process.env.GRAPHQL_URL,
 			fetch: customFetch,
 		},
 	};

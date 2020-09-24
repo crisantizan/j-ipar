@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex align-items-center" style="height: calc(100vh - 69.6px);">
-    <vue-datatable
+    <datatable
       :columns="columns"
       :rows="invoices"
       class="bills-table"
@@ -27,7 +27,7 @@
           {{ props.formattedRow[props.column.field] }}
         </span>
       </template>
-    </vue-datatable>
+    </datatable>
   </div>
 </template>
 
@@ -38,7 +38,7 @@ import { enUsFormatter } from '../helpers/number-format';
 
 export default {
   components: {
-    VueDatatable: () => import('@/components/vue-datatable/Table'),
+    Datatable: () => import('@/components/Table'),
   },
   data: () => ({
     // datatable headers
