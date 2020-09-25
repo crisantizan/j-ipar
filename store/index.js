@@ -1,10 +1,11 @@
 import gql from 'graphql-tag';
+import apolloToken from '@/helpers/apollo-token';
 
 export const state = () => ({
   authenticated: false,
   loaded: false,
   loading: false,
-  token: '',
+  token: null,
 });
 
 export const mutations = {
@@ -22,6 +23,7 @@ export const mutations = {
 
   SET_TOKEN(state, token) {
     state.token = token;
+    apolloToken.set(token);
   },
 };
 
@@ -157,7 +159,6 @@ export const actions = {
     return new Promise(async (resolve, reject) => {
       // apollo client
       const client = this.app.apolloProvider.defaultClient;
-      // console.log(client);
 
       try {
         const { data } = await client.query({

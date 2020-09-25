@@ -7,12 +7,5 @@
 <script>
 	export default {
 		layout: 'access-denied',
-
-		async created() {
-			// remove cookie (token)
-			if (this.$apolloHelpers.getToken()) {
-				await this.$apolloHelpers.onLogout();
-			}
-		}
 	}
 </script>

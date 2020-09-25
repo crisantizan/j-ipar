@@ -10,6 +10,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex';
+import apolloToken from '@/helpers/apollo-token';
 
 export default {
   components: {
@@ -19,14 +20,10 @@ export default {
     ...mapState(['token']),
   },
   created() {
-    // save token locally (in cookie)
-    if (!this.$apolloHelpers.getToken() && !!this.token) {
-      console.log('Set token...');
-      this.$apolloHelpers.onLogin(this.token);
+    // save token for Apollo context access
+    if (!apolloToken.get() && !!this.token) {
+      apolloToken.set(this.token);
     }
-  },
-  methods: {
-    ...mapActions(['getAll']),
   },
 };
 </script>

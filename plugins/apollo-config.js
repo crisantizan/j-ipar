@@ -1,10 +1,10 @@
-const customFetch = (uri, options) => {
-	// add token if there's
-	if (!!options.headers.authorization) {
-		const token = options.headers.authorization.split(' ')[1];
+import apolloToken from '@/helpers/apollo-token';
 
-		uri = `${uri}?token=${token}`
-	}
+const customFetch = (uri, options) => {
+	const token = apolloToken.get();
+
+	// add token if there's
+	!!token && (uri = `${uri}?token=${token}`);
 
 	return fetch(uri, options);
 };
