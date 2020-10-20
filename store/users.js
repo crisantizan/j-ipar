@@ -1,3 +1,5 @@
+import gql from 'graphql-tag';
+
 export const state = () => ({
   users: [],
   librariesQuantity: {},
@@ -53,16 +55,13 @@ export const getters = {
       return 1;
     });
 
-    return sorted.reduce(
-      (acc, key) => {
-        if (libraries[key] > 0) {
-          return { ...acc, [key]: libraries[key] };
-        }
+    return sorted.reduce((acc, key) => {
+      if (libraries[key] > 0) {
+        return { ...acc, [key]: libraries[key] };
+      }
 
-        return acc;
-      },
-      {},
-    );
+      return acc;
+    }, {});
   },
 
   librariesQuantity(state) {
@@ -72,7 +71,10 @@ export const getters = {
       return {};
     }
 
-    const availables = [...Object.keys(state.users[0].assignLibraries), 'Prima Facie'];
+    const availables = [
+      ...Object.keys(state.users[0].assignLibraries),
+      'Prima Facie',
+    ];
 
     return keys.reduce((acc, key) => {
       if (availables.includes(key)) {
@@ -108,8 +110,40 @@ export const getters = {
     //   return acc;
     // }, 0);
 
-    obj['Prima Facie'] = getters.users.reduce((acc, user) => user.active ? acc + 1 : acc, 0);
+    obj['Prima Facie'] = getters.users.reduce(
+      (acc, user) => (user.active ? acc + 1 : acc),
+      0,
+    );
 
     return obj;
+  },
+};
+
+export const actions = {
+  /** assign library to user **/
+  assignLibrary(store, payload) {
+    // payload: { userId: number, library: Object }
+    return new Promise(async (resolve, reject) => {
+      // apollo client
+      const client = this.app.apolloProvider.defaultClient;
+
+      try {
+        const { data } = await client.mutate({
+          mutation: gql`
+            mutation($userId: Int!, $library: JSON!) {
+              userEdit(id: $userId, editUser: { assignLibraries: $library }) {
+                id
+              }
+            }
+          `,
+          variables: payload,
+          fetchPolicy: 'no-cache',
+        });
+
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
   },
 };

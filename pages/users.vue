@@ -3,6 +3,7 @@
     <datatable
       :columns="columns"
       :rows="showedUsers"
+      :loading="datatableLoading"
       class="users-table"
       :pagination="{
         enabled: true,
@@ -251,7 +252,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { generateCheckboxHTML } from '../helpers/generate-html';
 
 export default {
@@ -368,6 +369,8 @@ export default {
         },
       ],
       showDisabledUsers: false,
+
+      datatableLoading: false,
     };
   },
 
@@ -397,6 +400,8 @@ export default {
       'SET_ACTIVE',
     ]),
 
+    ...mapActions('users', ['assignLibrary']),
+
     /** generate custom checkbox id */
     generateCheckboxId(library, id) {
       return `checkLib${library}${id}`;
@@ -423,8 +428,24 @@ export default {
       return middleName !== '-' ? `${firstName} ${middleName}` : firstName;
     },
 
-    onChange({ checked, library, index }) {
-      this.SET_CHECKED({ checked, library, index });
+    /** checboxe «libraries» change event **/
+    async onChange({ checked, library, index }) {
+      const user = this.users[index];
+
+      try {
+        this.datatableLoading = true;
+        // execute request
+        await this.assignLibrary({
+          userId: user.id,
+          library: { [library]: checked },
+        });
+        // update ui
+        this.SET_CHECKED({ checked, library, index });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.datatableLoading = false;
+      }
     },
 
     onChangeIsAttorney(data) {

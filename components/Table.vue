@@ -25,6 +25,7 @@
 				:rows="$props.rows"
 				height="calc(100vh - 275px)"
 				:row-style-class="$props.rowStyleClass"
+				:isLoading="$props.loading"
 				:pagination-options="{
 					mode: 'pages',
 					enabled: $props.pagination.enabled,
@@ -39,6 +40,11 @@
 					<slot name="table-row" v-bind="props"></slot>
 				</template>
 				<!-- end table-row slot -->
+
+				<!-- loading content -->
+				<template slot="loadingContent"><div></div></template>
+				<!-- end loading content -->
+
 
 				<!-- pagination slot -->
 				<template
@@ -76,6 +82,11 @@ export default {
 		rows: {
 			type: Array,
 			default: () => [],
+		},
+
+		loading: {
+			type: Boolean,
+			default: false,
 		},
 
 		pagination: {
