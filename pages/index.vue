@@ -42,6 +42,10 @@ export default {
 			return `${process.env.BASE_IMAGE_URL}/${this.tenant.logoUrl}`;
 		},
 	},
+
+	created() {
+		console.log(this.tenant);
+	}
 };
 </script>
 

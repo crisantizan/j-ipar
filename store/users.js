@@ -7,7 +7,7 @@ export const state = () => ({
 
 export const mutations = {
   SET_USERS(state, payload) {
-    state.users = payload.filter(user => this.state.user.id !== user.id);
+    state.users = payload;
   },
 
   SET_CHECKED(state, { checked, library, index }) {

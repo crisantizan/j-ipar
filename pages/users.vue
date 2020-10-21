@@ -34,18 +34,18 @@
         <div class="d-flex">
           <div class="text-right">
             <div
-              v-for="(value, key) in libraries"
-              :key="key"
+              v-for="item of librariesCounter"
+              :key="item.library"
               class="badge badge-pill badge-light text-success ml-1 d-block mb-no-last"
               :class="{
-                'text-danger': selected[key] === librariesQuantity[key],
+                'text-danger': item.isFull,
               }"
               style="
                 font-size: 14px;
                 background: linear-gradient(#f4f5f8, #f1f3f6);
               "
             >
-              {{ selected[key] }}/{{ librariesQuantity[key] }} {{ key }}
+              {{ item.label }}
             </div>
           </div>
         </div>
@@ -172,6 +172,7 @@
                   disabled: dropdownActionItemIsDisabled(
                     action.action,
                     props.formattedRow.active,
+                    props.formattedRow.id,
                   ),
                 }"
                 @click="
@@ -382,6 +383,8 @@ export default {
       'librariesQuantity',
     ]),
 
+    ...mapGetters(['user']),
+
     showedUsers() {
       // show only actived users
       if (!this.showDisabledUsers) {
@@ -391,6 +394,26 @@ export default {
       // show all
       return this.users;
     },
+
+    /** data for generate counter labels **/
+    librariesCounter() {
+      const arr = [];
+
+      for (const key in this.libraries) {
+        arr.push({
+          library: key,
+          isFull: this.selected[key] === this.librariesQuantity[key],
+          label: `${this.selected[key]}/${this.librariesQuantity[key]} ${key}`,
+        });
+      }
+
+      return arr;
+    },
+
+    /** indicates if «Prima Facie» library is full **/
+    coreIsFull() {
+      return this.librariesCounter.find(val => val.library === 'Prima Facie').isFull;
+    }
   },
 
   methods: {
@@ -530,7 +553,15 @@ export default {
     },
 
     /* disable dropdown actions items */
-    dropdownActionItemIsDisabled(action, isActive) {
+    dropdownActionItemIsDisabled(action, isActive, userId) {
+      if (this.user.id === userId && action === 'disable') {
+        return true;
+      }
+
+      if (this.coreIsFull && action === 'disable' && !isActive) {
+        return true;
+      }
+
       return action !== 'disable' && !isActive;
     },
 

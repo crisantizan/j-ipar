@@ -153,7 +153,8 @@ export const actions = {
         commit('users/SET_LIBRARIES_QUANTITY', obj);
 
         // users module
-        commit('users/SET_USERS', data.users.slice(0, obj['Prima Facie']));
+        commit('users/SET_USERS', data.users);
+        // commit('users/SET_USERS', data.users.slice(0, obj['Prima Facie']));
       }
     } catch (error) {
       console.error(error);
