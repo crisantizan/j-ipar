@@ -400,7 +400,7 @@ export default {
       'SET_ACTIVE',
     ]),
 
-    ...mapActions('users', ['assignLibrary']),
+    ...mapActions('users', ['assignLibrary', 'updateState']),
 
     /** generate custom checkbox id */
     generateCheckboxId(library, id) {
@@ -477,26 +477,51 @@ export default {
     },
 
     /** on click user action **/
-    onClickAction({ action, index }) {
+    async onClickAction({ action, index }) {
       switch (action) {
         case 'disable':
-          // const index = this.users.findIndex(user => user.id === userId);
-          const isActive = this.users[index].active;
+          try {
+            this.datatableLoading = true;
 
-          // disabled
-          if (isActive) {
-            // verify active licences
-            const libs = this.users[index].assignLibraries;
+            const user = this.users[index];
+            let libraries = null;
 
-            Object.keys(libs).forEach(key => {
-              // if true set to false
-              if (libs[key]) {
-                this.SET_CHECKED({ checked: false, library: key, index });
-              }
+            // disabled
+            if (user.active) {
+              libraries = {};
+
+              // clear libraries
+              Object.keys(user.assignLibraries).forEach(key => {
+                // if true set to false
+                if (user.assignLibraries[key]) {
+                  libraries[key] = false;
+                }
+              });
+            }
+
+            // execute request
+            await this.updateState({
+              userId: user.id,
+              active: !user.active,
+              libraries,
             });
-          }
 
-          this.SET_ACTIVE({ index: index, value: !isActive });
+            // clear libraries in UI
+            if (user.active) {
+              Object.keys(user.assignLibraries).forEach(key => {
+                // if true set to false
+                if (user.assignLibraries[key]) {
+                  this.SET_CHECKED({ checked: false, library: key, index });
+                }
+              });
+            }
+
+            this.SET_ACTIVE({ index: index, value: !user.active });
+          } catch (e) {
+            console.error(e);
+          } finally {
+            this.datatableLoading = false;
+          }
           break;
 
         default:

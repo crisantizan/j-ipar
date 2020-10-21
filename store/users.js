@@ -7,7 +7,7 @@ export const state = () => ({
 
 export const mutations = {
   SET_USERS(state, payload) {
-    state.users = payload;
+    state.users = payload.filter(user => this.state.user.id !== user.id);
   },
 
   SET_CHECKED(state, { checked, library, index }) {
@@ -137,6 +137,52 @@ export const actions = {
             }
           `,
           variables: payload,
+          fetchPolicy: 'no-cache',
+        });
+
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  /** update user state **/
+  updateState(store, { userId, active, libraries = null }) {
+    return new Promise(async (resolve, reject) => {
+      // apollo client
+      const client = this.app.apolloProvider.defaultClient;
+
+      let mutation = null;
+      let variables = { userId, active, libraries };
+
+      if (libraries) {
+        mutation = gql`
+          mutation($userId: Int!, $active: Boolean!, $libraries: JSON!) {
+            userEdit(
+              id: $userId
+              editUser: { active: $active, assignLibraries: $libraries }
+            ) {
+              id
+            }
+          }
+        `;
+      } else {
+        mutation = gql`
+          mutation($userId: Int!, $active: Boolean!) {
+            userEdit(id: $userId, editUser: { active: $active }) {
+              id
+            }
+          }
+        `;
+
+        variables = { userId, active };
+      }
+
+      try {
+        const { data } = await client.mutate({
+          mutation,
+          variables,
           fetchPolicy: 'no-cache',
         });
 

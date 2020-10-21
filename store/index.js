@@ -6,9 +6,15 @@ export const state = () => ({
   loaded: false,
   loading: false,
   token: null,
+  user: null,
 });
 
 export const mutations = {
+  /** user logged **/
+  SET_USER(state, payload) {
+    state.user = payload;
+  },
+
   SET_AUTHENTICATED(state, payload) {
     state.authenticated = payload;
   },
@@ -30,6 +36,7 @@ export const mutations = {
 export const getters = {
   loaded: state => state.loaded,
   loading: state => state.loading,
+  user: state => state.user,
 };
 
 export const actions = {
@@ -167,11 +174,18 @@ export const actions = {
               whoAmI {
                 id
                 firstName
+                middleName
+                lastName
+                active
               }
             }
           `,
           fetchPolicy: 'no-cache',
         });
+
+        if (!state.user) {
+          commit('SET_USER', data.whoAmI);
+        }
 
         resolve(true);
       } catch (error) {

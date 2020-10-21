@@ -50,6 +50,8 @@ export default async function ({ app, store, redirect, route }) {
 				store.commit('SET_TOKEN', process.token);
 				// set as authenticated
 				store.commit('SET_AUTHENTICATED', true);
+				// get user data
+				await store.dispatch('whoami');
 				// get data
 				await store.dispatch('getAll');
 

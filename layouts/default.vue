@@ -16,9 +16,11 @@ export default {
   components: {
     navbar: () => import('~/components/Navbar'),
   },
+
   computed: {
     ...mapState(['token']),
   },
+
   created() {
     // save token for Apollo context access
     if (!apolloToken.get() && !!this.token) {
