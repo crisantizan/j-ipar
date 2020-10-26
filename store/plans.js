@@ -262,20 +262,20 @@ export const getters = {
 export const actions = {
   async cancelSubscriptions({ commit, state }, plans) {
     // apollo client
-    const client = this.app.apolloProvider.defaultClient;
+    // const client = this.app.apolloProvider.defaultClient;
 
     try {
       commit('SET_LOADING', true, { root: true });
 
-      const result = await client.mutate({
-        mutation: gql`
+      const result = await this.$axios.graphql({
+        mutate: gql`
           mutation($plans: Array!) {
             stripeSubscriptionCancel(plans: $plans) {
               id
             }
           }
         `,
-        fetchPolicy: 'no-cache',
+        // fetchPolicy: 'no-cache',
         variables: { plans },
       });
     } catch (err) {
@@ -287,13 +287,13 @@ export const actions = {
 
   async addSubscription({ commit, state }, plans) {
     // apollo client
-    const client = this.app.apolloProvider.defaultClient;
+    // const client = this.app.apolloProvider.defaultClient;
 
     try {
       commit('SET_LOADING', true, { root: true });
 
-      const result = await client.mutate({
-        mutation: gql`
+      const result = await this.$axios.graphql({
+        mutate: gql`
           mutation($plans: Array!) {
             stripeSubscripterAdd(newSubscripter: { plans: $plans }) {
               id
@@ -339,12 +339,12 @@ export const actions = {
 
   async getPaymentMethods({ commit, state }) {
     // apollo client
-    const client = this.app.apolloProvider.defaultClient;
+    // const client = this.app.apolloProvider.defaultClient;
 
     try {
       commit('SET_LOADING', true, { root: true });
 
-      const { data } = await client.query({
+      const { data } = await this.$axios.graphql({
         query: gql`
           query {
             paymentMethods: stripePaymentMethods {

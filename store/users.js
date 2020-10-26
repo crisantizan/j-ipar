@@ -125,11 +125,11 @@ export const actions = {
     // payload: { userId: number, library: Object }
     return new Promise(async (resolve, reject) => {
       // apollo client
-      const client = this.app.apolloProvider.defaultClient;
+      // const client = this.app.apolloProvider.defaultClient;
 
       try {
-        const { data } = await client.mutate({
-          mutation: gql`
+        const { data } = await this.$axios.graphql({
+          mutate: gql`
             mutation($userId: Int!, $library: JSON!) {
               userEdit(id: $userId, editUser: { assignLibraries: $library }) {
                 id
@@ -137,7 +137,7 @@ export const actions = {
             }
           `,
           variables: payload,
-          fetchPolicy: 'no-cache',
+          // fetchPolicy: 'no-cache',
         });
 
         resolve(true);
@@ -151,13 +151,13 @@ export const actions = {
   updateState(store, { userId, active, libraries = null }) {
     return new Promise(async (resolve, reject) => {
       // apollo client
-      const client = this.app.apolloProvider.defaultClient;
+      // const client = this.app.apolloProvider.defaultClient;
 
-      let mutation = null;
+      let mutate = null;
       let variables = { userId, active, libraries };
 
       if (libraries) {
-        mutation = gql`
+        mutate = gql`
           mutation($userId: Int!, $active: Boolean!, $libraries: JSON!) {
             userEdit(
               id: $userId
@@ -168,7 +168,7 @@ export const actions = {
           }
         `;
       } else {
-        mutation = gql`
+        mutate = gql`
           mutation($userId: Int!, $active: Boolean!) {
             userEdit(id: $userId, editUser: { active: $active }) {
               id
@@ -180,10 +180,10 @@ export const actions = {
       }
 
       try {
-        const { data } = await client.mutate({
-          mutation,
+        const { data } = await this.$axios.graphql({
+          mutate,
           variables,
-          fetchPolicy: 'no-cache',
+          // fetchPolicy: 'no-cache',
         });
 
         resolve(true);

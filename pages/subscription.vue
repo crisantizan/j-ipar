@@ -484,7 +484,7 @@ export default {
           card,
         });
 
-        const mutation = gql`
+        const mutate = gql`
           mutation($paymentMethodId: String!) {
             paymentMethodEdit(paymentMethodId: $paymentMethodId) {
               id
@@ -493,8 +493,8 @@ export default {
         `;
 
         // backend result
-        const result = await this.$apollo.mutate({
-          mutation,
+        const result = await this.$axios.graphql({
+          mutate,
           variables: { paymentMethodId: paymentMethod.id },
         });
 
@@ -609,7 +609,7 @@ export default {
         `;
 
         // backend result
-        const result = await this.$apollo.query({
+        const result = await this.$axios.graphql({
           query,
           variables: { couponId: couponId.value },
         });
@@ -889,7 +889,7 @@ export default {
         this.SET_LOADING(true, { root: true });
         this.$nuxt.$loading.start();
 
-        const mutation = gql`
+        const mutate = gql`
           mutation($id: String!) {
             paymentMethodEdit(paymentMethodId: $id) {
               id
@@ -898,8 +898,8 @@ export default {
         `;
 
         // backend result
-        const result = await this.$apollo.mutate({
-          mutation,
+        const result = await this.$axios.graphql({
+          mutate,
           variables: { id },
         });
 
@@ -932,7 +932,7 @@ export default {
         this.SET_LOADING(true, { root: true });
         this.$nuxt.$loading.start();
 
-        const mutation = gql`
+        const mutate = gql`
           mutation($id: String!) {
             paymentMethodDelete(paymentMethodId: $id) {
               id
@@ -941,8 +941,8 @@ export default {
         `;
 
         // backend result
-        const result = await this.$apollo.mutate({
-          mutation,
+        const result = await this.$axios.graphql({
+          mutate,
           variables: { id },
         });
 

@@ -4,7 +4,7 @@ export default function ({ $axios, store }) {
 	// inject «graphql» method to axios instance
 	$axios.graphql = data => $axios.$post('/', { ...data, isGraphql: true });
 
-	const props = ['query', 'mutation'];
+	const props = ['query', 'mutate'];
 
 	// axios request interceptor
 	$axios.onRequest(config => {
@@ -17,7 +17,7 @@ export default function ({ $axios, store }) {
 
 			for (const prop in config.data) {
 				// format query and mutation
-				props.includes(prop) && (config.data[prop] = print(config.data[prop]));
+				props.includes(prop) && (config.data['query'] = print(config.data[prop]));
 			}
 		}
 	});
