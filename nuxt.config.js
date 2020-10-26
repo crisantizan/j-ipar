@@ -102,14 +102,8 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/apollo', '@nuxtjs/axios'],
-
-  apollo: {
-    clientConfigs: {
-      default: '~/plugins/apollo-config.js',
-    },
-  },
-
+  modules: ['@nuxtjs/axios'],
+  
   // Axios module configuration
   axios: {
     baseURL: process.env.API_URL,

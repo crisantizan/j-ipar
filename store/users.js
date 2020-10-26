@@ -102,14 +102,6 @@ export const getters = {
       return acc;
     }, {});
 
-    // obj['Prima Facie'] = Object.keys(getters.librariesQuantity).reduce((acc, key) => {
-    //   if (key !== 'Prima Facie') {
-    //     return acc + getters.librariesQuantity[key];
-    //   }
-
-    //   return acc;
-    // }, 0);
-
     obj['Prima Facie'] = getters.users.reduce(
       (acc, user) => (user.active ? acc + 1 : acc),
       0,
@@ -124,9 +116,6 @@ export const actions = {
   assignLibrary(store, payload) {
     // payload: { userId: number, library: Object }
     return new Promise(async (resolve, reject) => {
-      // apollo client
-      // const client = this.app.apolloProvider.defaultClient;
-
       try {
         const { data } = await this.$axios.graphql({
           mutate: gql`
@@ -137,7 +126,6 @@ export const actions = {
             }
           `,
           variables: payload,
-          // fetchPolicy: 'no-cache',
         });
 
         resolve(true);
@@ -150,9 +138,6 @@ export const actions = {
   /** update user state **/
   updateState(store, { userId, active, libraries = null }) {
     return new Promise(async (resolve, reject) => {
-      // apollo client
-      // const client = this.app.apolloProvider.defaultClient;
-
       let mutate = null;
       let variables = { userId, active, libraries };
 
@@ -183,7 +168,6 @@ export const actions = {
         const { data } = await this.$axios.graphql({
           mutate,
           variables,
-          // fetchPolicy: 'no-cache',
         });
 
         resolve(true);

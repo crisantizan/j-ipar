@@ -1,5 +1,3 @@
-import apolloToken from '@/helpers/apollo-token';
-
 export default async function ({ app, store, redirect, route, $axios }) {
 	/** SERVER SIDE **/
 
@@ -13,7 +11,6 @@ export default async function ({ app, store, redirect, route, $axios }) {
 				}
 
 				process.token = route.query.token;
-				// apolloToken.set(process.token);
 				store.commit('SET_TOKEN', process.token);
 
 				// token valid, redirect to home
@@ -31,7 +28,6 @@ export default async function ({ app, store, redirect, route, $axios }) {
 				!process.token && (process.token = route.query.token);
 
 				if (!process.isAuth) {
-					// apolloToken.set(process.token);
 					store.commit('SET_TOKEN', process.token);
 					const isAuth = await store.dispatch('whoami');
 

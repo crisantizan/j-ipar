@@ -833,14 +833,6 @@ export default {
         };
       }
 
-      // // update main when there'is increment
-      // if (value > plan.users) {
-      //   mainValues = {
-      //     newValue: mainPlan.value.users + (value - plan.users),
-      //     index: mainPlan.index,
-      //   };
-      // }
-
       this.UPDATE_USERS({
         value,
         oldValue: plan.users,
