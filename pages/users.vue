@@ -511,12 +511,16 @@ export default {
 
             // disabled
             if (user.active) {
-              libraries = {};
+              // libraries = {};
 
               // clear libraries
               Object.keys(user.assignLibraries).forEach(key => {
                 // if true set to false
                 if (user.assignLibraries[key]) {
+                  if (libraries === null) {
+                    libraries = {};
+                  }
+
                   libraries[key] = false;
                 }
               });
