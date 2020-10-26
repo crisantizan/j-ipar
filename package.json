@@ -9,7 +9,6 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@nuxtjs/apollo": "^4.0.1-rc.3",
     "@nuxtjs/axios": "^5.12.2",
     "bootstrap-table": "^1.17.1",
     "dayjs": "^1.8.34",
