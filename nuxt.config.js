@@ -84,6 +84,7 @@ export default {
    ** https://nuxtjs.org/guide/plugins
    */
   plugins: [
+    '~/plugins/axios',
     { src: '@/plugins/filters.js' },
     { src: '@/plugins/jquery.js', ssr: false },
     { src: '@/plugins/bootstrap-table.js', ssr: false },
@@ -101,16 +102,24 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/apollo'],
+  modules: ['@nuxtjs/apollo', '@nuxtjs/axios'],
+
   apollo: {
     clientConfigs: {
       default: '~/plugins/apollo-config.js',
     },
   },
+
+  // Axios module configuration
+  axios: {
+    baseURL: process.env.API_URL,
+  },
+
   router: {
     linkExactActiveClass: 'active',
     middleware: ['authenticated'],
   },
+
   pageTransition: 'page',
   /*
    ** Build configuration

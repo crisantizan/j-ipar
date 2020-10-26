@@ -25,6 +25,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import gql from 'graphql-tag';
 
 export default {
 	computed: {
@@ -35,7 +36,7 @@ export default {
 		},
 
 		address() {
-			return this.tenant.billingAddress || 'Billing Address'
+			return this.tenant.billingAddress || 'Billing Address';
 		},
 
 		imageUrl() {
@@ -43,14 +44,32 @@ export default {
 		},
 	},
 
-	created() {
-		console.log(this.tenant);
-	}
+	async created() {
+		// try {
+		// 	const { data } = await this.$axios.graphql({
+		// 		query: gql`
+		// 			query {
+		// 				contacts {
+		// 					id
+		// 					firstName
+		// 					middleName
+		// 					lastName
+		// 					email
+		// 					alienNumber
+		// 				}
+		// 			}
+		// 		`,
+		// 	});
+		// 	console.log(data);
+		// } catch (e) {
+		// 	console.log(e);
+		// }
+	},
 };
 </script>
 
 <style scoped>
-	.card {
-		border: 1px solid rgba(0, 0, 0, 0.1);
-	}
+.card {
+	border: 1px solid rgba(0, 0, 0, 0.1);
+}
 </style>
