@@ -177,16 +177,16 @@ export const actions = {
     });
   },
 
-  async resendEmail (store, payload) {
+  async resendEmail(store, userId) {
     return new Promise(async (resolve, reject) => {
       try {
         await this.$axios({
-          url: 'https://staging.primafacieapp.com/resend-email-from-admin?userId=' + payload.userId,
+          url: `https://staging.primafacieapp.com/resend-email-from-admin?userId=${userId}`,
           method: 'post',
           data: {
-            token: this.getters.token
-          }
-        })
+            token: this.getters.token,
+          },
+        });
 
         resolve(true);
       } catch (error) {
@@ -195,21 +195,21 @@ export const actions = {
     });
   },
 
-  async resetPassword (store, payload) {
+  async resetPassword(store, userId) {
     return new Promise(async (resolve, reject) => {
       try {
         await this.$axios({
-          url: 'https://staging.primafacieapp.com/reset-password-from-admin?userId=' + payload.userId,
+          url: `https://staging.primafacieapp.com/reset-password-from-admin?userId=${userId}`,
           method: 'post',
           data: {
-            token: this.getters.token
-          }
-        })
+            token: this.getters.token,
+          },
+        });
 
         resolve(true);
       } catch (error) {
         reject(error);
       }
     });
-  }
+  },
 };

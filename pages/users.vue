@@ -634,9 +634,7 @@ export default {
             this.datatableLoading = true;
 
             // execute request
-            await this.resetPassword({
-              userId: user.id,
-            });
+            await this.resetPassword(user.id);
           } catch (err) {
             console.error(err);
           } finally {
@@ -650,9 +648,7 @@ export default {
             this.datatableLoading = true;
 
             // execute request
-            await this.resendEmail({
-              userId: user.id,
-            });
+            await this.resendEmail(user.id);
           } catch (err) {
             console.error(err);
           } finally {
