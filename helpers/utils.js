@@ -31,3 +31,8 @@ export function calcPlanDiscount(plan) {
 		? (total * discount.value) / 100
 		: Number(String(discount.value).slice(0, -2));
 }
+
+/** clone object **/
+export function cloneObject(obj) {
+	return JSON.parse(JSON.stringify(obj));
+}

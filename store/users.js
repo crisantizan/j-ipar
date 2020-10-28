@@ -10,6 +10,10 @@ export const mutations = {
     state.users = payload;
   },
 
+  UPDATE_USER_DATA(state, { index, data }) {
+    state.users[index] = data;
+  },
+
   SET_CHECKED(state, { checked, library, index }) {
     state.users[index].assignLibraries[library] = checked;
   },
@@ -206,6 +210,40 @@ export const actions = {
           },
         });
 
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  /** update user data **/
+  async updateUser({ commit }, { index, userId, userData }) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await this.$axios.graphql({
+          mutate: gql`
+            mutation($userId: Int!, $userData: editUser!) {
+              userEdit(id: $userId, editUser: $userData) {
+                id
+                firstName
+                middleName
+                lastName
+                email
+                tenantCode
+                isAttorney
+                admin
+                tenantCode
+                active
+                assignLibraries
+                librariesQuantity
+              }
+            }
+          `,
+          variables: { userId, userData },
+        });
+
+        commit('UPDATE_USER_DATA', { index, data: data.userEdit });
         resolve(true);
       } catch (error) {
         reject(error);

@@ -236,7 +236,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form @submit.prevent>
+          <form @submit.prevent="onUserEdit">
             <div class="modal-body">
               <!-- <pre>Disabled: {{ disabledBtnEditUser }}</pre> -->
               <!-- <pre>{{ selectedUser }}</pre> -->
@@ -287,7 +287,8 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex';
-import { generateCheckboxHTML } from '../helpers/generate-html';
+import { generateCheckboxHTML } from '@/helpers/generate-html';
+import { cloneObject } from '@/helpers/utils';
 
 export default {
   components: {
@@ -406,6 +407,12 @@ export default {
 
       datatableLoading: false,
       selectedUser: null,
+      userEditableProps: [
+        // only firstName field is required
+        { field: 'firstName', required: true },
+        { field: 'middleName', required: false },
+        { field: 'lastName', required: false },
+      ],
     };
   },
 
@@ -461,15 +468,7 @@ export default {
         return true;
       }
 
-      // displayed fields in user edit modal
-      const props = [
-        // only firstName field is required
-        { field: 'firstName', required: true },
-        { field: 'middleName', required: false },
-        { field: 'lastName', required: false },
-      ];
-
-      for (const prop of props) {
+      for (const prop of this.userEditableProps) {
         // field value in datatable
         const columnPropValue = this.users[this.selectedUser.index][prop.field];
         // field value in modal edit user
@@ -502,6 +501,7 @@ export default {
       'updateState',
       'resetPassword',
       'resendEmail',
+      'updateUser',
     ]),
 
     /** generate custom checkbox id */
@@ -657,11 +657,51 @@ export default {
           break;
 
         case 'edit':
-          this.selectedUser = JSON.parse(JSON.stringify(user));
+          this.selectedUser = cloneObject(user);
           break;
 
         default:
           console.log(action);
+      }
+    },
+
+    /** edit user modal submit event **/
+    async onUserEdit() {
+      if (this.disabledBtnEditUser) return;
+
+      const columnUser = this.users[this.selectedUser.index];
+
+      // get only changed data
+      const newData = Object.keys(this.selectedUser).reduce((obj, key) => {
+        // current prop is not editable
+        if (this.userEditableProps.every(val => val.field !== key)) {
+          return obj;
+        }
+
+        // current prop has been changed
+        if (columnUser[key] !== this.selectedUser[key]) {
+          // field in datatables was empty y is now too
+          if (columnUser[key] === null && this.selectedUser[key] === '') {
+            return obj;
+          }
+
+          return { ...obj, [key]: this.selectedUser[key] };
+        }
+
+        return obj;
+      }, {});
+
+      try {
+        this.datatableLoading = true;
+        await this.updateUser({
+          index: this.selectedUser.index,
+          userId: this.selectedUser.id,
+          userData: newData,
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        this.datatableLoading = false;
       }
     },
 
