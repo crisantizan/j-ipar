@@ -222,7 +222,7 @@
       aria-hidden="true"
       ref="modal"
     >
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog" role="document" v-if="!!selectedUser">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="editUserModalLabel">Edit user data</h5>
@@ -235,17 +235,55 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">...</div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
+          <form @submit.prevent>
+            <div class="modal-body">
+              <!-- <pre>Disabled: {{ disabledBtnEditUser }}</pre> -->
+              <!-- <pre>{{ selectedUser }}</pre> -->
+              <div class="form-group">
+                <input
+                  v-model="selectedUser.firstName"
+                  type="text"
+                  class="form-control"
+                  placeholder="First name"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <input
+                  v-model="selectedUser.middleName"
+                  type="text"
+                  class="form-control"
+                  placeholder="Middle name"
+                />
+              </div>
+
+              <div class="form-group">
+                <input
+                  v-model="selectedUser.lastName"
+                  type="text"
+                  class="form-control"
+                  placeholder="Last name"
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                :disabled="disabledBtnEditUser"
+                class="btn btn-primary"
+              >
+                Save changes
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -372,6 +410,7 @@ export default {
       showDisabledUsers: false,
 
       datatableLoading: false,
+      selectedUser: null,
     };
   },
 
@@ -419,6 +458,41 @@ export default {
       return this.librariesCounter.find(
         ({ library }) => library === 'Prima Facie',
       ).isFull;
+    },
+
+    /** disable button in edit user modal **/
+    disabledBtnEditUser() {
+      if (!this.selectedUser) {
+        return true;
+      }
+
+      // displayed fields in user edit modal
+      const props = [
+        // only firstName field is required
+        { field: 'firstName', required: true },
+        { field: 'middleName', required: false },
+        { field: 'lastName', required: false },
+      ];
+
+      for (const prop of props) {
+        // field value in datatable
+        const columnPropValue = this.users[this.selectedUser.index][prop.field];
+        // field value in modal edit user
+        const propValue = this.selectedUser[prop.field];
+
+        // current value is different to datatable
+        if (columnPropValue !== propValue) {
+          // field is required but his current value is empty
+          if (prop.required && propValue === '') return true;
+          // field in datatables was empty y is now too
+          if (columnPropValue === null && propValue === '') continue;
+
+          return false;
+        }
+
+      }
+
+      return true;
     },
   },
 
@@ -590,6 +664,10 @@ export default {
           } finally {
             this.datatableLoading = false;
           }
+          break;
+
+        case 'edit':
+          this.selectedUser = JSON.parse(JSON.stringify(user));
           break;
 
         default:
