@@ -9,6 +9,11 @@ export default {
    ** See https://nuxtjs.org/api/configuration-target
    */
   target: 'server',
+  // CHANGE SERVER
+  server: {
+    port: 8090, // default: 3000
+    host: '0.0.0.0' // default: localhost
+  },
   /** Environment variables **/
   env: {
     BASE_IMAGE_URL:

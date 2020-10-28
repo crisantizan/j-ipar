@@ -11,7 +11,9 @@ export const mutations = {
   },
 
   UPDATE_USER_DATA(state, { index, data }) {
-    state.users[index] = data;
+    for (const prop in data) {
+      state.users[index][prop] = data[prop];
+    }
   },
 
   SET_CHECKED(state, { checked, library, index }) {
@@ -226,24 +228,13 @@ export const actions = {
             mutation($userId: Int!, $userData: editUser!) {
               userEdit(id: $userId, editUser: $userData) {
                 id
-                firstName
-                middleName
-                lastName
-                email
-                tenantCode
-                isAttorney
-                admin
-                tenantCode
-                active
-                assignLibraries
-                librariesQuantity
               }
             }
           `,
           variables: { userId, userData },
         });
 
-        commit('UPDATE_USER_DATA', { index, data: data.userEdit });
+        commit('UPDATE_USER_DATA', { index, data: userData });
         resolve(true);
       } catch (error) {
         reject(error);

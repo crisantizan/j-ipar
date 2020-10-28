@@ -229,7 +229,7 @@
             <h5 class="modal-title" id="editUserModalLabel">Edit user data</h5>
             <button
               type="button"
-              class="close"
+              class="close custom-close-modal"
               data-dismiss="modal"
               aria-label="Close"
             >
@@ -698,6 +698,9 @@ export default {
           userId: this.selectedUser.id,
           userData: newData,
         });
+
+        // close modal
+        this.$refs.modal.querySelector('.custom-close-modal').click();
       } catch (err) {
         console.error(err);
       } finally {
