@@ -16,7 +16,10 @@ export default {
       'https://s3-us-west-2.amazonaws.com/prima-pictures',
     GRAPHQL_URL:
       process.env.GRAPHQL_URL ||
-      'https://graph-staging.primafacieapp.com/graphql',
+      'https://graph-staging.primafacieapp.com/graphql/',
+    PRIMA_URL:
+      process.env.PRIMA_URL ||
+      'https://staging.primafacieapp.com/'
   },
   /*
    ** Headers of the page

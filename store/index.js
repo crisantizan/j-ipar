@@ -37,6 +37,7 @@ export const getters = {
   loaded: state => state.loaded,
   loading: state => state.loading,
   user: state => state.user,
+  token: state => state.token
 };
 
 export const actions = {

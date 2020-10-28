@@ -412,8 +412,14 @@ export default {
 
     /** indicates if «Prima Facie» library is full **/
     coreIsFull() {
-      return this.librariesCounter.find(val => val.library === 'Prima Facie').isFull;
-    }
+      if (!this.librariesCounter.length) {
+        return false;
+      }
+
+      return this.librariesCounter.find(
+        ({ library }) => library === 'Prima Facie',
+      ).isFull;
+    },
   },
 
   methods: {
@@ -423,7 +429,12 @@ export default {
       'SET_ACTIVE',
     ]),
 
-    ...mapActions('users', ['assignLibrary', 'updateState']),
+    ...mapActions('users', [
+      'assignLibrary',
+      'updateState',
+      'resetPassword',
+      'resendEmail',
+    ]),
 
     /** generate custom checkbox id */
     generateCheckboxId(library, id) {
@@ -501,18 +512,17 @@ export default {
 
     /** on click user action **/
     async onClickAction({ action, index }) {
+      const user = this.users[index];
+
       switch (action) {
         case 'disable':
           try {
             this.datatableLoading = true;
 
-            const user = this.users[index];
             let libraries = null;
 
             // disabled
             if (user.active) {
-              // libraries = {};
-
               // clear libraries
               Object.keys(user.assignLibraries).forEach(key => {
                 // if true set to false
@@ -546,6 +556,37 @@ export default {
             this.SET_ACTIVE({ index: index, value: !user.active });
           } catch (e) {
             console.error(e);
+          } finally {
+            this.datatableLoading = false;
+          }
+          break;
+
+        case 'resetPassword':
+          try {
+            this.datatableLoading = true;
+
+            // execute request
+            await this.resetPassword({
+              userId: user.id,
+            });
+          } catch (err) {
+            console.error(err);
+          } finally {
+            this.datatableLoading = false;
+          }
+
+          break;
+
+        case 'resendEmail':
+          try {
+            this.datatableLoading = true;
+
+            // execute request
+            await this.resendEmail({
+              userId: user.id,
+            });
+          } catch (err) {
+            console.error(err);
           } finally {
             this.datatableLoading = false;
           }

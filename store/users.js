@@ -176,4 +176,40 @@ export const actions = {
       }
     });
   },
+
+  async resendEmail (store, payload) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.$axios({
+          url: 'https://staging.primafacieapp.com/resend-email-from-admin?userId=' + payload.userId,
+          method: 'post',
+          data: {
+            token: this.getters.token
+          }
+        })
+
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  async resetPassword (store, payload) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.$axios({
+          url: 'https://staging.primafacieapp.com/reset-password-from-admin?userId=' + payload.userId,
+          method: 'post',
+          data: {
+            token: this.getters.token
+          }
+        })
+
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 };
