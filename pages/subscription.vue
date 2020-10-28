@@ -330,6 +330,15 @@
               <button
                 v-if="!!paymentMethods.length"
                 type="button"
+                class="btn btn-outline-danger mr-2"
+                :disabled="loading"
+              >
+                Cancel Subscription
+              </button>
+
+              <button
+                v-if="!!paymentMethods.length"
+                type="button"
                 class="btn btn-success"
                 @click="subscribeUpdatePlan()"
                 :disabled="loading"
@@ -469,7 +478,11 @@ export default {
       'CONFIRM_COUPONS',
       'SET_DEFAULT_PERIOD',
     ]),
-    ...mapActions('plans', ['getPaymentMethods', 'addSubscription', 'cancelSubscriptions']),
+    ...mapActions('plans', [
+      'getPaymentMethods',
+      'addSubscription',
+      'cancelSubscriptions',
+    ]),
     ...mapMutations(['SET_LOADING']),
 
     /** create payment method (with apollo) */
@@ -740,13 +753,15 @@ export default {
 
     copyValues(from, to) {
       return to.map((plan, index) => {
-        const { checked, users, coupon, discount, couponId, active } = from[index];
+        const { checked, users, coupon, discount, couponId, active } = from[
+          index
+        ];
         return { ...plan, checked, users, coupon, discount, couponId, active };
       });
     },
 
     /** on checked plan handler */
-    onCheckedPlan(data) {
+    async onCheckedPlan(data) {
       // data { value, index });
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
 
@@ -854,9 +869,7 @@ export default {
     },
 
     getCurrentCheckedPlans() {
-      return this.show
-        .filter(plan => plan.checked)
-        .map(plan => plan.id);
+      return this.show.filter(plan => plan.checked).map(plan => plan.id);
     },
 
     /** change default payment method (with apollo) */
@@ -998,18 +1011,22 @@ export default {
       const currentCheckeds = this.getCurrentCheckedPlans();
 
       // plans uncheckeds
-      const unCheckeds = this.defaultCheckedPlans.filter(id => !currentCheckeds.includes(id));
+      const unCheckeds = this.defaultCheckedPlans.filter(
+        id => !currentCheckeds.includes(id),
+      );
 
       // delete uncheckeds plans
       if (!!unCheckeds.length) {
-        toDelete.push(...unCheckeds.map(id => ({ planId: id })))
+        toDelete.push(...unCheckeds.map(id => ({ planId: id })));
       }
 
       // remove old period subscription
       if (this.paymentPeriod !== this.defaultPeriod) {
         // set the current period as default
         this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-        toDelete.push(...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })));
+        toDelete.push(
+          ...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })),
+        );
       }
 
       // remove subscriptions
