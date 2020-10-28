@@ -220,6 +220,7 @@
       role="dialog"
       aria-labelledby="editUserModalLabel"
       aria-hidden="true"
+      data-backdrop="static"
       ref="modal"
     >
       <div class="modal-dialog" role="document" v-if="!!selectedUser">
@@ -268,17 +269,11 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
+              <!-- data-dismiss="modal" -->
               <button
                 type="submit"
-                :disabled="disabledBtnEditUser"
                 class="btn btn-primary"
+                :disabled="disabledBtnEditUser"
               >
                 Save changes
               </button>
@@ -489,7 +484,6 @@ export default {
 
           return false;
         }
-
       }
 
       return true;
