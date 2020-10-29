@@ -269,11 +269,15 @@ export const actions = {
           mutation($plans: Array!) {
             stripeSubscriptionCancel(plans: $plans) {
               id
+              plan
+              currentPeriodEnd
+              currentPeriodStart
             }
           }
         `,
         variables: { plans },
       });
+
     } catch (err) {
       console.error(err);
     } finally {

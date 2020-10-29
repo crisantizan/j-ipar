@@ -332,6 +332,7 @@
                 type="button"
                 class="btn btn-outline-danger mr-2"
                 :disabled="loading"
+                @click="cancelSubscription"
               >
                 Cancel Subscription
               </button>
@@ -340,8 +341,8 @@
                 v-if="!!paymentMethods.length"
                 type="button"
                 class="btn btn-success"
-                @click="subscribeUpdatePlan()"
                 :disabled="loading"
+                @click="subscribeUpdatePlan"
               >
                 Subscribe / Update
               </button>
@@ -965,6 +966,29 @@ export default {
         this.SET_LOADING(false, { root: true });
         this.$nuxt.$loading.finish();
       }
+    },
+
+    async cancelSubscription() {
+      const { isConfirmed } = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to cancel your subscription?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, do it!',
+      });
+
+      if (!isConfirmed) {
+        return;
+      }
+
+      const plans = this.defaultCheckedPlans.map(planId => ({ planId }));
+
+      this.$nuxt.$loading.start();
+      await this.cancelSubscriptions(plans);
+      this.$nuxt.$loading.finish();
+
     },
 
     async subscribeUpdatePlan() {

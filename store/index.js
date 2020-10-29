@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-// import apolloToken from '@/helpers/apollo-token';
 
 export const state = () => ({
   authenticated: false,
@@ -29,7 +28,6 @@ export const mutations = {
 
   SET_TOKEN(state, token) {
     state.token = token;
-    // apolloToken.set(token);
   },
 };
 
@@ -46,9 +44,6 @@ export const actions = {
     if (state.loaded) {
       return;
     }
-
-    // apollo client
-    // const client = this.app.apolloProvider.defaultClient;
 
     try {
       commit('SET_LOADING', true);
@@ -166,9 +161,6 @@ export const actions = {
 
   whoami({ commit, state }) {
     return new Promise(async (resolve, reject) => {
-      // apollo client
-      // const client = this.app.apolloProvider.defaultClient;
-
       try {
         const { data } = await this.$axios.graphql({
           query: gql`
