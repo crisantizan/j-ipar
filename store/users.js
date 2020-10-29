@@ -3,6 +3,8 @@ import gql from 'graphql-tag';
 export const state = () => ({
   users: [],
   librariesQuantity: {},
+  usersIntegrations: [],
+  integrations: [],
 });
 
 export const mutations = {
@@ -30,6 +32,22 @@ export const mutations = {
 
   SET_LIBRARIES_QUANTITY(state, payload) {
     state.librariesQuantity = payload;
+  },
+
+  SET_USERS_INTEGRATIONS(state, payload) {
+    state.usersIntegrations = payload;
+  },
+
+  SET_INTEGRATIONS(state, payload) {
+    state.integrations = payload;
+  },
+
+  CHECK_RELATION(state, payload) {
+    state.usersIntegrations[
+      state.usersIntegrations
+        .map(a => a.userId)
+        .indexOf(payload.userIntegrationId)
+    ].linked = payload.linked;
   },
 };
 
@@ -115,6 +133,10 @@ export const getters = {
 
     return obj;
   },
+
+  usersIntegrations: state => state.usersIntegrations,
+
+  integrations: state => state.integrations,
 };
 
 export const actions = {
@@ -183,6 +205,7 @@ export const actions = {
     });
   },
 
+  // RESEND EMAIL PHP ROUTE
   async resendEmail(store, userId) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -201,6 +224,7 @@ export const actions = {
     });
   },
 
+  // RESET PASSWORD PHP ROUTE
   async resetPassword(store, userId) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -210,6 +234,86 @@ export const actions = {
           data: {
             token: this.getters.token,
           },
+        });
+
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  /** GET INTEGRATION USERS FOR RELATIONS USER **/
+  getUsersIntegrations({ commit }, payload) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await this.$axios.graphql({
+          query: gql`
+            query($userId: Int!) {
+              usersIntegrations(userId: $userId) {
+                userId
+                integrationId
+                linked
+                email
+                name
+                prefix
+                integration
+              }
+            }
+          `,
+          variables: payload,
+        });
+
+        if (data.usersIntegrations && data.usersIntegrations !== null) {
+          commit('SET_USERS_INTEGRATIONS', data.usersIntegrations);
+
+          // SET INFO FOR INTEGRATIONS FOR LIST ON USER RELATIONS MODAL
+
+          let integrations = [];
+
+          data.usersIntegrations.forEach(user => {
+            if (
+              integrations.map(a => a.id).indexOf(user.integrationId) === -1
+            ) {
+              integrations.push({
+                id: user.integrationId,
+                prefix: user.prefix,
+                users: [user],
+                name: user.integration,
+              });
+            } else {
+              integrations[
+                integrations.map(a => a.id).indexOf(user.integrationId)
+              ].users.push(user);
+            }
+          });
+
+          commit('SET_INTEGRATIONS', integrations);
+        }
+
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  /** UPDATE USER RELATIONS **/
+  async updateUserRelations({ commit }, payload) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await this.$axios.graphql({
+          mutate: gql`
+            mutation($relations: Array!) {
+              userRelationAdd(relations: $relations) {
+                _id
+                userPrimaId
+                userRelativeId
+                partner
+              }
+            }
+          `,
+          variables: payload,
         });
 
         resolve(true);

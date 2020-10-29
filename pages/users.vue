@@ -212,7 +212,7 @@
       </template>
     </datatable>
 
-    <!-- Modal -->
+    <!-- EDIT USER MODAL -->
     <div
       class="modal fade"
       id="editUserModal"
@@ -238,8 +238,6 @@
           </div>
           <form @submit.prevent="onUserEdit">
             <div class="modal-body">
-              <!-- <pre>Disabled: {{ disabledBtnEditUser }}</pre> -->
-              <!-- <pre>{{ selectedUser }}</pre> -->
               <div class="form-group">
                 <input
                   v-model="selectedUser.firstName"
@@ -269,7 +267,6 @@
               </div>
             </div>
             <div class="modal-footer">
-              <!-- data-dismiss="modal" -->
               <button
                 type="submit"
                 class="btn btn-primary"
@@ -279,6 +276,85 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATIONS MODAL -->
+    <div
+      class="modal fade"
+      id="relationsModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="relationsLabel"
+      aria-hidden="true"
+      ref="relationModal"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="relationsLabel">User Relations</h5>
+            <button
+              type="button"
+              class="close custom-close-modal"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div
+              v-show="integrations && integrations.length > 0"
+              v-for="(integration, indexIntegration) in integrations"
+              :key="indexIntegration"
+            >
+              <hr v-if="indexIntegration > 0" />
+
+              <label>{{ integration.name }}</label>
+
+              <!-- CLIO USERS -->
+
+              <div
+                v-for="(user, indexUser) in integration.users"
+                :key="indexUser"
+              >
+                <span>
+                  <input
+                    type="checkbox"
+                    name=""
+                    :id="user.userId"
+                    :checked="user.linked"
+                    @click="
+                      setRelation({
+                        user,
+                      })
+                    "
+                  />
+                  <label :for="user.userId">
+                    <small>{{ user.name }} {{ user.email }}</small>
+                  </label>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="saveRelations"
+              :disabled="disabledBtnSaveRelationUser"
+            >
+              Save
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -406,6 +482,7 @@ export default {
       showDisabledUsers: false,
 
       datatableLoading: false,
+
       selectedUser: null,
       userEditableProps: [
         // only firstName field is required
@@ -413,6 +490,9 @@ export default {
         { field: 'middleName', required: false },
         { field: 'lastName', required: false },
       ],
+
+      currentUser: null,
+      disabledBtnSaveRelationUser: true,
     };
   },
 
@@ -422,6 +502,8 @@ export default {
       'libraries',
       'selected',
       'librariesQuantity',
+      'usersIntegrations',
+      'integrations',
     ]),
 
     ...mapGetters(['user']),
@@ -494,6 +576,7 @@ export default {
       'SET_CHECKED',
       'SET_IS_ATTORNEY_CHECKED',
       'SET_ACTIVE',
+      'CHECK_RELATION',
     ]),
 
     ...mapActions('users', [
@@ -502,6 +585,8 @@ export default {
       'resetPassword',
       'resendEmail',
       'updateUser',
+      'getUsersIntegrations',
+      'updateUserRelations',
     ]),
 
     /** generate custom checkbox id */
@@ -660,6 +745,13 @@ export default {
           this.selectedUser = cloneObject(user);
           break;
 
+        case 'relations':
+          // GET INTEGRATIONS && GET INTEGRATION USERS (ITERATE INTEGRATIONS)
+          this.currentUser = user;
+
+          this.getUsersIntegrations({ userId: user.id });
+          break;
+
         default:
           console.log(action);
       }
@@ -741,11 +833,47 @@ export default {
 
     /** bind modal properties in "Edit" item **/
     bindModalProps(action) {
+      if (action === 'relations') {
+        return { 'data-toggle': 'modal', 'data-target': '#relationsModal' };
+      }
+
       if (action !== 'edit') {
         return {};
       }
 
       return { 'data-toggle': 'modal', 'data-target': '#editUserModal' };
+    },
+
+    setRelation(payload) {
+      this.disabledBtnSaveRelationUser = false;
+
+      this.CHECK_RELATION({
+        userIntegrationId: payload.user.userId,
+        linked: !payload.user.linked,
+      });
+    },
+
+    async saveRelations() {
+      let relationsToSave = [];
+
+      this.usersIntegrations.forEach(user => {
+        if (user.linked) {
+          relationsToSave.push({
+            integrationId: user.integrationId,
+            userIntegrationId: user.userId,
+            userPrimaId: this.currentUser.id,
+          });
+        }
+      });
+
+      // REQUEST TO SAVE RELATIONS GRAPH
+
+      this.updateUserRelations({
+        relations: relationsToSave,
+      });
+
+      // close modal
+      this.$refs.relationModal.querySelector('.custom-close-modal').click();
     },
   },
 };

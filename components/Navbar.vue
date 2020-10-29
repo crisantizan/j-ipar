@@ -4,7 +4,7 @@
     style="background-color: #2d5f8b"
   >
     <a class="navbar-brand" href="#">
-      <img src="~/assets/images/logo.png" style="max-width: 240px;" alt="" />
+      <img src="~/assets/images/logo.png" style="max-width: 240px" alt="" />
     </a>
     <button
       class="navbar-toggler"
@@ -26,6 +26,12 @@
             :to="page.path"
             data-toggle="collapse"
             data-target=".navbar-collapse.show"
+            v-if="
+              page.name === 'Home' ||
+              page.name === 'Subscription' ||
+              (page.name === 'Bills' && tenant.statusId !== 4) ||
+              (page.name === 'Users' && tenant.statusId !== 4)
+            "
           >
             {{ page.name }}
           </nuxt-link>
@@ -36,6 +42,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   data: () => ({
     pages: [
@@ -45,6 +53,10 @@ export default {
       { path: '/users', name: 'Users' },
     ],
   }),
+
+  computed: {
+    ...mapGetters('tenant', ['tenant']),
+  },
 };
 </script>
 
