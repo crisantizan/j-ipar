@@ -29,8 +29,14 @@
             v-if="
               page.name === 'Home' ||
               page.name === 'Subscription' ||
-              (page.name === 'Bills' && tenant.statusId !== 4) ||
-              (page.name === 'Users' && tenant.statusId !== 4)
+              (
+                page.name === 'Bills' &&
+                tenant.statusId !== 4
+              ) ||
+              (
+                page.name === 'Users' &&
+                tenant.statusId !== 4
+              )
             "
           >
             {{ page.name }}
@@ -55,8 +61,10 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('tenant', ['tenant']),
-  },
+    ...mapGetters('tenant', [
+      'tenant',
+    ]),
+  }
 };
 </script>
 

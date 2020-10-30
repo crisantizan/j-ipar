@@ -4,7 +4,7 @@ export const state = () => ({
   users: [],
   librariesQuantity: {},
   usersIntegrations: [],
-  integrations: [],
+  integrations: []
 });
 
 export const mutations = {
@@ -43,12 +43,8 @@ export const mutations = {
   },
 
   CHECK_RELATION(state, payload) {
-    state.usersIntegrations[
-      state.usersIntegrations
-        .map(a => a.userId)
-        .indexOf(payload.userIntegrationId)
-    ].linked = payload.linked;
-  },
+    state.usersIntegrations[state.usersIntegrations.map(a => a.userId).indexOf(payload.userIntegrationId)].linked = payload.linked
+  }
 };
 
 export const getters = {
@@ -264,29 +260,28 @@ export const actions = {
           variables: payload,
         });
 
-        if (data.usersIntegrations && data.usersIntegrations !== null) {
+        if (
+          data.usersIntegrations &&
+          data.usersIntegrations !== null
+        ) {
           commit('SET_USERS_INTEGRATIONS', data.usersIntegrations);
 
           // SET INFO FOR INTEGRATIONS FOR LIST ON USER RELATIONS MODAL
 
-          let integrations = [];
+          let integrations = []
 
           data.usersIntegrations.forEach(user => {
-            if (
-              integrations.map(a => a.id).indexOf(user.integrationId) === -1
-            ) {
+            if (integrations.map(a => a.id).indexOf(user.integrationId) === -1) {
               integrations.push({
                 id: user.integrationId,
                 prefix: user.prefix,
                 users: [user],
-                name: user.integration,
-              });
+                name: user.integration
+              })
             } else {
-              integrations[
-                integrations.map(a => a.id).indexOf(user.integrationId)
-              ].users.push(user);
+              integrations[integrations.map(a => a.id).indexOf(user.integrationId)].users.push(user)
             }
-          });
+          })
 
           commit('SET_INTEGRATIONS', integrations);
         }
@@ -315,6 +310,8 @@ export const actions = {
           `,
           variables: payload,
         });
+
+        console.log(data)
 
         resolve(true);
       } catch (error) {
