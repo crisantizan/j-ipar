@@ -503,6 +503,10 @@ export default {
     ...mapMutations(['SET_LOADING']),
 
     printStatusPlan(plan) {
+      if (this.paymentPeriod !== this.defaultPeriod) {
+        return '-';
+      }
+      
       if (!plan.checked || !this.defaultCheckedPlans.includes(plan.id)) {
         return '-';
       }
@@ -796,59 +800,63 @@ export default {
         return;
       }
 
-      // subscription already canceled
-      if (!data.value && data.isCanceled) {
-        data.event.preventDefault();
+      // only in active payment period
+      if (this.paymentPeriod === this.defaultPeriod) {
+        // subscription already canceled
+        if (!data.value && data.isCanceled) {
+          data.event.preventDefault();
 
-        Swal.fire({
-          position: 'center',
-          icon: 'info',
-          html: '<h4>This subscription already canceled!</h4>',
-          showConfirmButton: false,
-          timer: 1800,
-        });
+          Swal.fire({
+            position: 'center',
+            icon: 'info',
+            html: '<h4>This subscription already canceled!</h4>',
+            showConfirmButton: false,
+            timer: 1800,
+          });
 
-        return;
-      }
-
-      // cancel plan
-      if (!data.value && this.defaultCheckedPlans.includes(data.planId)) {
-        data.event.preventDefault();
-        delete data.event;
-
-        const { isConfirmed } = await Swal.fire({
-          position: 'center',
-          title: 'Cancel subscription',
-          text: 'Are you sure you want to cancel this subscription?',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, do It!',
-        });
-
-        // execute cancel subscription request
-        if (isConfirmed) {
-          try {
-            this.$nuxt.$loading.start();
-
-            const [result] = await this.cancelSubscriptions([
-              { planId: data.planId },
-            ]);
-
-            this.SET_CANCELED_STATUS_PLAN({
-              ...result,
-              index: data.index,
-            });
-          } catch (e) {
-            console.error(e);
-          } finally {
-            this.$nuxt.$loading.finish();
-          }
+          return;
         }
 
-        return;
+        // cancel plan
+        if (!data.value && this.defaultCheckedPlans.includes(data.planId)) {
+          data.event.preventDefault();
+          delete data.event;
+
+          const { isConfirmed } = await Swal.fire({
+            position: 'center',
+            title: 'Cancel subscription',
+            text: 'Are you sure you want to cancel this subscription?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, do It!',
+          });
+
+          // execute cancel subscription request
+          if (isConfirmed) {
+            try {
+              this.$nuxt.$loading.start();
+
+              const [result] = await this.cancelSubscriptions([
+                { planId: data.planId },
+              ]);
+
+              this.SET_CANCELED_STATUS_PLAN({
+                ...result,
+                index: data.index,
+              });
+            } catch (e) {
+              console.error(e);
+            } finally {
+              this.$nuxt.$loading.finish();
+            }
+          }
+
+          return;
+        }
       }
+
 
       delete data.event;
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
