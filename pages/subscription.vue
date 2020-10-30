@@ -340,7 +340,10 @@
                 v-if="!!paymentMethods.length"
                 type="button"
                 class="btn btn-danger mr-2"
-                :disabled="loading"
+                :title="
+                  disabledBtnCancel ? 'Already canceled' : 'Cancel subscription'
+                "
+                :disabled="disabledBtnCancel"
                 @click="cancelSubscription"
               >
                 Cancel Subscription
@@ -401,6 +404,7 @@ export default {
       'planIsMain',
       'mainPlan',
       'coreIds',
+      'subscriptionIsCanceled',
     ]),
     ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded', 'loading']),
@@ -412,6 +416,14 @@ export default {
       set(period) {
         this.$store.commit('plans/SET_PERIOD', period);
       },
+    },
+
+    disabledBtnCancel() {
+      return (
+        this.loading ||
+        this.paymentPeriod !== this.defaultPeriod ||
+        this.subscriptionIsCanceled
+      );
     },
   },
   mounted() {
@@ -506,7 +518,7 @@ export default {
       if (this.paymentPeriod !== this.defaultPeriod) {
         return '-';
       }
-      
+
       if (!plan.checked || !this.defaultCheckedPlans.includes(plan.id)) {
         return '-';
       }
@@ -857,7 +869,6 @@ export default {
         }
       }
 
-
       delete data.event;
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
 
@@ -1080,9 +1091,23 @@ export default {
 
       const plans = this.defaultCheckedPlans.map(planId => ({ planId }));
 
-      this.$nuxt.$loading.start();
-      await this.cancelSubscriptions(plans);
-      this.$nuxt.$loading.finish();
+      // await this.cancelSubscriptions(plans);
+
+      try {
+        this.$nuxt.$loading.start();
+
+        const results = await this.cancelSubscriptions(plans);
+
+        for (const planResult of results) {
+          this.SET_CANCELED_STATUS_PLAN({
+            ...planResult,
+            index: data.index,
+          });
+        }
+      } catch (e) {
+      } finally {
+        this.$nuxt.$loading.finish();
+      }
     },
 
     async subscribeUpdatePlan() {

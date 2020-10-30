@@ -272,6 +272,14 @@ export const getters = {
   paymentMethods(state) {
     return state.paymentMethods;
   },
+
+  subscriptionIsCanceled(state, getters) {
+    return getters.defaultCheckedPlans.every(planId => {
+      const plan = state[state.defaultPeriod].find(plan => plan.id === planId);
+
+      return plan.cancelAtPeriodEnd;
+    });
+  },
 };
 
 export const actions = {
