@@ -829,20 +829,22 @@ export default {
 
         // execute cancel subscription request
         if (isConfirmed) {
-          this.SET_LOADING(true, { root: true });
-          this.$nuxt.$loading.start();
+          try {
+            this.$nuxt.$loading.start();
 
-          setTimeout(() => {
+            const [result] = await this.cancelSubscriptions([
+              { planId: data.planId },
+            ]);
+
             this.SET_CANCELED_STATUS_PLAN({
-              cancelAt: '1605198441',
-              canceledAt: '1604013204',
-              cancelAtPeriodEnd: true,
+              ...result,
               index: data.index,
             });
-
-            this.SET_LOADING(false, { root: true });
+          } catch (e) {
+            console.error(e);
+          } finally {
             this.$nuxt.$loading.finish();
-          }, 2000);
+          }
         }
 
         return;

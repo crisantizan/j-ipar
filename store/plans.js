@@ -282,27 +282,30 @@ export const getters = {
 
 export const actions = {
   async cancelSubscriptions({ commit, state }, plans) {
-    try {
-      commit('SET_LOADING', true, { root: true });
+    return new Promise(async (resolve, reject) => {
+      try {
+        commit('SET_LOADING', true, { root: true });
 
-      const result = await this.$axios.graphql({
-        mutate: gql`
-          mutation($plans: Array!) {
-            stripeSubscriptionCancel(plans: $plans) {
-              id
-              plan
-              currentPeriodEnd
-              currentPeriodStart
+        const { data } = await this.$axios.graphql({
+          mutate: gql`
+            mutation($plans: Array!) {
+              stripeSubscriptionCancel(plans: $plans) {
+                cancelAt
+                canceledAt
+                cancelAtPeriodEnd
+              }
             }
-          }
-        `,
-        variables: { plans },
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      commit('SET_LOADING', false, { root: true });
-    }
+          `,
+          variables: { plans },
+        });
+        // array
+        resolve(data.stripeSubscriptionCancel);
+      } catch (err) {
+        reject(err);
+      } finally {
+        commit('SET_LOADING', false, { root: true });
+      }
+    });
   },
 
   async addSubscription({ commit, state }, plans) {
