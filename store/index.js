@@ -72,6 +72,9 @@ export const actions = {
 
             plans: stripePlans {
               id
+              cancelAt
+              canceledAt
+              cancelAtPeriodEnd
               object
               active
               aggregateUsage

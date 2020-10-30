@@ -1,6 +1,6 @@
 <template>
   <div class="row col-12 mt-2">
-    <div class="col-md-5">
+    <div class="col-md-4">
       <div class="card p-2">
         <h2 class="mb-0">Card Information</h2>
 
@@ -66,7 +66,6 @@
                   <span class="d-block"
                     ><i class="fab fa-cc-mastercard fa-2x"></i>
                     <i class="fa fa-cc-visa fa-2x"></i>
-                    <!-- {{ paymentMethod.card.brand }} -->
                   </span>
                   <span style="font-size: larger"
                     >**** **** **** {{ paymentMethod.card.last4 }}</span
@@ -99,13 +98,11 @@
               </div>
             </div>
           </div>
-
-          <!-- <div v-if="paymentMethods == null">Add Payment Method</div> -->
         </div>
       </div>
     </div>
 
-    <div class="col-md-7">
+    <div class="col-md-8">
       <div class="card">
         <h2 class="mb-0 p-2">Select Plan</h2>
 
@@ -145,6 +142,7 @@
                     <th class="text-center">User(s)</th>
                     <th class="text-center">Price</th>
                     <th class="text-center">Discount</th>
+                    <th class="text-center">Status</th>
                     <th class="text-center">Total</th>
                   </tr>
                 </thead>
@@ -157,7 +155,6 @@
                   >
                     <td>
                       <div class="checkbox checkbox-success">
-                        <!-- :disabled="loading || plan.couponId.confirmed" -->
                         <input
                           type="checkbox"
                           :id="plan.id"
@@ -183,7 +180,6 @@
                         ]"
                         v-if="plan.couponId.valid && plan.checked"
                       >
-                        <!-- <b> Discount:</b> 5% for 12 months -->
                         <div class="d-flex align-items-center">
                           <b class="mr-1">{{ plan.coupon.name }}</b>
 
@@ -309,13 +305,16 @@
                     <td class="text-center">
                       {{ plan | calcDiscount | enUsFormatter }}
                     </td>
+                    <td class="text-center" :class="{ 'text-danger': plan.cancelAtPeriodEnd }">
+                      {{ printStatusPlan(plan) }}
+                    </td>
                     <td class="text-center">
                       {{ plan | calcTotalPlan | enUsFormatter }}
                     </td>
                   </tr>
 
                   <tr>
-                    <td colspan="4">
+                    <td colspan="5">
                       <b>Total to pay per {{ paymentPeriod }}</b>
                     </td>
                     <td class="text-right">
@@ -330,7 +329,7 @@
               <button
                 v-if="!!paymentMethods.length"
                 type="button"
-                class="btn btn-outline-danger mr-2"
+                class="btn btn-danger mr-2"
                 :disabled="loading"
                 @click="cancelSubscription"
               >
@@ -357,16 +356,19 @@
 <script>
 import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
+import dayjs from 'dayjs';
 import { camelToSnakeCaseObj, calcPlanDiscount } from '@/helpers/utils';
 
 export default {
   data: () => ({
     currentVerifyCuponPlan: null,
   }),
+
   filters: {
     calcDiscount(plan) {
       return calcPlanDiscount(plan);
     },
+
     calcTotalPlan(plan) {
       const total = (plan.amount * plan.users) / 100;
       const discount = calcPlanDiscount(plan);
@@ -374,6 +376,7 @@ export default {
       return discount > total ? 0 : total - discount;
     },
   },
+
   computed: {
     ...mapGetters('plans', [
       'defaultPeriod',
@@ -479,12 +482,24 @@ export default {
       'CONFIRM_COUPONS',
       'SET_DEFAULT_PERIOD',
     ]),
+
     ...mapActions('plans', [
       'getPaymentMethods',
       'addSubscription',
       'cancelSubscriptions',
     ]),
+
     ...mapMutations(['SET_LOADING']),
+
+    printStatusPlan(plan) {
+      if (!plan.checked) {
+        return '-';
+      }
+
+      return plan.cancelAtPeriodEnd
+        ? `Cancel at ${dayjs(plan.cancelAt).format('YYYY/MM/DD')}`
+        : 'Subscribed';
+    },
 
     /** create payment method (with apollo) */
     async createPaymentMethod(stripe, card) {
@@ -988,7 +1003,6 @@ export default {
       this.$nuxt.$loading.start();
       await this.cancelSubscriptions(plans);
       this.$nuxt.$loading.finish();
-
     },
 
     async subscribeUpdatePlan() {
