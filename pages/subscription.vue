@@ -160,14 +160,21 @@
                           :id="plan.id"
                           :checked="plan.checked"
                           :disabled="loading || !plan.active"
-                          @change="
+                          @click.prevent
+                        />
+                        <label
+                          :for="plan.id"
+                          :class="{ 'cursor-pointer': !loading && plan.active }"
+                          @click="
                             onCheckedPlan({
+                              event: $event,
+                              planId: plan.id,
                               value: !plan.checked,
+                              isCanceled: plan.cancelAtPeriodEnd,
                               index,
                             })
                           "
-                        />
-                        <label :for="plan.id">
+                        >
                           {{ plan.nickname }}
                         </label>
                       </div>
@@ -305,7 +312,10 @@
                     <td class="text-center">
                       {{ plan | calcDiscount | enUsFormatter }}
                     </td>
-                    <td class="text-center" :class="{ 'text-danger': plan.cancelAtPeriodEnd }">
+                    <td
+                      class="text-center"
+                      :class="{ 'text-danger': plan.cancelAtPeriodEnd }"
+                    >
                       {{ printStatusPlan(plan) }}
                     </td>
                     <td class="text-center">
@@ -492,12 +502,12 @@ export default {
     ...mapMutations(['SET_LOADING']),
 
     printStatusPlan(plan) {
-      if (!plan.checked) {
+      if (!plan.checked || !this.defaultCheckedPlans.includes(plan.id)) {
         return '-';
       }
 
       return plan.cancelAtPeriodEnd
-        ? `Cancel at ${dayjs(plan.cancelAt).format('YYYY/MM/DD')}`
+        ? `Cancel at ${dayjs.unix(plan.cancelAt).format('YYYY/MM/DD')}`
         : 'Subscribed';
     },
 
@@ -778,7 +788,52 @@ export default {
 
     /** on checked plan handler */
     async onCheckedPlan(data) {
-      // data { value, index });
+      // data { planId, value, isCanceled, index });
+
+      // core, stop
+      if (this.planIsMain(data.planId)) {
+        return;
+      }
+
+      // subscription already canceled
+      if (!data.value && data.isCanceled) {
+        data.event.preventDefault();
+
+        Swal.fire({
+          position: 'center',
+          icon: 'info',
+          html: '<h4>This subscription already canceled!</h4>',
+          showConfirmButton: false,
+          timer: 1800,
+        });
+
+        return;
+      }
+
+      // cancel plan
+      if (!data.value && this.defaultCheckedPlans.includes(data.planId)) {
+        data.event.preventDefault();
+        delete data.event;
+
+        const { isConfirmed } = await Swal.fire({
+          position: 'center',
+          title: 'Cancel subscription',
+          text: 'Are you sure you want to cancel this subscription?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, do It!',
+        });
+
+        if (isConfirmed) {
+          this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
+        }
+
+        return;
+      }
+
+      delete data.event;
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
 
       if (!data.value) {

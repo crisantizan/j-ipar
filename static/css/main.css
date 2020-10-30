@@ -61,3 +61,7 @@ th[class^='vgt'] {
 .btn-icon i {
   margin-right: 0.3rem;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}
