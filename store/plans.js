@@ -188,6 +188,27 @@ export const mutations = {
       }
     });
   },
+
+  SET_CANCELED_STATUS_PLAN(state, payload) {
+    /**
+     * payload: { cancelAt: numeric string,
+     * canceledAt: numeric string,
+     * cancelAtPeriodEnd: boolean,
+     * index: number,
+     * }
+     **/
+
+    const mirrorPeriod = this.getters['plans/mirrorPeriod'];
+    const { index } = payload;
+
+    state[state.period][index].cancelAt = payload.cancelAt;
+    state[state.period][index].canceledAt = payload.canceledAt;
+    state[state.period][index].cancelAtPeriodEnd = payload.cancelAtPeriodEnd;
+
+    state[mirrorPeriod][index].cancelAt = payload.cancelAt;
+    state[mirrorPeriod][index].canceledAt = payload.canceledAt;
+    state[mirrorPeriod][index].cancelAtPeriodEnd = payload.cancelAtPeriodEnd;
+  },
 };
 
 export const getters = {
@@ -277,7 +298,6 @@ export const actions = {
         `,
         variables: { plans },
       });
-
     } catch (err) {
       console.error(err);
     } finally {

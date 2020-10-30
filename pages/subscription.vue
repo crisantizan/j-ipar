@@ -491,6 +491,7 @@ export default {
       'SET_CUPON_STATE',
       'CONFIRM_COUPONS',
       'SET_DEFAULT_PERIOD',
+      'SET_CANCELED_STATUS_PLAN',
     ]),
 
     ...mapActions('plans', [
@@ -826,8 +827,22 @@ export default {
           confirmButtonText: 'Yes, do It!',
         });
 
+        // execute cancel subscription request
         if (isConfirmed) {
-          this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
+          this.SET_LOADING(true, { root: true });
+          this.$nuxt.$loading.start();
+
+          setTimeout(() => {
+            this.SET_CANCELED_STATUS_PLAN({
+              cancelAt: '1605198441',
+              canceledAt: '1604013204',
+              cancelAtPeriodEnd: true,
+              index: data.index,
+            });
+
+            this.SET_LOADING(false, { root: true });
+            this.$nuxt.$loading.finish();
+          }, 2000);
         }
 
         return;
@@ -1098,36 +1113,42 @@ export default {
       // apply changes in template
       this.CONFIRM_COUPONS();
 
-      // subscriptions to delete
-      let toDelete = [];
-
-      const currentCheckeds = this.getCurrentCheckedPlans();
-
-      // plans uncheckeds
-      const unCheckeds = this.defaultCheckedPlans.filter(
-        id => !currentCheckeds.includes(id),
-      );
-
-      // delete uncheckeds plans
-      if (!!unCheckeds.length) {
-        toDelete.push(...unCheckeds.map(id => ({ planId: id })));
-      }
-
       // remove old period subscription
       if (this.paymentPeriod !== this.defaultPeriod) {
         // set the current period as default
         this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-        toDelete.push(
-          ...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })),
-        );
-      }
-
-      // remove subscriptions
-      if (!!toDelete.length) {
-        await this.cancelSubscriptions(toDelete);
       }
 
       this.$nuxt.$loading.finish();
+
+      // // subscriptions to delete
+      // let toDelete = [];
+
+      // const currentCheckeds = this.getCurrentCheckedPlans();
+
+      // // plans uncheckeds
+      // const unCheckeds = this.defaultCheckedPlans.filter(
+      //   id => !currentCheckeds.includes(id),
+      // );
+
+      // // delete uncheckeds plans
+      // if (!!unCheckeds.length) {
+      //   toDelete.push(...unCheckeds.map(id => ({ planId: id })));
+      // }
+
+      // // remove old period subscription
+      // if (this.paymentPeriod !== this.defaultPeriod) {
+      //   // set the current period as default
+      //   this.SET_DEFAULT_PERIOD(this.paymentPeriod);
+      //   toDelete.push(
+      //     ...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })),
+      //   );
+      // }
+
+      // // remove subscriptions
+      // if (!!toDelete.length) {
+      //   await this.cancelSubscriptions(toDelete);
+      // }
     },
   },
 };
