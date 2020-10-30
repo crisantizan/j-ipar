@@ -51,7 +51,7 @@ export default {
         type: 'date',
         tdClass: 'text-left',
         thClass: 'text-left',
-        formatFn: val => dayjs(val).format('YYYY/MM/DD'),
+        formatFn: val => dayjs.unix(val).format('YYYY/MM/DD'),
       },
       {
         label: 'Email',
