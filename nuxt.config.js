@@ -82,6 +82,7 @@ export default {
 
   loading: {
     height: '5px',
+    color: '#3283f6',
   },
   /*
    ** Global CSS
