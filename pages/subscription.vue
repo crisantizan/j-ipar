@@ -854,6 +854,8 @@ export default {
                 { planId: data.planId },
               ]);
 
+              delete result.plan;
+
               this.SET_CANCELED_STATUS_PLAN({
                 ...result,
                 index: data.index,
@@ -1097,11 +1099,17 @@ export default {
         this.$nuxt.$loading.start();
 
         const results = await this.cancelSubscriptions(plans);
+        console.log(results);
 
+        // update view
         for (const planResult of results) {
+          const index = this.show.findIndex(plan => plan.id === planResult.plan.id);
+
+          delete planResult.plan;
+
           this.SET_CANCELED_STATUS_PLAN({
             ...planResult,
-            index: data.index,
+            index,
           });
         }
       } catch (e) {
@@ -1153,6 +1161,19 @@ export default {
         // set the current period as default
         this.SET_DEFAULT_PERIOD(this.paymentPeriod);
       }
+
+      // update default checked plans
+      this.SET_DEFAULT_CHECKED_PLANS();
+
+      // old canceled plans, update
+      this.show.forEach((plan, index) => {
+        this.SET_CANCELED_STATUS_PLAN({
+          cancelAt: null,
+          canceledAt: null,
+          cancelAtPeriodEnd: false,
+          index,
+        });
+      });
 
       this.$nuxt.$loading.finish();
 

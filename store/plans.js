@@ -295,6 +295,7 @@ export const actions = {
                 cancelAt
                 canceledAt
                 cancelAtPeriodEnd
+                plan
               }
             }
           `,
