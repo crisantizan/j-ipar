@@ -1,6 +1,6 @@
 import { print } from 'graphql/language/printer';
 
-export default function ({ $axios, store }) {
+export default function ({ $axios, store, redirect }) {
 	// inject «graphql» method to axios instance
 	$axios.graphql = data => $axios.$post('/', { ...data, isGraphql: true });
 
@@ -17,8 +17,23 @@ export default function ({ $axios, store }) {
 
 			for (const prop in config.data) {
 				// format query and mutation
-				props.includes(prop) && (config.data['query'] = print(config.data[prop]));
+				props.includes(prop) &&
+					(config.data['query'] = print(config.data[prop]));
 			}
+		}
+	});
+
+	// axios error interceptor
+	$axios.onError(err => {
+		// only in client side
+		if (process.server) return;
+
+		// unauthorized and forbidden status codes
+		const codes = [401, 403];
+
+		// redirect to access denied page
+		if (codes.includes(err.response.status)) {
+			redirect('/access-denied');
 		}
 	});
 }
