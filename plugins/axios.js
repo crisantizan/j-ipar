@@ -8,6 +8,7 @@ export default function ({ $axios, store, redirect }) {
 
 	// axios request interceptor
 	$axios.onRequest(config => {
+		store.commit('SET_LOADING', true);
 		// only using graphql method
 		if (config.data.isGraphql) {
 			delete config.data.isGraphql;
@@ -21,6 +22,10 @@ export default function ({ $axios, store, redirect }) {
 					(config.data['query'] = print(config.data[prop]));
 			}
 		}
+	});
+
+	$axios.onResponse(config => {
+		store.commit('SET_LOADING', false);
 	});
 
 	// axios error interceptor

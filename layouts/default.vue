@@ -1,19 +1,20 @@
 <template>
   <div>
-    <navbar />
+    <Navbar />
     <div class="container-fluid">
       <div style="height: 69.6px"></div>
       <Nuxt />
     </div>
+    <Loading v-model="loading" />
   </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
-  components: {
-    navbar: () => import('~/components/Navbar'),
+  computed: {
+    ...mapGetters(['loading']),
   },
 };
 </script>
