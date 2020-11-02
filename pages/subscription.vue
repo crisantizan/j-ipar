@@ -531,9 +531,6 @@ export default {
     /** create payment method (with apollo) */
     async createPaymentMethod(stripe, card) {
       try {
-        this.SET_LOADING(true, { root: true });
-        this.$nuxt.$loading.start();
-
         // get stripe payment method
         const { paymentMethod } = await stripe.createPaymentMethod({
           type: 'card',
@@ -566,9 +563,6 @@ export default {
         card.clear();
       } catch (error) {
         console.error(error);
-      } finally {
-        this.SET_LOADING(false, { root: true });
-        this.$nuxt.$loading.finish();
       }
     },
 
@@ -636,9 +630,6 @@ export default {
       }
 
       try {
-        this.SET_LOADING(true, { root: true });
-        this.$nuxt.$loading.start();
-
         this.currentVerifyCuponPlan = plan.id;
 
         const query = gql`
@@ -710,8 +701,6 @@ export default {
           input.focus();
         }
       } finally {
-        this.SET_LOADING(false, { root: true });
-        this.$nuxt.$loading.finish();
         this.currentVerifyCuponPlan = null;
       }
     },
@@ -848,8 +837,6 @@ export default {
           // execute cancel subscription request
           if (isConfirmed) {
             try {
-              this.$nuxt.$loading.start();
-
               const [result] = await this.cancelSubscriptions([
                 { planId: data.planId },
               ]);
@@ -862,8 +849,6 @@ export default {
               });
             } catch (e) {
               console.error(e);
-            } finally {
-              this.$nuxt.$loading.finish();
             }
           }
 
@@ -1000,9 +985,6 @@ export default {
 
       // execute request
       try {
-        this.SET_LOADING(true, { root: true });
-        this.$nuxt.$loading.start();
-
         const mutate = gql`
           mutation($id: String!) {
             paymentMethodEdit(paymentMethodId: $id) {
@@ -1020,9 +1002,6 @@ export default {
         this.CHANGE_DEFAULT_CUSTOMER(id);
       } catch (error) {
         console.error(error);
-      } finally {
-        this.SET_LOADING(false, { root: true });
-        this.$nuxt.$loading.finish();
       }
     },
 
@@ -1043,9 +1022,6 @@ export default {
 
       // execute request
       try {
-        this.SET_LOADING(true, { root: true });
-        this.$nuxt.$loading.start();
-
         const mutate = gql`
           mutation($id: String!) {
             paymentMethodDelete(paymentMethodId: $id) {
@@ -1070,9 +1046,6 @@ export default {
         await this.getPaymentMethods();
       } catch (error) {
         console.error(error);
-      } finally {
-        this.SET_LOADING(false, { root: true });
-        this.$nuxt.$loading.finish();
       }
     },
 
@@ -1093,11 +1066,7 @@ export default {
 
       const plans = this.defaultCheckedPlans.map(planId => ({ planId }));
 
-      // await this.cancelSubscriptions(plans);
-
       try {
-        this.$nuxt.$loading.start();
-
         const results = await this.cancelSubscriptions(plans);
         console.log(results);
 
@@ -1113,8 +1082,7 @@ export default {
           });
         }
       } catch (e) {
-      } finally {
-        this.$nuxt.$loading.finish();
+        console.error(e);
       }
     },
 
@@ -1149,8 +1117,6 @@ export default {
           return obj;
         });
 
-      this.$nuxt.$loading.start();
-
       // execute request
       await this.addSubscription(plans);
       // apply changes in template
@@ -1174,8 +1140,6 @@ export default {
           index,
         });
       });
-
-      this.$nuxt.$loading.finish();
 
       // // subscriptions to delete
       // let toDelete = [];
