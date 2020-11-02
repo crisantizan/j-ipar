@@ -350,6 +350,10 @@ export const actions = {
         `,
         variables: { plans },
       });
+
+      if (!!result.errors) {
+        throw(result.errors);
+      }
     } catch (err) {
       console.error(err);
     } finally {
