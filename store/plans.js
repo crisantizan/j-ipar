@@ -286,7 +286,7 @@ export const actions = {
   async cancelSubscriptions({ commit, state }, plans) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await this.$axios.graphql({
+        const { data, errors } = await this.$axios.graphql({
           mutate: gql`
             mutation($plans: Array!) {
               stripeSubscriptionCancel(plans: $plans) {
@@ -307,50 +307,54 @@ export const actions = {
     });
   },
 
-  async addSubscription({ commit, state }, plans) {
-    try {
-      const result = await this.$axios.graphql({
-        mutate: gql`
-          mutation($plans: Array!) {
-            stripeSubscripterAdd(newSubscripter: { plans: $plans }) {
-              id
-              object
-              applicationFeePercent
-              billingCycleAnchor
-              billingThresholds
-              cancelAt
-              cancelAtPeriodEnd
-              canceledAt
-              collectionMethod
-              created
-              currentPeriodEnd
-              currentPeriodStart
-              customer
-              daysUntilDue
-              defaultPaymentMethod
-              defaultSource
-              defaultTaxRates
-              discount
-              endedAt
-              items
-              latestInvoice
-              livemode
-              metadata
-              nextPendingInvoiceItemInvoice
-              quantity
-              status
+  addSubscription({ commit, state }, plans) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data, errors } = await this.$axios.graphql({
+          mutate: gql`
+            mutation($plans: Array!) {
+              stripeSubscripterAdd(newSubscripter: { plans: $plans }) {
+                id
+                object
+                applicationFeePercent
+                billingCycleAnchor
+                billingThresholds
+                cancelAt
+                cancelAtPeriodEnd
+                canceledAt
+                collectionMethod
+                created
+                currentPeriodEnd
+                currentPeriodStart
+                customer
+                daysUntilDue
+                defaultPaymentMethod
+                defaultSource
+                defaultTaxRates
+                discount
+                endedAt
+                items
+                latestInvoice
+                livemode
+                metadata
+                nextPendingInvoiceItemInvoice
+                quantity
+                status
+              }
             }
-          }
-        `,
-        variables: { plans },
-      });
+          `,
+          variables: { plans },
+        });
 
-      if (!!result.errors) {
-        throw result.errors;
+        if (!!errors) {
+          return reject(errors);
+        }
+
+        resolve(data.stripeSubscripterAdd);
+      } catch (err) {
+        reject(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    });
   },
 
   async getPaymentMethods({ commit, state }) {

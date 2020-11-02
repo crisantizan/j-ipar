@@ -843,16 +843,36 @@ export default {
 
               delete result.plan;
 
-              this.SET_CANCELED_STATUS_PLAN({
-                ...result,
-                index: data.index,
-              });
+              // canceled at
+              if (result.cancelAtPeriodEnd) {
+                this.SET_CANCELED_STATUS_PLAN({
+                  ...result,
+                  index: data.index,
+                });
+              } else {
+                // set «canceledAt» as null
+                this.SET_CANCELED_STATUS_PLAN({
+                  ...result,
+                  canceledAt: null,
+                  index: data.index,
+                });
+
+                // quit checked
+                this.SET_CHECKED_OR_USERS({
+                  prop: 'checked',
+                  value: false,
+                  index: data.index,
+                });
+
+                // update default checked plan
+                this.SET_DEFAULT_CHECKED_PLANS();
+              }
             } catch (e) {
               console.error(e);
             }
-          }
 
-          return;
+            return;
+          }
         }
       }
 
@@ -1068,18 +1088,38 @@ export default {
 
       try {
         const results = await this.cancelSubscriptions(plans);
-        console.log(results);
 
         // update view
         for (const planResult of results) {
-          const index = this.show.findIndex(plan => plan.id === planResult.plan.id);
+          const index = this.show.findIndex(
+            plan => plan.id === planResult.plan.id,
+          );
 
           delete planResult.plan;
 
-          this.SET_CANCELED_STATUS_PLAN({
-            ...planResult,
-            index,
-          });
+          if (planResult.cancelAtPeriodEnd) {
+            this.SET_CANCELED_STATUS_PLAN({
+              ...planResult,
+              index,
+            });
+          } else {
+            // set «canceledAt» as null
+            this.SET_CANCELED_STATUS_PLAN({
+              ...planResult,
+              canceledAt: null,
+              index,
+            });
+
+            // quit checked
+            this.SET_CHECKED_OR_USERS({
+              prop: 'checked',
+              value: false,
+              index,
+            });
+
+            // update default checked plan
+            this.SET_DEFAULT_CHECKED_PLANS();
+          }
         }
       } catch (e) {
         console.error(e);
@@ -1117,29 +1157,36 @@ export default {
           return obj;
         });
 
-      // execute request
-      await this.addSubscription(plans);
-      // apply changes in template
-      this.CONFIRM_COUPONS();
+      try {
+        await this.addSubscription(plans);
+        // execute request
 
-      // remove old period subscription
-      if (this.paymentPeriod !== this.defaultPeriod) {
-        // set the current period as default
-        this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-      }
+        // apply changes in template
+        this.CONFIRM_COUPONS();
 
-      // update default checked plans
-      this.SET_DEFAULT_CHECKED_PLANS();
+        // remove old period subscription
+        if (this.paymentPeriod !== this.defaultPeriod) {
+          // set the current period as default
+          this.SET_DEFAULT_PERIOD(this.paymentPeriod);
 
-      // old canceled plans, update
-      this.show.forEach((plan, index) => {
-        this.SET_CANCELED_STATUS_PLAN({
-          cancelAt: null,
-          canceledAt: null,
-          cancelAtPeriodEnd: false,
-          index,
+          // cancel plans of the other period
+        }
+
+        // update default checked plans
+        this.SET_DEFAULT_CHECKED_PLANS();
+
+        // old canceled plans, update
+        this.show.forEach((plan, index) => {
+          this.SET_CANCELED_STATUS_PLAN({
+            cancelAt: null,
+            canceledAt: null,
+            cancelAtPeriodEnd: false,
+            index,
+          });
         });
-      });
+      } catch (err) {
+        console.error(err);
+      }
 
       // // subscriptions to delete
       // let toDelete = [];
