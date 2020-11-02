@@ -1,5 +1,5 @@
 <template functional>
-	<div class="Loading__wrapper" v-if="props.value">
+	<div class="Loading__wrapper" v-show="props.value">
 		<div class="Loading__content">
 			<div class="sk-chase">
 				<div class="sk-chase-dot"></div>

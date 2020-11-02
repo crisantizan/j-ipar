@@ -46,8 +46,6 @@ export const actions = {
     }
 
     try {
-      commit('SET_LOADING', true);
-
       const { data } = await this.$axios.graphql({
         query: gql`
           query {
@@ -158,8 +156,6 @@ export const actions = {
       }
     } catch (error) {
       console.error(error);
-    } finally {
-      commit('SET_LOADING', false);
     }
   },
 

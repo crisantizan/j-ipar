@@ -286,8 +286,6 @@ export const actions = {
   async cancelSubscriptions({ commit, state }, plans) {
     return new Promise(async (resolve, reject) => {
       try {
-        commit('SET_LOADING', true, { root: true });
-
         const { data } = await this.$axios.graphql({
           mutate: gql`
             mutation($plans: Array!) {
@@ -305,16 +303,12 @@ export const actions = {
         resolve(data.stripeSubscriptionCancel);
       } catch (err) {
         reject(err);
-      } finally {
-        commit('SET_LOADING', false, { root: true });
       }
     });
   },
 
   async addSubscription({ commit, state }, plans) {
     try {
-      commit('SET_LOADING', true, { root: true });
-
       const result = await this.$axios.graphql({
         mutate: gql`
           mutation($plans: Array!) {
@@ -352,19 +346,15 @@ export const actions = {
       });
 
       if (!!result.errors) {
-        throw(result.errors);
+        throw result.errors;
       }
     } catch (err) {
       console.error(err);
-    } finally {
-      commit('SET_LOADING', false, { root: true });
     }
   },
 
   async getPaymentMethods({ commit, state }) {
     try {
-      commit('SET_LOADING', true, { root: true });
-
       const { data } = await this.$axios.graphql({
         query: gql`
           query {
@@ -380,8 +370,6 @@ export const actions = {
       commit('SET_PAYMENT_METHODS', data.paymentMethods);
     } catch (err) {
       console.error(err);
-    } finally {
-      commit('SET_LOADING', false, { root: true });
     }
   },
 };
