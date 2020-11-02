@@ -1,5 +1,6 @@
 <template>
   <div class="row col-12 mt-2">
+    <Loading v-model="loading" />
     <div class="col-md-4">
       <div class="card p-2">
         <h2 class="mb-0">Card Information</h2>
