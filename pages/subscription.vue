@@ -1170,6 +1170,11 @@ export default {
           this.SET_DEFAULT_PERIOD(this.paymentPeriod);
 
           // cancel plans of the other period
+          const toCancelPlans = this.mirrorSubscriptionPlans.map(plan => ({
+            planId: plan.id,
+          }));
+
+          await this.cancelSubscriptions(toCancelPlans);
         }
 
         // update default checked plans
@@ -1207,9 +1212,9 @@ export default {
       // if (this.paymentPeriod !== this.defaultPeriod) {
       //   // set the current period as default
       //   this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-      //   toDelete.push(
-      //     ...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })),
-      //   );
+      // toDelete.push(
+      //   ...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })),
+      // );
       // }
 
       // // remove subscriptions

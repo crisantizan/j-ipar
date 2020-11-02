@@ -9,7 +9,7 @@ export default function ({ $axios, store, redirect }) {
 	// axios request interceptor
 	$axios.onRequest(config => {
 		// show loading
-		store.commit('SET_LOADING', true);
+		!store.state.loading && store.commit('SET_LOADING', true);
 
 		// only using graphql method
 		if (config.data.isGraphql) {
@@ -29,7 +29,7 @@ export default function ({ $axios, store, redirect }) {
 	// axios response interceptor
 	$axios.onResponse(config => {
 		// hide loading
-		store.commit('SET_LOADING', false);
+		store.state.loading && store.commit('SET_LOADING', false);
 	});
 
 	// axios error interceptor
