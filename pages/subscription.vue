@@ -871,8 +871,8 @@ export default {
               console.error(e);
             }
 
-            return;
           }
+          return;
         }
       }
 
