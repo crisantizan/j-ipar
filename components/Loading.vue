@@ -41,14 +41,13 @@
 }
 
 .Loading__content {
-	background-color: #3283f6;
+	background-color: #2d5f8b;
 	border-radius: 3px;
-	padding: 0 1.5rem;
-	box-shadow: 0px 0px 5px 0px rgba(50, 131, 246, 0.65);
+	padding: 1rem;
+	box-shadow: 0px 0px 5px 0px #2d5f8b;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 50px;
 }
 
 .Loading__text {
@@ -58,8 +57,8 @@
 }
 
 .sk-chase {
-	width: 75px;
-	height: 75px;
+	width: 60px;
+	height: 60px;
 	position: relative;
 	animation: sk-chase 2.5s infinite linear both;
 }
@@ -79,7 +78,6 @@
 	width: 25%;
 	height: 25%;
 	background-color: #fff;
-	/*background-color: #3283f6;*/
 	border-radius: 100%;
 	animation: sk-chase-dot-before 2s infinite ease-in-out both;
 }

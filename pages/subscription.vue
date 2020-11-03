@@ -524,7 +524,7 @@ export default {
       }
 
       return plan.cancelAtPeriodEnd
-        ? `Cancel at ${dayjs.unix(plan.cancelAt).format('YYYY/MM/DD')}`
+        ? `Cancel at ${dayjs.unix(plan.cancelAt).format('DD/MM/YYYY')}`
         : 'Subscribed';
     },
 
