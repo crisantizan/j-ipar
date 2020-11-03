@@ -55,8 +55,8 @@ export default {
     pages: [
       { path: '/', name: 'Home' },
       { path: '/subscription', name: 'Subscription' },
-      { path: '/bills', name: 'Bills' },
       { path: '/users', name: 'Users' },
+      { path: '/bills', name: 'Bills' },
     ],
   }),
 

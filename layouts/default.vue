@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Navbar />
+    <TheNavbar />
     <div class="container-fluid">
       <div style="height: 69.6px"></div>
       <Nuxt />
