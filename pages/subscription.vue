@@ -135,204 +135,218 @@
                 </div>
               </div>
 
-              <table class="table table-striped table-hover table-plans">
-                <thead>
-                  <tr>
-                    <th>Package</th>
-                    <th class="text-center">User(s)</th>
-                    <th class="text-center">Price</th>
-                    <th class="text-center">Discount</th>
-                    <th class="text-center">Status</th>
-                    <th class="text-center">Total</th>
-                  </tr>
-                </thead>
+              <!-- <client-only> -->
+                <table class="table table-striped table-hover table-plans">
+                  <thead>
+                    <tr>
+                      <th>Package</th>
+                      <th class="text-center">User(s)</th>
+                      <th class="text-center">Price</th>
+                      <th class="text-center">Discount</th>
+                      <th class="text-center">Status</th>
+                      <th class="text-center">Total</th>
+                    </tr>
+                  </thead>
 
-                <tbody>
-                  <tr
-                    v-for="(plan, index) in show"
-                    :key="plan.id"
-                    :class="{ 'package-selected': plan.checked }"
-                  >
-                    <td>
-                      <div class="checkbox checkbox-success">
-                        <input
-                          type="checkbox"
-                          :id="plan.id"
-                          :checked="plan.checked"
-                          :disabled="loading || !plan.active"
-                          @click.prevent
-                        />
-                        <label
-                          :for="plan.id"
-                          :class="{ 'cursor-pointer': !loading && plan.active }"
-                          @click="
-                            onCheckedPlan({
-                              event: $event,
-                              planId: plan.id,
-                              value: !plan.checked,
-                              isCanceled: plan.cancelAtPeriodEnd,
-                              index,
-                            })
-                          "
-                        >
-                          {{ plan.nickname }}
-                        </label>
-                      </div>
-
-                      <div
-                        :class="[
-                          plan.couponId.confirmed
-                            ? 'text-success'
-                            : 'text-grey',
-                        ]"
-                        v-if="plan.couponId.valid && plan.checked"
-                      >
-                        <div class="d-flex align-items-center">
-                          <b class="mr-1">{{ plan.coupon.name }}</b>
-
-                          <span
-                            v-if="!plan.couponId.confirmed"
-                            class="quit-cupon"
-                            title="Remove coupon"
-                            @click="quitCoupon(index)"
-                          >
-                            <i class="fas fa-times text-danger"></i>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div v-else>
-                        <div class="input-group input-group-sm mt-1">
-                          <span
-                            @click="quitCoupon(index)"
-                            class="quit-cupon"
-                            title="Remove coupon"
-                            v-if="plan.couponId.valid"
-                          >
-                            <i class="fas fa-times"></i>
-                          </span>
+                  <tbody>
+                    <tr
+                      v-for="(plan, index) in show"
+                      :key="plan.id"
+                      :class="{ 'package-selected': plan.checked }"
+                    >
+                      <td>
+                        <div class="checkbox checkbox-success">
                           <input
-                            type="text"
-                            class="form-control form-control-sm text-secondary"
-                            placeholder="Add Coupon"
-                            :disabled="!plan.checked"
-                            :title="inputCuponTitle(plan.couponId.valid)"
-                            :class="isValidCupon(plan.couponId.valid)"
-                            :value="plan.couponId.value"
-                            @input="
-                              onTypeCupon({
-                                value: $event.target.value,
-                                index,
-                              })
-                            "
-                            @blur="
-                              onBlurInputCoupon({
-                                index,
-                                valid: plan.couponId.valid,
-                              })
-                            "
-                            @keyup.enter="
-                              verifyCupon({
-                                index,
-                                couponId: plan.couponId,
-                                plan: plan,
-                              })
-                            "
+                            type="checkbox"
+                            :id="plan.id"
+                            :checked="plan.checked"
+                            :disabled="loading || !plan.active"
+                            @click.prevent
                           />
-                          <div class="input-group-append">
-                            <button
-                              class="btn btn-sm btn-outline-secondary"
-                              type="button"
-                              :disabled="
-                                !plan.checked ||
-                                btnAddCuponDisabledState(plan.couponId)
+                          <label
+                            :for="plan.id"
+                            :class="{ 'cursor-pointer': !loading && plan.active }"
+                            @click="
+                              onCheckedPlan({
+                                event: $event,
+                                planId: plan.id,
+                                value: !plan.checked,
+                                isCanceled: plan.cancelAtPeriodEnd,
+                                index,
+                              })
+                            "
+                          >
+                            {{ plan.nickname }}
+                          </label>
+                        </div>
+
+                        <div
+                          :class="[
+                            plan.couponId.confirmed
+                              ? 'text-success'
+                              : 'text-grey',
+                          ]"
+                          v-if="plan.couponId.valid && plan.checked"
+                        >
+                          <div class="d-flex align-items-center">
+                            <b class="mr-1">{{ plan.coupon.name }}</b>
+
+                            <span
+                              v-if="!plan.couponId.confirmed"
+                              class="quit-cupon"
+                              title="Remove coupon"
+                              @click="quitCoupon(index)"
+                            >
+                              <i class="fas fa-times text-danger"></i>
+                            </span>
+                          </div>
+                        </div>
+
+                        <div v-else>
+                          <div class="input-group input-group-sm mt-1">
+                            <span
+                              @click="quitCoupon(index)"
+                              class="quit-cupon"
+                              title="Remove coupon"
+                              v-if="plan.couponId.valid"
+                            >
+                              <i class="fas fa-times"></i>
+                            </span>
+                            <input
+                              type="text"
+                              class="form-control form-control-sm text-secondary"
+                              placeholder="Add Coupon"
+                              :disabled="!plan.checked"
+                              :title="inputCuponTitle(plan.couponId.valid)"
+                              :class="isValidCupon(plan.couponId.valid)"
+                              :value="plan.couponId.value"
+                              @input="
+                                onTypeCupon({
+                                  value: $event.target.value,
+                                  index,
+                                })
                               "
-                              title="Add coupon"
-                              @click="
+                              @blur="
+                                onBlurInputCoupon({
+                                  index,
+                                  valid: plan.couponId.valid,
+                                })
+                              "
+                              @keyup.enter="
                                 verifyCupon({
                                   index,
                                   couponId: plan.couponId,
                                   plan: plan,
-                                  input:
-                                    $event.target.parentNode
-                                      .previousElementSibling,
                                 })
                               "
-                            >
-                              <template
-                                v-if="
-                                  loading && currentVerifyCuponPlan === plan.id
+                            />
+                            <div class="input-group-append">
+                              <button
+                                class="btn btn-sm btn-outline-secondary"
+                                type="button"
+                                :disabled="
+                                  !plan.checked ||
+                                  btnAddCuponDisabledState(plan.couponId)
+                                "
+                                title="Add coupon"
+                                @click="
+                                  verifyCupon({
+                                    index,
+                                    couponId: plan.couponId,
+                                    plan: plan,
+                                    input:
+                                      $event.target.parentNode
+                                        .previousElementSibling,
+                                  })
                                 "
                               >
-                                <div
-                                  class="spinner-border text-primary"
-                                  role="status"
+                                <template
+                                  v-if="
+                                    loading && currentVerifyCuponPlan === plan.id
+                                  "
                                 >
-                                  <span class="sr-only">Loading...</span>
-                                </div>
-                              </template>
-                              <span v-else style="pointer-events: none"
-                                >Add</span
-                              >
-                            </button>
+                                  <div
+                                    class="spinner-border text-primary"
+                                    role="status"
+                                  >
+                                    <span class="sr-only">Loading...</span>
+                                  </div>
+                                </template>
+                                <span v-else style="pointer-events: none"
+                                  >Add</span
+                                >
+                              </button>
+                            </div>
                           </div>
+                          <small
+                            v-if="plan.couponId.valid === false"
+                            class="form-text text-danger mt-0"
+                          >
+                            Invalid coupon
+                          </small>
                         </div>
-                        <small
-                          v-if="plan.couponId.valid === false"
-                          class="form-text text-danger mt-0"
-                        >
-                          Invalid coupon
-                        </small>
-                      </div>
-                    </td>
-                    <td class="users-td">
-                      <div class="d-flex align-items-center">
-                        <input
-                          class="form-control form-control-sm"
-                          type="number"
-                          maxlength="3"
-                          min="0"
-                          size="3"
-                          :disabled="!plan.checked"
-                          :value="plan.users"
-                          @change="
-                            onChangeUsers({
-                              event: $event,
-                              plan: { ...plan },
-                              value: Number($event.target.value),
-                              index,
-                            })
-                          "
-                        />
-                      </div>
-                    </td>
-                    <td class="text-center">
-                      {{ plan.amount | slice(0, -2) | enUsFormatter }}
-                    </td>
-                    <td class="text-center">
-                      {{ plan | calcDiscount | enUsFormatter }}
-                    </td>
-                    <td
-                      class="text-center"
-                      :class="{ 'text-danger': plan.cancelAtPeriodEnd }"
-                    >
-                      {{ printStatusPlan(plan) }}
-                    </td>
-                    <td class="text-center">
-                      {{ plan | calcTotalPlan | enUsFormatter }}
-                    </td>
-                  </tr>
+                      </td>
+                      <td class="users-td">
+                        <div class="d-flex align-items-center">
+                          <input
+                            class="form-control form-control-sm"
+                            type="number"
+                            maxlength="3"
+                            min="0"
+                            size="3"
+                            :disabled="!plan.checked"
+                            :value="plan.users"
+                            @change="
+                              onChangeUsers({
+                                event: $event,
+                                plan: { ...plan },
+                                value: Number($event.target.value),
+                                index,
+                              })
+                            "
+                          />
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        {{ plan.amount | slice(0, -2) | enUsFormatter }}
+                      </td>
+                      <td class="text-center">
+                        {{ plan | calcDiscount | enUsFormatter }}
+                      </td>
+                      <td
+                        class="text-center"
+                        :class="{ 'text-danger': plan.cancelAtPeriodEnd }"
+                      >
+                        <client-only>
+                          <div class="d-flex flex-column">
+                            {{ printStatusPlan(plan) }}
+                            <!-- reset plan  -->
+                            <a
+                              class="text-primary"
+                              v-if="plan.cancelAtPeriodEnd"
+                              style="cursor: pointer; text-decoration: underline"
+                              @click="onResetPlan({ plan, index })"
+                              >Reset plan</a
+                            >
+                          </div>
+                        </client-only>
+                      </td>
+                      <td class="text-center">
+                        {{ plan | calcTotalPlan | enUsFormatter }}
+                      </td>
+                    </tr>
 
-                  <tr>
-                    <td colspan="5">
-                      <b>Total to pay per {{ paymentPeriod }}</b>
-                    </td>
-                    <td class="text-right">
-                      <b>{{ totalPaid | enUsFormatter }}</b>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    <tr>
+                      <td colspan="5">
+                        <b>Total to pay per {{ paymentPeriod }}</b>
+                      </td>
+                      <td class="text-right">
+                        <b>{{ totalPaid | enUsFormatter }}</b>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              <!-- </client-only> -->
             </div>
 
             <div class="text-right mb-3">
@@ -792,6 +806,48 @@ export default {
       });
     },
 
+    /** on reset plan **/
+    async onResetPlan({ plan, index }) {
+      const { isConfirmed } = await Swal.fire({
+        position: 'center',
+        title: 'Reset plan',
+        text: 'Are you sure you want to reset this plan?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, do It!',
+      });
+
+      if (!isConfirmed) {
+        return;
+      }
+
+      const subscriptionData = {
+        planId: plan.id,
+        quantity: plan.users,
+      };
+
+      // send coupon
+      if (plan.couponId.valid) {
+        subscriptionData.coupon = plan.couponId.value;
+      }
+
+      try {
+        await this.addSubscription([subscriptionData]);
+
+        // update view
+        this.SET_CANCELED_STATUS_PLAN({
+          cancelAt: null,
+          canceledAt: null,
+          cancelAtPeriodEnd: false,
+          index,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    },
+
     /** on checked plan handler */
     async onCheckedPlan(data) {
       // data { planId, value, isCanceled, index });
@@ -810,7 +866,7 @@ export default {
           Swal.fire({
             position: 'center',
             icon: 'info',
-            html: '<h4>This subscription already canceled!</h4>',
+            html: '<h4>This plan already canceled!</h4>',
             showConfirmButton: false,
             timer: 1800,
           });
@@ -825,8 +881,8 @@ export default {
 
           const { isConfirmed } = await Swal.fire({
             position: 'center',
-            title: 'Cancel subscription',
-            text: 'Are you sure you want to cancel this subscription?',
+            title: 'Cancel plan',
+            text: 'Are you sure you want to cancel this plan?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -870,7 +926,6 @@ export default {
             } catch (e) {
               console.error(e);
             }
-
           }
           return;
         }
