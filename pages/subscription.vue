@@ -136,222 +136,238 @@
               </div>
 
               <!-- <client-only> -->
-                <table class="table table-striped table-hover table-plans">
-                  <thead>
-                    <tr>
-                      <th>Package</th>
-                      <th class="text-center">User(s)</th>
-                      <th class="text-center">Price</th>
-                      <th class="text-center">Discount</th>
-                      <th class="text-center">Status</th>
-                      <th class="text-center">Total</th>
-                    </tr>
-                  </thead>
+              <table class="table table-striped table-hover table-plans">
+                <thead>
+                  <tr>
+                    <th>Package</th>
+                    <th class="text-center">User(s)</th>
+                    <th class="text-center">Price</th>
+                    <th class="text-center">Discount</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Total</th>
+                  </tr>
+                </thead>
 
-                  <tbody>
-                    <tr
-                      v-for="(plan, index) in show"
-                      :key="plan.id"
-                      :class="{ 'package-selected': plan.checked }"
-                    >
-                      <td>
-                        <div class="checkbox checkbox-success">
+                <tbody>
+                  <tr
+                    v-for="(plan, index) in show"
+                    :key="plan.id"
+                    :class="{ 'package-selected': plan.checked }"
+                  >
+                    <td>
+                      <div class="checkbox checkbox-success">
+                        <input
+                          type="checkbox"
+                          :id="plan.id"
+                          :checked="plan.checked"
+                          :disabled="
+                            loading || !plan.active || subscriptionIsCanceled
+                          "
+                          @click.prevent
+                        />
+                        <label
+                          :for="plan.id"
+                          :class="{
+                            'cursor-pointer':
+                              !loading &&
+                              plan.active &&
+                              !subscriptionIsCanceled,
+                          }"
+                          @click="
+                            onCheckedPlan({
+                              event: $event,
+                              planId: plan.id,
+                              value: !plan.checked,
+                              isCanceled: plan.cancelAtPeriodEnd,
+                              index,
+                            })
+                          "
+                        >
+                          {{ plan.nickname }}
+                        </label>
+                      </div>
+
+                      <div
+                        :class="[
+                          plan.couponId.confirmed
+                            ? 'text-success'
+                            : 'text-grey',
+                        ]"
+                        v-if="plan.couponId.valid && plan.checked"
+                      >
+                        <div class="d-flex align-items-center">
+                          <b class="mr-1">{{ plan.coupon.name }}</b>
+
+                          <span
+                            v-if="!plan.couponId.confirmed"
+                            class="quit-cupon"
+                            title="Remove coupon"
+                            @click="quitCoupon(index)"
+                          >
+                            <i class="fas fa-times text-danger"></i>
+                          </span>
+                        </div>
+                      </div>
+
+                      <div v-else>
+                        <div class="input-group input-group-sm mt-1">
+                          <span
+                            @click="quitCoupon(index)"
+                            class="quit-cupon"
+                            title="Remove coupon"
+                            v-if="plan.couponId.valid"
+                          >
+                            <i class="fas fa-times"></i>
+                          </span>
                           <input
-                            type="checkbox"
-                            :id="plan.id"
-                            :checked="plan.checked"
-                            :disabled="loading || !plan.active"
-                            @click.prevent
-                          />
-                          <label
-                            :for="plan.id"
-                            :class="{ 'cursor-pointer': !loading && plan.active }"
-                            @click="
-                              onCheckedPlan({
-                                event: $event,
-                                planId: plan.id,
-                                value: !plan.checked,
-                                isCanceled: plan.cancelAtPeriodEnd,
+                            type="text"
+                            class="form-control form-control-sm text-secondary"
+                            placeholder="Add Coupon"
+                            :disabled="!plan.checked || subscriptionIsCanceled"
+                            :title="inputCuponTitle(plan.couponId.valid)"
+                            :class="isValidCupon(plan.couponId.valid)"
+                            :value="plan.couponId.value"
+                            @input="
+                              onTypeCupon({
+                                value: $event.target.value,
                                 index,
                               })
                             "
-                          >
-                            {{ plan.nickname }}
-                          </label>
-                        </div>
-
-                        <div
-                          :class="[
-                            plan.couponId.confirmed
-                              ? 'text-success'
-                              : 'text-grey',
-                          ]"
-                          v-if="plan.couponId.valid && plan.checked"
-                        >
-                          <div class="d-flex align-items-center">
-                            <b class="mr-1">{{ plan.coupon.name }}</b>
-
-                            <span
-                              v-if="!plan.couponId.confirmed"
-                              class="quit-cupon"
-                              title="Remove coupon"
-                              @click="quitCoupon(index)"
-                            >
-                              <i class="fas fa-times text-danger"></i>
-                            </span>
-                          </div>
-                        </div>
-
-                        <div v-else>
-                          <div class="input-group input-group-sm mt-1">
-                            <span
-                              @click="quitCoupon(index)"
-                              class="quit-cupon"
-                              title="Remove coupon"
-                              v-if="plan.couponId.valid"
-                            >
-                              <i class="fas fa-times"></i>
-                            </span>
-                            <input
-                              type="text"
-                              class="form-control form-control-sm text-secondary"
-                              placeholder="Add Coupon"
-                              :disabled="!plan.checked"
-                              :title="inputCuponTitle(plan.couponId.valid)"
-                              :class="isValidCupon(plan.couponId.valid)"
-                              :value="plan.couponId.value"
-                              @input="
-                                onTypeCupon({
-                                  value: $event.target.value,
-                                  index,
-                                })
+                            @blur="
+                              onBlurInputCoupon({
+                                index,
+                                valid: plan.couponId.valid,
+                              })
+                            "
+                            @keyup.enter="
+                              verifyCupon({
+                                index,
+                                couponId: plan.couponId,
+                                plan: plan,
+                              })
+                            "
+                          />
+                          <div class="input-group-append">
+                            <button
+                              class="btn btn-sm btn-outline-secondary"
+                              type="button"
+                              :disabled="
+                                !plan.checked ||
+                                btnAddCuponDisabledState(plan.couponId)
                               "
-                              @blur="
-                                onBlurInputCoupon({
-                                  index,
-                                  valid: plan.couponId.valid,
-                                })
-                              "
-                              @keyup.enter="
+                              title="Add coupon"
+                              @click="
                                 verifyCupon({
                                   index,
                                   couponId: plan.couponId,
                                   plan: plan,
+                                  input:
+                                    $event.target.parentNode
+                                      .previousElementSibling,
                                 })
                               "
-                            />
-                            <div class="input-group-append">
-                              <button
-                                class="btn btn-sm btn-outline-secondary"
-                                type="button"
-                                :disabled="
-                                  !plan.checked ||
-                                  btnAddCuponDisabledState(plan.couponId)
-                                "
-                                title="Add coupon"
-                                @click="
-                                  verifyCupon({
-                                    index,
-                                    couponId: plan.couponId,
-                                    plan: plan,
-                                    input:
-                                      $event.target.parentNode
-                                        .previousElementSibling,
-                                  })
+                            >
+                              <template
+                                v-if="
+                                  loading && currentVerifyCuponPlan === plan.id
                                 "
                               >
-                                <template
-                                  v-if="
-                                    loading && currentVerifyCuponPlan === plan.id
-                                  "
+                                <div
+                                  class="spinner-border text-primary"
+                                  role="status"
                                 >
-                                  <div
-                                    class="spinner-border text-primary"
-                                    role="status"
-                                  >
-                                    <span class="sr-only">Loading...</span>
-                                  </div>
-                                </template>
-                                <span v-else style="pointer-events: none"
-                                  >Add</span
-                                >
-                              </button>
-                            </div>
+                                  <span class="sr-only">Loading...</span>
+                                </div>
+                              </template>
+                              <span v-else style="pointer-events: none"
+                                >Add</span
+                              >
+                            </button>
                           </div>
-                          <small
-                            v-if="plan.couponId.valid === false"
-                            class="form-text text-danger mt-0"
+                        </div>
+                        <small
+                          v-if="plan.couponId.valid === false"
+                          class="form-text text-danger mt-0"
+                        >
+                          Invalid coupon
+                        </small>
+                      </div>
+                    </td>
+                    <td class="users-td">
+                      <div class="d-flex align-items-center">
+                        <input
+                          class="form-control form-control-sm"
+                          type="number"
+                          maxlength="3"
+                          min="0"
+                          size="3"
+                          :disabled="!plan.checked || subscriptionIsCanceled"
+                          :value="plan.users"
+                          @change="
+                            onChangeUsers({
+                              event: $event,
+                              plan: { ...plan },
+                              value: Number($event.target.value),
+                              index,
+                            })
+                          "
+                        />
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      {{ plan.amount | slice(0, -2) | enUsFormatter }}
+                    </td>
+                    <td class="text-center">
+                      {{ plan | calcDiscount | enUsFormatter }}
+                    </td>
+                    <td
+                      class="text-center"
+                      :class="{ 'text-danger': plan.cancelAtPeriodEnd }"
+                    >
+                      <client-only>
+                        <div class="d-flex flex-column">
+                          {{ printStatusPlan(plan) }}
+                          <!-- reset plan  -->
+                          <a
+                            class="text-primary"
+                            v-if="plan.cancelAtPeriodEnd && !subscriptionIsCanceled"
+                            style="cursor: pointer; text-decoration: underline"
+                            @click="onResetPlan({ plan, index })"
+                            >Reset plan</a
                           >
-                            Invalid coupon
-                          </small>
                         </div>
-                      </td>
-                      <td class="users-td">
-                        <div class="d-flex align-items-center">
-                          <input
-                            class="form-control form-control-sm"
-                            type="number"
-                            maxlength="3"
-                            min="0"
-                            size="3"
-                            :disabled="!plan.checked"
-                            :value="plan.users"
-                            @change="
-                              onChangeUsers({
-                                event: $event,
-                                plan: { ...plan },
-                                value: Number($event.target.value),
-                                index,
-                              })
-                            "
-                          />
-                        </div>
-                      </td>
-                      <td class="text-center">
-                        {{ plan.amount | slice(0, -2) | enUsFormatter }}
-                      </td>
-                      <td class="text-center">
-                        {{ plan | calcDiscount | enUsFormatter }}
-                      </td>
-                      <td
-                        class="text-center"
-                        :class="{ 'text-danger': plan.cancelAtPeriodEnd }"
-                      >
-                        <client-only>
-                          <div class="d-flex flex-column">
-                            {{ printStatusPlan(plan) }}
-                            <!-- reset plan  -->
-                            <a
-                              class="text-primary"
-                              v-if="plan.cancelAtPeriodEnd"
-                              style="cursor: pointer; text-decoration: underline"
-                              @click="onResetPlan({ plan, index })"
-                              >Reset plan</a
-                            >
-                          </div>
-                        </client-only>
-                      </td>
-                      <td class="text-center">
-                        {{ plan | calcTotalPlan | enUsFormatter }}
-                      </td>
-                    </tr>
+                      </client-only>
+                    </td>
+                    <td class="text-center">
+                      {{ plan | calcTotalPlan | enUsFormatter }}
+                    </td>
+                  </tr>
 
-                    <tr>
-                      <td colspan="5">
-                        <b>Total to pay per {{ paymentPeriod }}</b>
-                      </td>
-                      <td class="text-right">
-                        <b>{{ totalPaid | enUsFormatter }}</b>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                  <tr>
+                    <td colspan="5">
+                      <b>Total to pay per {{ paymentPeriod }}</b>
+                    </td>
+                    <td class="text-right">
+                      <b>{{ totalPaid | enUsFormatter }}</b>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
               <!-- </client-only> -->
             </div>
 
-            <div class="text-right mb-3">
+            <div class="text-right mb-3" v-if="!!paymentMethods.length">
               <button
-                v-if="!!paymentMethods.length"
+                class="btn btn-warning mr-2"
+                v-if="subscriptionIsCanceled"
+                :disabled="this.paymentPeriod !== this.defaultPeriod"
+                @click="resetSubscription"
+              >
+                Reset Subscription
+              </button>
+
+              <button
+                v-else
                 type="button"
                 class="btn btn-danger mr-2"
                 :title="
@@ -364,10 +380,9 @@
               </button>
 
               <button
-                v-if="!!paymentMethods.length"
                 type="button"
                 class="btn btn-success"
-                :disabled="loading"
+                :disabled="loading || disabledBtnCancel"
                 @click="subscribeUpdatePlan"
               >
                 Subscribe / Update
@@ -852,8 +867,8 @@ export default {
     async onCheckedPlan(data) {
       // data { planId, value, isCanceled, index });
 
-      // core, stop
-      if (this.planIsMain(data.planId)) {
+      // canceled or core, stop
+      if (this.subscriptionIsCanceled || this.planIsMain(data.planId)) {
         return;
       }
 
@@ -1181,6 +1196,24 @@ export default {
       }
     },
 
+    async resetSubscription() {
+      const { isConfirmed } = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Are you sure you want to reset your subscription?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, do it!',
+      });
+
+      if (!isConfirmed) {
+        return;
+      }
+
+      this.updateSubscription();
+    },
+
     async subscribeUpdatePlan() {
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
@@ -1196,6 +1229,39 @@ export default {
         return;
       }
 
+      this.updateSubscription();
+
+      // // subscriptions to delete
+      // let toDelete = [];
+
+      // const currentCheckeds = this.getCurrentCheckedPlans();
+
+      // // plans uncheckeds
+      // const unCheckeds = this.defaultCheckedPlans.filter(
+      //   id => !currentCheckeds.includes(id),
+      // );
+
+      // // delete uncheckeds plans
+      // if (!!unCheckeds.length) {
+      //   toDelete.push(...unCheckeds.map(id => ({ planId: id })));
+      // }
+
+      // // remove old period subscription
+      // if (this.paymentPeriod !== this.defaultPeriod) {
+      //   // set the current period as default
+      //   this.SET_DEFAULT_PERIOD(this.paymentPeriod);
+      // toDelete.push(
+      //   ...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })),
+      // );
+      // }
+
+      // // remove subscriptions
+      // if (!!toDelete.length) {
+      //   await this.cancelSubscriptions(toDelete);
+      // }
+    },
+
+    async updateSubscription() {
       const plans = this.show
         .filter(plan => plan.checked)
         .map(plan => {
@@ -1247,35 +1313,6 @@ export default {
       } catch (err) {
         console.error(err);
       }
-
-      // // subscriptions to delete
-      // let toDelete = [];
-
-      // const currentCheckeds = this.getCurrentCheckedPlans();
-
-      // // plans uncheckeds
-      // const unCheckeds = this.defaultCheckedPlans.filter(
-      //   id => !currentCheckeds.includes(id),
-      // );
-
-      // // delete uncheckeds plans
-      // if (!!unCheckeds.length) {
-      //   toDelete.push(...unCheckeds.map(id => ({ planId: id })));
-      // }
-
-      // // remove old period subscription
-      // if (this.paymentPeriod !== this.defaultPeriod) {
-      //   // set the current period as default
-      //   this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-      // toDelete.push(
-      //   ...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })),
-      // );
-      // }
-
-      // // remove subscriptions
-      // if (!!toDelete.length) {
-      //   await this.cancelSubscriptions(toDelete);
-      // }
     },
   },
 };

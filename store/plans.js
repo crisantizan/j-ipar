@@ -231,7 +231,7 @@ export const getters = {
   },
 
   defaultCheckedPlans(state) {
-    return state.defaultCheckedPlans[state.period];
+    return state.defaultCheckedPlans[state.defaultPeriod];
   },
 
   totalPaid(state) {
