@@ -363,7 +363,7 @@
                 :disabled="this.paymentPeriod !== this.defaultPeriod"
                 @click="resetSubscription"
               >
-                Reset Subscription
+                Resubscribe
               </button>
 
               <button
@@ -553,7 +553,7 @@ export default {
       }
 
       return plan.cancelAtPeriodEnd
-        ? `Cancel at ${dayjs.unix(plan.cancelAt).format('DD/MM/YYYY')}`
+        ? `Cancel at ${dayjs.unix(plan.cancelAt).format('MM/DD/YYYY')}`
         : 'Subscribed';
     },
 

@@ -347,11 +347,13 @@ export const actions = {
         });
 
         if (!!errors) {
+          console.log(errors);
           return reject(errors);
         }
 
         resolve(data.stripeSubscripterAdd);
       } catch (err) {
+        console.error(err);
         reject(err);
       }
     });
