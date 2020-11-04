@@ -280,6 +280,10 @@ export const getters = {
       return plan.cancelAtPeriodEnd;
     });
   },
+
+  isSubscribed(state, getters) {
+    return !!getters.defaultCheckedPlans.length;
+  },
 };
 
 export const actions = {

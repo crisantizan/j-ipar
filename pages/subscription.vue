@@ -161,7 +161,7 @@
                           :id="plan.id"
                           :checked="plan.checked"
                           :disabled="
-                            loading || !plan.active || subscriptionIsCanceled
+                            loading || !plan.active || disabledMirrorPeriodElements
                           "
                           @click.prevent
                         />
@@ -171,7 +171,7 @@
                             'cursor-pointer':
                               !loading &&
                               plan.active &&
-                              !subscriptionIsCanceled,
+                              !disabledMirrorPeriodElements,
                           }"
                           @click="
                             onCheckedPlan({
@@ -223,7 +223,7 @@
                             type="text"
                             class="form-control form-control-sm text-secondary"
                             placeholder="Add Coupon"
-                            :disabled="!plan.checked || subscriptionIsCanceled"
+                            :disabled="!plan.checked || disabledMirrorPeriodElements"
                             :title="inputCuponTitle(plan.couponId.valid)"
                             :class="isValidCupon(plan.couponId.valid)"
                             :value="plan.couponId.value"
@@ -301,7 +301,7 @@
                           maxlength="3"
                           min="0"
                           size="3"
-                          :disabled="!plan.checked || subscriptionIsCanceled"
+                          :disabled="!plan.checked || disabledMirrorPeriodElements"
                           :value="plan.users"
                           @change="
                             onChangeUsers({
@@ -434,6 +434,7 @@ export default {
       'mainPlan',
       'coreIds',
       'subscriptionIsCanceled',
+      'isSubscribed'
     ]),
     ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded', 'loading']),
@@ -453,6 +454,10 @@ export default {
         this.paymentPeriod !== this.defaultPeriod ||
         this.subscriptionIsCanceled
       );
+    },
+
+    disabledMirrorPeriodElements() {
+      return this.paymentPeriod !== this.defaultPeriod && this.isSubscribed;
     },
   },
   mounted() {
@@ -868,7 +873,7 @@ export default {
       // data { planId, value, isCanceled, index });
 
       // canceled or core, stop
-      if (this.subscriptionIsCanceled || this.planIsMain(data.planId)) {
+      if (this.disabledMirrorPeriodElements || this.planIsMain(data.planId)) {
         return;
       }
 
