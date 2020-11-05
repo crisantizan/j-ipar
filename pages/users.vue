@@ -206,6 +206,7 @@
                     action.label,
                     action.action,
                     props.formattedRow.active,
+                    props.row.admin,
                   )
                 }}
               </a>
@@ -500,6 +501,12 @@ export default {
           action: 'resendEmail',
           label: 'Resend Email',
           icon: 'fas fa-paper-plane',
+        },
+
+        {
+          action: 'changeRole',
+          label: '',
+          icon: 'fas fa-user-tag',
         },
 
         {
@@ -866,12 +873,15 @@ export default {
     },
 
     /* print text in dropdown actions items */
-    dropdownActionItemPrintLabel(label, action, isActive) {
-      if (action !== 'disable') {
-        return label;
+    dropdownActionItemPrintLabel(label, action, isActive, isAdmin) {
+      switch (action) {
+        case 'disable':
+          return isActive ? label : 'Enable';
+        case 'changeRole':
+          return !isAdmin ? 'Change to admin' : 'Change to user';
+        default:
+          return label;
       }
-
-      return isActive ? label : 'Enable';
     },
 
     /* print icon in dropdown actions items */
