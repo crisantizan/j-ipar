@@ -28,6 +28,14 @@
             </label>
           </div>
         </div>
+
+        <center>
+          <span
+            v-if="isLoginAgain"
+          >
+            <h4 class="text-danger">After modifying user privileges, the user must re-login to Prima.</h4>
+          </span>
+        </center>
       </template>
       <!-- available libraries -->
       <template slot="header-right">
@@ -304,8 +312,23 @@
             </button>
           </div>
           <div class="modal-body">
+            <!-- SPINNER -->
+
+            <center v-if="(!integrations || integrations === null) && messageErrorUsersIntegrations === null">
+              <div
+                class="spinner-border text-primary"
+                role="status"
+              >
+                <span class="sr-only">Loading...</span>
+              </div>
+            </center>
+
+            <!-- MESSAGE ERROR -->
+
+            <span v-if="messageErrorUsersIntegrations !== null">{{ messageErrorUsersIntegrations }}</span>
+
             <div
-              v-show="integrations && integrations.length > 0"
+              v-show="integrations && integrations !== null && integrations.length > 0"
               v-for="(integration, indexIntegration) in integrations"
               :key="indexIntegration"
             >
@@ -488,7 +511,9 @@ export default {
       ],
 
       currentUser: null,
-      disabledBtnSaveRelationUser: true
+      disabledBtnSaveRelationUser: true,
+
+      isLoginAgain: false
     };
   },
 
@@ -500,6 +525,7 @@ export default {
       'librariesQuantity',
       'usersIntegrations',
       'integrations',
+      'messageErrorUsersIntegrations',
     ]),
 
     ...mapGetters(['user']),
@@ -624,6 +650,8 @@ export default {
         });
         // update ui
         this.SET_CHECKED({ checked, library, index });
+
+        this.isLoginAgain = true
       } catch (e) {
         console.error(e);
       } finally {

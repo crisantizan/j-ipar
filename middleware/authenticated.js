@@ -15,7 +15,7 @@ export default async function ({ app, store, redirect, route, $axios }) {
 
 				// token valid, redirect to home
 				if (await store.dispatch('whoami')) {
-					return redirect('/');
+					return redirect('/subscription');
 				}
 
 				return;
@@ -38,7 +38,7 @@ export default async function ({ app, store, redirect, route, $axios }) {
 					// have query in URL, clear
 					if (Object.keys(route.query).length > 0) {
 						process.isAuth = true;
-						return redirect(route.path);
+						return redirect('/subscription');
 					}
 				}
 

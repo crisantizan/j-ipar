@@ -4,7 +4,8 @@ export const state = () => ({
   users: [],
   librariesQuantity: {},
   usersIntegrations: [],
-  integrations: []
+  integrations: null,
+  messageErrorUsersIntegrations: null
 });
 
 export const mutations = {
@@ -44,6 +45,10 @@ export const mutations = {
 
   CHECK_RELATION(state, payload) {
     state.usersIntegrations[state.usersIntegrations.map(a => a.userId).indexOf(payload.userIntegrationId)].linked = payload.linked
+  },
+
+  SET_MESSAGE_ERROR_USERS_INTEGRATIONS(state, payload) {
+    state.messageErrorUsersIntegrations = payload.message
   }
 };
 
@@ -133,6 +138,8 @@ export const getters = {
   usersIntegrations: state => state.usersIntegrations,
 
   integrations: state => state.integrations,
+
+  messageErrorUsersIntegrations: state => state.messageErrorUsersIntegrations,
 };
 
 export const actions = {
@@ -243,7 +250,7 @@ export const actions = {
   getUsersIntegrations({ commit }, payload) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await this.$axios.graphql({
+        const { data, errors } = await this.$axios.graphql({
           query: gql`
             query($userId: Int!) {
               usersIntegrations(userId: $userId) {
@@ -284,10 +291,13 @@ export const actions = {
           })
 
           commit('SET_INTEGRATIONS', integrations);
+        } else {
+          commit('SET_MESSAGE_ERROR_USERS_INTEGRATIONS', { message: errors[0].message });
         }
 
         resolve(true);
       } catch (error) {
+        console.log(error)
         reject(error);
       }
     });

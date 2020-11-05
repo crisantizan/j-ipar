@@ -53,7 +53,7 @@ import { mapGetters } from 'vuex';
 export default {
   data: () => ({
     pages: [
-      { path: '/', name: 'Home' },
+      // { path: '/', name: 'Home' },
       { path: '/subscription', name: 'Subscription' },
       { path: '/users', name: 'Users' },
       { path: '/bills', name: 'Bills' },
