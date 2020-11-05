@@ -842,8 +842,8 @@ export default {
     async onResetPlan({ plan, index }) {
       const { isConfirmed } = await Swal.fire({
         position: 'center',
-        title: 'Reset plan',
-        text: 'Are you sure you want to reset this plan?',
+        title: 'Resubscribe',
+        text: `Are you sure you want to resubscribe to plan? We think this is a great idea :-)`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -1215,8 +1215,8 @@ export default {
 
     async resetSubscription() {
       const { isConfirmed } = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'Are you sure you want to reset your subscription?',
+        title: 'Resubscribe',
+        text: `Are you sure you want to resubscribe to Prima? We think this is a great idea :-)`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',

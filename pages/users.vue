@@ -30,10 +30,10 @@
         </div>
 
         <center>
-          <span
-            v-if="isLoginAgain"
-          >
-            <h4 class="text-danger">After modifying user privileges, the user must re-login to Prima.</h4>
+          <span v-if="isLoginAgain">
+            <h4 class="text-danger">
+              After modifying user privileges, the user must re-login to Prima.
+            </h4>
           </span>
         </center>
       </template>
@@ -314,45 +314,54 @@
           <div class="modal-body">
             <!-- SPINNER -->
 
-            <center v-if="(!integrations || integrations === null) && messageErrorUsersIntegrations === null">
-              <div
-                class="spinner-border text-primary"
-                role="status"
-              >
+            <center
+              v-if="
+                (!integrations || integrations === null) &&
+                messageErrorUsersIntegrations === null
+              "
+            >
+              <div class="spinner-border text-primary" role="status">
                 <span class="sr-only">Loading...</span>
               </div>
             </center>
 
             <!-- MESSAGE ERROR -->
 
-            <span v-if="messageErrorUsersIntegrations !== null">{{ messageErrorUsersIntegrations }}</span>
+            <span v-if="messageErrorUsersIntegrations !== null">{{
+              messageErrorUsersIntegrations
+            }}</span>
 
             <div
-              v-show="integrations && integrations !== null && integrations.length > 0"
+              v-show="
+                integrations && integrations !== null && integrations.length > 0
+              "
               v-for="(integration, indexIntegration) in integrations"
               :key="indexIntegration"
             >
-
-              <hr v-if="indexIntegration > 0">
+              <hr v-if="indexIntegration > 0" />
 
               <label>{{ integration.name }}</label>
 
               <!-- CLIO USERS -->
 
-              <div v-for="(user, indexUser) in integration.users" :key="indexUser">
+              <div
+                v-for="(user, indexUser) in integration.users"
+                :key="indexUser"
+              >
                 <span>
                   <input
                     type="checkbox"
                     name=""
                     :id="user.userId"
                     :checked="user.linked"
-                    @click="setRelation({
-                      user
-                    })">
-                  <label
-                    :for="user.userId"
-                  >
-                    <small>{{user.name}} {{user.email}}</small>
+                    @click="
+                      setRelation({
+                        user,
+                      })
+                    "
+                  />
+                  <label :for="user.userId">
+                    <small>{{ user.name }} {{ user.email }}</small>
                   </label>
                 </span>
               </div>
@@ -367,7 +376,8 @@
               Close
             </button>
             <button
-              type="button" class="btn btn-primary"
+              type="button"
+              class="btn btn-primary"
               @click="saveRelations"
               :disabled="disabledBtnSaveRelationUser"
             >
@@ -513,7 +523,7 @@ export default {
       currentUser: null,
       disabledBtnSaveRelationUser: true,
 
-      isLoginAgain: false
+      isLoginAgain: false,
     };
   },
 
@@ -598,7 +608,7 @@ export default {
       'SET_CHECKED',
       'SET_IS_ATTORNEY_CHECKED',
       'SET_ACTIVE',
-      'CHECK_RELATION'
+      'CHECK_RELATION',
     ]),
 
     ...mapActions('users', [
@@ -608,7 +618,7 @@ export default {
       'resendEmail',
       'updateUser',
       'getUsersIntegrations',
-      'updateUserRelations'
+      'updateUserRelations',
     ]),
 
     /** generate custom checkbox id */
@@ -651,7 +661,7 @@ export default {
         // update ui
         this.SET_CHECKED({ checked, library, index });
 
-        this.isLoginAgain = true
+        this.isLoginAgain = true;
       } catch (e) {
         console.error(e);
       } finally {
@@ -700,6 +710,22 @@ export default {
 
             // disabled
             if (user.active) {
+              const { isConfirmed } = await Swal.fire({
+                title: 'Are you sure you want to disable this user?',
+                text: `They will immediately lose access to Prima.
+                You will be able to reassign their license to another user immediately.
+                This does not cancel your subscription.  If you desire to cancel or modify your subscription, you must do so from the "Subscription" section of the administrator panel.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, do it!',
+              });
+
+              if (!isConfirmed) {
+                return;
+              }
+
               // clear libraries
               Object.keys(user.assignLibraries).forEach(key => {
                 // if true set to false
@@ -771,11 +797,11 @@ export default {
 
         case 'relations':
           // GET INTEGRATIONS && GET INTEGRATION USERS (ITERATE INTEGRATIONS)
-          this.currentUser = user
+          this.currentUser = user;
 
           this.getUsersIntegrations({
-            userId: user.id
-          })
+            userId: user.id,
+          });
           break;
 
         default:
@@ -860,7 +886,6 @@ export default {
     /** bind modal properties in "Edit" item **/
     bindModalProps(action) {
       if (action === 'relations') {
-
         return { 'data-toggle': 'modal', 'data-target': '#relationsModal' };
       }
       if (action !== 'edit') {
@@ -870,37 +895,37 @@ export default {
       return { 'data-toggle': 'modal', 'data-target': '#editUserModal' };
     },
 
-    setRelation (payload) {
-      this.disabledBtnSaveRelationUser = false
+    setRelation(payload) {
+      this.disabledBtnSaveRelationUser = false;
 
       this.CHECK_RELATION({
         userIntegrationId: payload.user.userId,
-        linked: !payload.user.linked
-      })
+        linked: !payload.user.linked,
+      });
     },
 
-    async saveRelations () {
-      let relationsToSave = []
+    async saveRelations() {
+      let relationsToSave = [];
 
       this.usersIntegrations.forEach(user => {
         if (user.linked) {
           relationsToSave.push({
             integrationId: user.integrationId,
             userIntegrationId: user.userId,
-            userPrimaId: this.currentUser.id
-          })
+            userPrimaId: this.currentUser.id,
+          });
         }
-      })
+      });
 
       // REQUEST TO SAVE RELATIONS GRAPH
 
       this.updateUserRelations({
-        relations: relationsToSave
-      })
+        relations: relationsToSave,
+      });
 
       // close modal
       this.$refs.relationModal.querySelector('.custom-close-modal').click();
-    }
+    },
   },
 };
 </script>
