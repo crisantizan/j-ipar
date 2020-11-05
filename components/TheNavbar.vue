@@ -64,7 +64,7 @@ export default {
     ...mapGetters('tenant', [
       'tenant',
     ]),
-  }
+  },
 };
 </script>
 

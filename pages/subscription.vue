@@ -161,7 +161,9 @@
                           :id="plan.id"
                           :checked="plan.checked"
                           :disabled="
-                            loading || !plan.active || disabledMirrorPeriodElements
+                            loading ||
+                            !plan.active ||
+                            disabledMirrorPeriodElements
                           "
                           @click.prevent
                         />
@@ -223,7 +225,9 @@
                             type="text"
                             class="form-control form-control-sm text-secondary"
                             placeholder="Add Coupon"
-                            :disabled="!plan.checked || disabledMirrorPeriodElements"
+                            :disabled="
+                              !plan.checked || disabledMirrorPeriodElements
+                            "
                             :title="inputCuponTitle(plan.couponId.valid)"
                             :class="isValidCupon(plan.couponId.valid)"
                             :value="plan.couponId.value"
@@ -301,7 +305,9 @@
                           maxlength="3"
                           min="0"
                           size="3"
-                          :disabled="!plan.checked || disabledMirrorPeriodElements"
+                          :disabled="
+                            !plan.checked || disabledMirrorPeriodElements
+                          "
                           :value="plan.users"
                           @change="
                             onChangeUsers({
@@ -330,10 +336,12 @@
                           <!-- reset plan  -->
                           <a
                             class="text-primary"
-                            v-if="plan.cancelAtPeriodEnd && !subscriptionIsCanceled"
+                            v-if="
+                              plan.cancelAtPeriodEnd && !subscriptionIsCanceled
+                            "
                             style="cursor: pointer; text-decoration: underline"
                             @click="onResetPlan({ plan, index })"
-                            >Reset plan</a
+                            >Resubscribe</a
                           >
                         </div>
                       </client-only>
@@ -434,7 +442,7 @@ export default {
       'mainPlan',
       'coreIds',
       'subscriptionIsCanceled',
-      'isSubscribed'
+      'isSubscribed',
     ]),
     ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded', 'loading']),
@@ -443,6 +451,7 @@ export default {
       get() {
         return this.$store.getters['plans/period'];
       },
+
       set(period) {
         this.$store.commit('plans/SET_PERIOD', period);
       },
@@ -460,6 +469,7 @@ export default {
       return this.paymentPeriod !== this.defaultPeriod && this.isSubscribed;
     },
   },
+
   mounted() {
     // Create a Stripe client.
     var stripe = Stripe('pk_test_2AcUtig3rQa3DK0LTJQIGTrm');
@@ -500,6 +510,7 @@ export default {
       this.createPaymentMethod(stripe, cardElement);
     });
   },
+
   watch: {
     loaded: {
       immediate: true,
@@ -522,6 +533,7 @@ export default {
       },
     },
   },
+
   methods: {
     ...mapMutations('plans', [
       'SET_MONTHLY',
@@ -558,7 +570,7 @@ export default {
       }
 
       return plan.cancelAtPeriodEnd
-        ? `Cancel at ${dayjs.unix(plan.cancelAt).format('MM/DD/YYYY')}`
+        ? `Will cancel on ${dayjs.unix(plan.cancelAt).format('MM/DD/YYYY')}`
         : 'Subscribed';
     },
 
