@@ -163,7 +163,8 @@
                           :disabled="
                             loading ||
                             !plan.active ||
-                            disabledMirrorPeriodElements
+                            subscriptionIsCanceled ||
+                            disabledMirrorPeriod
                           "
                           @click.prevent
                         />
@@ -173,7 +174,8 @@
                             'cursor-pointer':
                               !loading &&
                               plan.active &&
-                              !disabledMirrorPeriodElements,
+                              !subscriptionIsCanceled &&
+                              !disabledMirrorPeriod,
                           }"
                           @click="
                             onCheckedPlan({
@@ -226,7 +228,9 @@
                             class="form-control form-control-sm text-secondary"
                             placeholder="Add Coupon"
                             :disabled="
-                              !plan.checked || disabledMirrorPeriodElements
+                              !plan.checked ||
+                              subscriptionIsCanceled ||
+                              disabledMirrorPeriod
                             "
                             :title="inputCuponTitle(plan.couponId.valid)"
                             :class="isValidCupon(plan.couponId.valid)"
@@ -306,7 +310,10 @@
                           min="0"
                           size="3"
                           :disabled="
-                            !plan.checked || disabledMirrorPeriodElements
+                            !plan.checked ||
+                            plan.cancelAtPeriodEnd ||
+                            subscriptionIsCanceled ||
+                            disabledMirrorPeriod
                           "
                           :value="plan.users"
                           @change="
@@ -465,8 +472,11 @@ export default {
       );
     },
 
-    disabledMirrorPeriodElements() {
-      return this.paymentPeriod !== this.defaultPeriod && this.isSubscribed;
+    disabledMirrorPeriod() {
+      return (
+        this.paymentPeriod !== this.defaultPeriod &&
+        (this.isSubscribed || this.subscriptionIsCanceled)
+      );
     },
   },
 
@@ -885,7 +895,11 @@ export default {
       // data { planId, value, isCanceled, index });
 
       // canceled or core, stop
-      if (this.disabledMirrorPeriodElements || this.planIsMain(data.planId)) {
+      if (
+        this.subscriptionIsCanceled ||
+        this.disabledMirrorPeriod ||
+        this.planIsMain(data.planId)
+      ) {
         return;
       }
 
@@ -1228,7 +1242,24 @@ export default {
         return;
       }
 
-      this.updateSubscription();
+      const plans = this.show
+        .filter(plan => plan.checked && plan.cancelAtPeriodEnd)
+        .map(plan => {
+          const obj = {
+            planId: plan.id,
+            quantity: plan.users,
+          };
+
+          // // send coupon
+          if (plan.couponId.valid) {
+            obj.coupon = plan.couponId.value;
+          }
+
+          return obj;
+        });
+
+      // console.log(JSON.parse(JSON.stringify(plans)))
+      this.updateSubscription(plans);
     },
 
     async subscribeUpdatePlan() {
@@ -1246,7 +1277,23 @@ export default {
         return;
       }
 
-      this.updateSubscription();
+      const plans = this.show
+        .filter(plan => plan.checked && !plan.cancelAtPeriodEnd)
+        .map(plan => {
+          const obj = {
+            planId: plan.id,
+            quantity: plan.users,
+          };
+
+          // send coupon
+          if (plan.couponId.valid) {
+            obj.coupon = plan.couponId.value;
+          }
+
+          return obj;
+        });
+
+      this.updateSubscription(plans);
 
       // // subscriptions to delete
       // let toDelete = [];
@@ -1278,23 +1325,7 @@ export default {
       // }
     },
 
-    async updateSubscription() {
-      const plans = this.show
-        .filter(plan => plan.checked)
-        .map(plan => {
-          const obj = {
-            planId: plan.id,
-            quantity: plan.users,
-          };
-
-          // send coupon
-          if (plan.couponId.valid) {
-            obj.coupon = plan.couponId.value;
-          }
-
-          return obj;
-        });
-
+    async updateSubscription(plans) {
       try {
         await this.addSubscription(plans);
         // execute request
