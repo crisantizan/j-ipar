@@ -16,6 +16,7 @@ export const state = () => ({
     month: [],
     year: [],
   },
+  defaultTotalPaid: null,
 });
 
 export const mutations = {
@@ -42,6 +43,10 @@ export const mutations = {
 
   SET_DEFAULT_PERIOD(state, period) {
     state.defaultPeriod = period;
+  },
+
+  SET_DEFAULT_TOTAL_PAID(state, total) {
+    state.defaultTotalPaid = total;
   },
 
   SET_DEFAULT_CHECKED_PLANS(state) {
@@ -208,6 +213,10 @@ export const mutations = {
 export const getters = {
   plans(state) {
     return state.all;
+  },
+
+  defaultTotalPaid(state) {
+    return state.defaultTotalPaid;
   },
 
   period(state) {

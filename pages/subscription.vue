@@ -450,6 +450,7 @@ export default {
       'coreIds',
       'subscriptionIsCanceled',
       'isSubscribed',
+      'defaultTotalPaid',
     ]),
     ...mapGetters('users', ['isUpdate']),
     ...mapGetters(['loaded', 'loading']),
@@ -478,6 +479,12 @@ export default {
         (this.isSubscribed || this.subscriptionIsCanceled)
       );
     },
+  },
+
+  created() {
+    if (this.defaultTotalPaid === null) {
+      this.SET_DEFAULT_TOTAL_PAID(this.totalPaid);
+    }
   },
 
   mounted() {
@@ -560,6 +567,7 @@ export default {
       'CONFIRM_COUPONS',
       'SET_DEFAULT_PERIOD',
       'SET_CANCELED_STATUS_PLAN',
+      'SET_DEFAULT_TOTAL_PAID',
     ]),
 
     ...mapActions('plans', [
