@@ -1294,35 +1294,6 @@ export default {
         });
 
       this.updateSubscription(plans);
-
-      // // subscriptions to delete
-      // let toDelete = [];
-
-      // const currentCheckeds = this.getCurrentCheckedPlans();
-
-      // // plans uncheckeds
-      // const unCheckeds = this.defaultCheckedPlans.filter(
-      //   id => !currentCheckeds.includes(id),
-      // );
-
-      // // delete uncheckeds plans
-      // if (!!unCheckeds.length) {
-      //   toDelete.push(...unCheckeds.map(id => ({ planId: id })));
-      // }
-
-      // // remove old period subscription
-      // if (this.paymentPeriod !== this.defaultPeriod) {
-      //   // set the current period as default
-      //   this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-      // toDelete.push(
-      //   ...this.mirrorSubscriptionPlans.map(plan => ({ planId: plan.id })),
-      // );
-      // }
-
-      // // remove subscriptions
-      // if (!!toDelete.length) {
-      //   await this.cancelSubscriptions(toDelete);
-      // }
     },
 
     async updateSubscription(plans) {
@@ -1351,12 +1322,14 @@ export default {
 
         // old canceled plans, update
         this.show.forEach((plan, index) => {
-          this.SET_CANCELED_STATUS_PLAN({
-            cancelAt: null,
-            canceledAt: null,
-            cancelAtPeriodEnd: false,
-            index,
-          });
+          if (plan.checked && !plan.cancelAtPeriodEnd) {
+            this.SET_CANCELED_STATUS_PLAN({
+              cancelAt: null,
+              canceledAt: null,
+              cancelAtPeriodEnd: false,
+              index,
+            });
+          }
         });
       } catch (err) {
         console.error(err);
