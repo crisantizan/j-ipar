@@ -937,7 +937,7 @@ export default {
           const { isConfirmed } = await Swal.fire({
             position: 'center',
             title: 'Cancel plan',
-            text: 'Are you sure you want to cancel this plan?',
+            text: 'Are you sure you want to cancel this product? You will continue to have access to this product until the next billing cycle and your subscription will not renew.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -1182,7 +1182,7 @@ export default {
     async cancelSubscription() {
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
-        text: 'Do you want to cancel your subscription?',
+        text: 'Are you sure you want to cancel this product? You will continue to have access to this product until the next billing cycle and your subscription will not renew.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
