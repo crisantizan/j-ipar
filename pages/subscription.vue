@@ -54,7 +54,7 @@
                 <span
                   v-if="
                     paymentMethod.id ===
-                    customer.invoiceSettings.default_payment_method
+                      customer.invoiceSettings.default_payment_method
                   "
                   >Active</span
                 >
@@ -82,7 +82,7 @@
                       href="#"
                       v-if="
                         paymentMethod.id !=
-                        customer.invoiceSettings.default_payment_method
+                          customer.invoiceSettings.default_payment_method
                       "
                       @click="changeDefaultPaymentMethod(paymentMethod.id)"
                       >Set Default</a
@@ -162,9 +162,9 @@
                           :checked="plan.checked"
                           :disabled="
                             loading ||
-                            !plan.active ||
-                            subscriptionIsCanceled ||
-                            disabledMirrorPeriod
+                              !plan.active ||
+                              subscriptionIsCanceled ||
+                              disabledMirrorPeriod
                           "
                           @click.prevent
                         />
@@ -229,8 +229,8 @@
                             placeholder="Add Coupon"
                             :disabled="
                               !plan.checked ||
-                              subscriptionIsCanceled ||
-                              disabledMirrorPeriod
+                                subscriptionIsCanceled ||
+                                disabledMirrorPeriod
                             "
                             :title="inputCuponTitle(plan.couponId.valid)"
                             :class="isValidCupon(plan.couponId.valid)"
@@ -261,7 +261,7 @@
                               type="button"
                               :disabled="
                                 !plan.checked ||
-                                btnAddCuponDisabledState(plan.couponId)
+                                  btnAddCuponDisabledState(plan.couponId)
                               "
                               title="Add coupon"
                               @click="
@@ -311,9 +311,9 @@
                           size="3"
                           :disabled="
                             !plan.checked ||
-                            plan.cancelAtPeriodEnd ||
-                            subscriptionIsCanceled ||
-                            disabledMirrorPeriod
+                              plan.cancelAtPeriodEnd ||
+                              subscriptionIsCanceled ||
+                              disabledMirrorPeriod
                           "
                           :value="plan.users"
                           @change="
@@ -415,6 +415,7 @@ import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
 import dayjs from 'dayjs';
 import { camelToSnakeCaseObj, calcPlanDiscount } from '@/helpers/utils';
+import { enUsFormatter } from '@/helpers/number-format';
 
 export default {
   data: () => ({
@@ -1271,9 +1272,26 @@ export default {
     },
 
     async subscribeUpdatePlan() {
+      let text = 'Are you sure you want to update?';
+
+      if (this.defaultTotalPaid !== this.totalPaid) {
+        let rest = null;
+        let action = '';
+  
+        if (this.defaultTotalPaid > this.totalPaid) {
+          rest = enUsFormatter.format(this.defaultTotalPaid - this.totalPaid);
+          action = 'decrease';
+        } else {
+          rest = enUsFormatter.format(this.totalPaid - this.defaultTotalPaid);
+          action = 'increase';
+        }
+
+        text +=` This will ${action} your monthly bill to ${rest}`;
+      }
+
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
-        text: 'Are you sure you want to update your subscription?',
+        text,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -1301,13 +1319,18 @@ export default {
           return obj;
         });
 
-      this.updateSubscription(plans);
+      this.updateSubscription(plans, true);
     },
 
-    async updateSubscription(plans) {
+    async updateSubscription(plans, updateDefaultTotalPaid = false) {
       try {
-        await this.addSubscription(plans);
         // execute request
+        await this.addSubscription(plans);
+
+        // update default total paid
+        if (updateDefaultTotalPaid) {
+          this.SET_DEFAULT_TOTAL_PAID(this.totalPaid);
+        }
 
         // apply changes in template
         this.CONFIRM_COUPONS();

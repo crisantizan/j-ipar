@@ -253,7 +253,7 @@ export const getters = {
       const discount = calcPlanDiscount(plan);
 
       return (
-        acc + (discount > totalPlan ? 0 : totalPlan - calcPlanDiscount(plan))
+        acc + (discount > totalPlan ? 0 : totalPlan - discount)
       );
     }, 0);
   },
