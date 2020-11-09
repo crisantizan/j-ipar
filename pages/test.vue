@@ -1,24 +1,39 @@
 <template>
-  <client-only>
-    <VDropdown multilevel>
-      <VDropdownToggleButton>Holitas</VDropdownToggleButton>
-      <VDropdownMenu>
-        <VDropdownMenuItem>Item 1</VDropdownMenuItem>
-        <VDropdownMenuItem submenu tag="div">
-          <VDropdownMenuItem arrow-indicator>Item 2</VDropdownMenuItem>
-          <VDropdownMenu>
-            <VDropdownMenuItem>Subitem 1</VDropdownMenuItem>
-            <VDropdownMenuItem>Subitem 2</VDropdownMenuItem>
-          </VDropdownMenu>
-        </VDropdownMenuItem>
-        <VDropdownMenuItem>Item 3</VDropdownMenuItem>
-      </VDropdownMenu>
-    </VDropdown>
-  </client-only>
+  <div>
+    <button class="btn btn-primary" @click="showModal = !showModal">
+      TOGGLE
+    </button>
+
+    <button class="btn btn-primary" @click="showModal1 = !showModal1">
+      TOGGLE UNO
+    </button>
+    <client-only>
+      <VModal v-model="showModal">
+        <VModalDialog>
+          <div class="modal-content">
+            Hola MUNDO
+          </div>
+        </VModalDialog>
+      </VModal>
+
+      <VModal v-model="showModal1">
+        <VModalDialog>
+          <div class="modal-content">
+            Hola MUNDO UNO
+          </div>
+        </VModalDialog>
+      </VModal>
+    </client-only>
+  </div>
 </template>
 
 <script>
-export default {};
+export default {
+  data: () => ({
+    showModal: false,
+    showModal1: false,
+  }),
+};
 </script>
 
 <style></style>
