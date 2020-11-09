@@ -149,15 +149,78 @@
         </template>
 
         <!-- generate buttons in actions field -->
-        <TheDatatableUsersActions
+        <template
           v-else-if="
             isTheColumn(props.column.field, 'actions', props.column.hidden)
           "
-          :row-props="props"
-          :user="users[props.row.index]"
-          :core-is-full="coreIsFull"
-          @current-user="currentUser = $event"
-        />
+        >
+          <div class="dropdown">
+            <button
+              class="btn btn-primary dropdown-toggle btn-sm"
+              type="button"
+              id="dropdownMenuButton"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Actions
+              <div class="arrow-down"></div>
+            </button>
+
+            <div
+              class="dropdown-menu dropdown-menu-right p-0"
+              aria-labelledby="dropdownMenuButton"
+            >
+              <a
+                v-for="action in userActions"
+                :key="action.action"
+                class="dropdown-item"
+                href="#"
+                :class="{
+                  disabled: dropdownActionItemIsDisabled(
+                    action.action,
+                    props.formattedRow.active,
+                    props.formattedRow.id,
+                  ),
+                }"
+                @click="
+                  onClickAction({
+                    action: action.action,
+                    index: props.row.index,
+                  })
+                "
+                v-bind="bindModalProps(action.action)"
+              >
+                <i
+                  :class="[
+                    dropdownActionItemPrintIcon(
+                      action.icon,
+                      action.action,
+                      props.formattedRow.active,
+                    ),
+                    'mr-1',
+                  ]"
+                ></i>
+                {{
+                  dropdownActionItemPrintLabel(
+                    action.label,
+                    action.action,
+                    props.formattedRow.active,
+                    props.row.admin,
+                  )
+                }}
+              </a>
+            </div>
+          </div>
+
+          <TheDatatableUsersActions
+            class="mt-2"
+            :row-props="props"
+            :user="users[props.row.index]"
+            :core-is-full="coreIsFull"
+            @openmodal="fromActionsOpenModal"
+          />
+        </template>
 
         <!-- print default data -->
         <span v-else>
@@ -241,6 +304,7 @@
       tabindex="-1"
       role="dialog"
       aria-labelledby="relationsLabel"
+      data-backdrop="static"
       aria-hidden="true"
       ref="relationModal"
     >
@@ -647,6 +711,29 @@ export default {
 
     rowStyleClassFn(row) {
       return row.active ? '' : 'disabled';
+    },
+
+    /** open modals from "TheDatatableUsersActions" */
+    async fromActionsOpenModal({ modal, data }) {
+      switch (modal) {
+        // edit user modal
+        case 'edit-user':
+          this.selectedUser = data;
+          $('#editUserModal').modal('show');
+          break;
+
+        // relations modal
+        case 'relations':
+          // GET INTEGRATIONS && GET INTEGRATION USERS (ITERATE INTEGRATIONS)
+          this.currentUser = data;
+
+          await this.getUsersIntegrations({
+            userId: this.currentUser.id,
+          });
+
+          $('#relationsModal').modal('show');
+          break;
+      }
     },
 
     /** on click user action **/
