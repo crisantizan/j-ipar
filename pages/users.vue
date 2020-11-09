@@ -153,7 +153,10 @@
           v-else-if="
             isTheColumn(props.column.field, 'actions', props.column.hidden)
           "
-          :index="props.row.index"
+          :row-props="props"
+          :user="users[props.row.index]"
+          :core-is-full="coreIsFull"
+          @current-user="currentUser = $event"
         />
 
         <!-- print default data -->
