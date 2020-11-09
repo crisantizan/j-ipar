@@ -16,5 +16,9 @@ export default {
   computed: {
     ...mapGetters(['loading']),
   },
+
+  mounted() {
+    $.noConflict();
+  }
 };
 </script>

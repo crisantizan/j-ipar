@@ -51,15 +51,18 @@ export default {
           'sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN',
         crossorigin: 'anonymous',
       },
-      { rel: 'stylesheet', href: 'css/ubold/bootstrap-creative.min.css' },
-      { rel: 'stylesheet', href: 'css/ubold/app-creative.min.css' },
+
+      { rel: 'stylesheet', href: '/css/ubold/bootstrap.min.css' },
+      { rel: 'stylesheet', href: '/css/ubold/app.min.css' },
+      
       {
         href:
           'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap',
         rel: 'stylesheet',
       },
-      { rel: 'stylesheet', href: 'css/main.css' },
-      { rel: 'stylesheet', href: 'css/vue-datatable.css' },
+      { rel: 'stylesheet', href: '/css/main.css' },
+      { rel: 'stylesheet', href: '/css/dropdown.css' },
+      { rel: 'stylesheet', href: '/css/vue-datatable.css' },
     ],
     script: [
       {
@@ -76,7 +79,7 @@ export default {
       { src: 'https://js.stripe.com/v3/' },
       { src: 'https://cdn.jsdelivr.net/npm/sweetalert2@9' },
       { src: 'https://cdn.jsdelivr.net/npm/promise-polyfill' },
-      { src: 'js/vendor.min.js' },
+      { src: '/js/vendor.min.js' },
     ],
   },
   loading: false,
