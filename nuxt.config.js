@@ -97,10 +97,10 @@ export default {
    */
   plugins: [
     '~/plugins/axios',
-    { src: '@/plugins/filters.js' },
-    { src: '@/plugins/jquery.js', ssr: false },
-    { src: '@/plugins/bootstrap-table.js', ssr: false },
-    { src: '@/plugins/vue-good-table', ssr: false },
+    '~/plugins/filters.js',
+    '~/plugins/jquery.client.js',
+    '~/plugins/bootstrap-table.client.js',
+    '~/plugins/vue-good-table.client.js',
   ],
   /*
    ** Auto import components

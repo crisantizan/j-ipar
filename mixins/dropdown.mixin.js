@@ -46,7 +46,6 @@ export default {
 
     // hide event on multilevel dropdown
     $(`#${this.dropdownMixin_id}`).on('hide.bs.dropdown', function() {
-      console.log('on hide');
       const $submenuContainer = $(this).find('.dropdown-item-submenu');
       // reset active state
       $submenuContainer.find('.dropdown-item').removeClass('active');
