@@ -50,6 +50,7 @@ export default {
       children.push(
         createElement('i', {
           class: 'fas fa-angle-right float-right ml-2',
+          style: 'line-height: inherit',
         }),
       );
     }

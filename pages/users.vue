@@ -128,7 +128,7 @@
                 :checked="isChecked(props.row.index, libraryKey)"
                 :disabled="
                   isDisabled(props.row.index, libraryKey) ||
-                  !props.formattedRow.active
+                    !props.formattedRow.active
                 "
                 @change="
                   onChange({
@@ -149,70 +149,12 @@
         </template>
 
         <!-- generate buttons in actions field -->
-        <template
+        <TheDatatableUsersActions
           v-else-if="
             isTheColumn(props.column.field, 'actions', props.column.hidden)
           "
-        >
-          <div class="dropdown">
-            <button
-              class="btn btn-primary dropdown-toggle btn-sm"
-              type="button"
-              id="dropdownMenuButton"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Actions
-              <div class="arrow-down"></div>
-            </button>
-
-            <div
-              class="dropdown-menu dropdown-menu-right p-0"
-              aria-labelledby="dropdownMenuButton"
-            >
-              <a
-                v-for="action in userActions"
-                :key="action.action"
-                class="dropdown-item"
-                href="#"
-                :class="{
-                  disabled: dropdownActionItemIsDisabled(
-                    action.action,
-                    props.formattedRow.active,
-                    props.formattedRow.id,
-                  ),
-                }"
-                @click="
-                  onClickAction({
-                    action: action.action,
-                    index: props.row.index,
-                  })
-                "
-                v-bind="bindModalProps(action.action)"
-              >
-                <i
-                  :class="[
-                    dropdownActionItemPrintIcon(
-                      action.icon,
-                      action.action,
-                      props.formattedRow.active,
-                    ),
-                    'mr-1',
-                  ]"
-                ></i>
-                {{
-                  dropdownActionItemPrintLabel(
-                    action.label,
-                    action.action,
-                    props.formattedRow.active,
-                    props.row.admin,
-                  )
-                }}
-              </a>
-            </div>
-          </div>
-        </template>
+          :index="props.row.index"
+        />
 
         <!-- print default data -->
         <span v-else>
@@ -318,7 +260,7 @@
             <center
               v-if="
                 (!integrations || integrations === null) &&
-                messageErrorUsersIntegrations === null
+                  messageErrorUsersIntegrations === null
               "
             >
               <div class="spinner-border text-primary" role="status">
