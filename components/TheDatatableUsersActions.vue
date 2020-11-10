@@ -16,7 +16,7 @@
 
       <VDropdownMenuItem
         :icon="user.active ? 'thumbs-down' : 'thumbs-up'"
-        :disabled="currentUser.id === user.id"
+        :disabled="currentUser.id === user.id || (!user.active && coreIsFull)"
         @click="onDisableClick"
       >
         {{ user.active ? 'Disable' : 'Enable' }}
@@ -48,8 +48,8 @@
           Change Role
         </VDropdownMenuItem>
         <VDropdownMenu class="p-0" pull-left>
-          <VDropdownMenuItem>User</VDropdownMenuItem>
-          <VDropdownMenuItem>Admin</VDropdownMenuItem>
+          <VDropdownMenuItem :disabled="!user.admin">To user</VDropdownMenuItem>
+          <VDropdownMenuItem :disabled="user.admin">To admin</VDropdownMenuItem>
         </VDropdownMenu>
       </VDropdownMenuItem>
 
