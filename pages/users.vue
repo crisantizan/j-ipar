@@ -281,46 +281,16 @@
       </VModalDialog>
     </VModal>
 
-    <!-- RELATIONS MODAL -->
-    <div
-      class="modal fade"
-      id="relationsModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="relationsLabel"
-      data-backdrop="static"
-      aria-hidden="true"
-      ref="relationModal"
-    >
-      <div class="modal-dialog" role="document">
+    <!-- relations modal -->
+    <VModal v-model="modal.relations" persistent>
+      <VModalDialog>
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="relationsLabel">User Relations</h5>
-            <button
-              type="button"
-              class="close custom-close-modal"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <h5 class="modal-title">User Relations</h5>
+            <VModalCloseButton />
           </div>
           <div class="modal-body">
-            <!-- SPINNER -->
-
-            <center
-              v-if="
-                (!integrations || integrations === null) &&
-                  messageErrorUsersIntegrations === null
-              "
-            >
-              <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Loading...</span>
-              </div>
-            </center>
-
             <!-- MESSAGE ERROR -->
-
             <span v-if="messageErrorUsersIntegrations !== null">{{
               messageErrorUsersIntegrations
             }}</span>
@@ -379,8 +349,8 @@
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </VModalDialog>
+    </VModal>
   </div>
 </template>
 
@@ -709,19 +679,19 @@ export default {
         // edit user modal
         case 'edit-user':
           this.selectedUser = data;
-          this.modal.editUser = true;
+          this.modal.editUser = true; // open modal
           break;
 
         // relations modal
         case 'relations':
-          // GET INTEGRATIONS && GET INTEGRATION USERS (ITERATE INTEGRATIONS)
+          // get integrations & get integration users (iterate integrations)
           this.currentUser = data;
 
           await this.getUsersIntegrations({
             userId: this.currentUser.id,
           });
 
-          $('#relationsModal').modal('show');
+          this.modal.relations = true; // open modal
           break;
       }
     },
