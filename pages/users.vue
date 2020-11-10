@@ -3,7 +3,6 @@
     <datatable
       :columns="columns"
       :rows="showedUsers"
-      :loading="datatableLoading"
       class="users-table"
       :pagination="{
         enabled: true,
@@ -45,9 +44,7 @@
               v-for="item of librariesCounter"
               :key="item.library"
               class="badge badge-pill badge-light text-success ml-1 d-block mb-no-last"
-              :class="{
-                'text-danger': item.isFull,
-              }"
+              :class="{ 'text-danger': item.isFull }"
               style="
                 font-size: 14px;
                 background: linear-gradient(#f4f5f8, #f1f3f6);
@@ -62,28 +59,20 @@
 
       <!-- generate fullname -->
       <template slot="table-row" slot-scope="props">
-        <template
-          v-if="
-            isTheColumn(props.column.field, 'firstName', props.column.hidden)
-          "
-        >
-          <span>{{ generateFullName(props.formattedRow) }}</span>
+        <template v-if="isTheColumn(props.column, 'firstName')">
+          <span>{{ generateFullName(props.row) }}</span>
         </template>
 
         <!-- printo isAttorney checkbox -->
-        <template
-          v-else-if="
-            isTheColumn(props.column.field, 'isAttorney', props.column.hidden)
-          "
-        >
+        <template v-else-if="isTheColumn(props.column, 'isAttorney')">
           <div
             class="custom-control custom-checkbox d-flex justify-content-center"
           >
             <input
               type="checkbox"
               class="custom-control-input"
-              :disabled="!props.formattedRow.active"
-              :id="generateCheckboxId('isAttorney', props.formattedRow.id)"
+              :disabled="!props.row.active"
+              :id="generateCheckboxId('isAttorney', props.row.id)"
               :checked="isAttorneyChecked(props.row.index)"
               @change="
                 onChangeIsAttorney({
@@ -94,26 +83,17 @@
             />
             <label
               class="custom-control-label d-flex align-items-center"
-              :for="generateCheckboxId('isAttorney', props.formattedRow.id)"
+              :for="generateCheckboxId('isAttorney', props.row.id)"
             >
             </label>
           </div>
         </template>
 
         <!-- generate checkboxes in "assignLibraries" field -->
-        <template
-          v-else-if="
-            isTheColumn(
-              props.column.field,
-              'assignLibraries',
-              props.column.hidden,
-            )
-          "
-        >
+        <template v-else-if="isTheColumn(props.column, 'assignLibraries')">
           <!-- print only avaibales libraries -->
           <template
-            v-for="(libraryValue, libraryKey) in props.formattedRow
-              .assignLibraries"
+            v-for="(libraryValue, libraryKey) in props.row.assignLibraries"
           >
             <div
               :key="libraryKey"
@@ -123,12 +103,11 @@
               <input
                 type="checkbox"
                 class="custom-control-input"
-                :id="generateCheckboxId(libraryKey, props.formattedRow.id)"
+                :id="generateCheckboxId(libraryKey, props.row.id)"
                 :value="libraryKey"
                 :checked="isChecked(props.row.index, libraryKey)"
                 :disabled="
-                  isDisabled(props.row.index, libraryKey) ||
-                    !props.formattedRow.active
+                  isDisabled(props.row.index, libraryKey) || !props.row.active
                 "
                 @change="
                   onChange({
@@ -140,7 +119,7 @@
               />
               <label
                 class="custom-control-label d-flex align-items-center"
-                :for="generateCheckboxId(libraryKey, props.formattedRow.id)"
+                :for="generateCheckboxId(libraryKey, props.row.id)"
               >
                 {{ libraryKey }}
               </label>
@@ -149,78 +128,13 @@
         </template>
 
         <!-- generate buttons in actions field -->
-        <template
-          v-else-if="
-            isTheColumn(props.column.field, 'actions', props.column.hidden)
-          "
-        >
-          <div class="dropdown">
-            <button
-              class="btn btn-primary dropdown-toggle btn-sm"
-              type="button"
-              id="dropdownMenuButton"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              Actions
-              <div class="arrow-down"></div>
-            </button>
-
-            <div
-              class="dropdown-menu dropdown-menu-right p-0"
-              aria-labelledby="dropdownMenuButton"
-            >
-              <a
-                v-for="action in userActions"
-                :key="action.action"
-                class="dropdown-item"
-                href="#"
-                :class="{
-                  disabled: dropdownActionItemIsDisabled(
-                    action.action,
-                    props.formattedRow.active,
-                    props.formattedRow.id,
-                  ),
-                }"
-                @click="
-                  onClickAction({
-                    action: action.action,
-                    index: props.row.index,
-                  })
-                "
-                v-bind="bindModalProps(action.action)"
-              >
-                <i
-                  :class="[
-                    dropdownActionItemPrintIcon(
-                      action.icon,
-                      action.action,
-                      props.formattedRow.active,
-                    ),
-                    'mr-1',
-                  ]"
-                ></i>
-                {{
-                  dropdownActionItemPrintLabel(
-                    action.label,
-                    action.action,
-                    props.formattedRow.active,
-                    props.row.admin,
-                  )
-                }}
-              </a>
-            </div>
-          </div>
-
-          <TheDatatableUsersActions
-            class="mt-2"
-            :row-props="props"
-            :user="users[props.row.index]"
-            :core-is-full="coreIsFull"
-            @openmodal="fromActionsOpenModal"
-          />
-        </template>
+        <TheDatatableUsersActions
+          v-else-if="isTheColumn(props.column, 'actions')"
+          :row-props="props"
+          :user="users[props.row.index]"
+          :core-is-full="coreIsFull"
+          @openmodal="fromActionsOpenModal"
+        />
 
         <!-- print default data -->
         <span v-else>
@@ -369,6 +283,7 @@ export default {
 
     return {
       searchTerm: '',
+
       columns: [
         {
           field: 'id',
@@ -441,48 +356,11 @@ export default {
           label: 'Actions',
         },
       ],
-      userActions: [
-        {
-          action: 'edit',
-          label: 'Edit',
-          icon: 'fas fa-user-edit',
-        },
 
-        {
-          action: 'disable',
-          label: 'Disable',
-          icon: 'fas fa-thumbs-down',
-        },
-
-        {
-          action: 'resetPassword',
-          label: 'Reset Password',
-          icon: 'fas fa-key',
-        },
-
-        {
-          action: 'resendEmail',
-          label: 'Resend Email',
-          icon: 'fas fa-paper-plane',
-        },
-
-        {
-          action: 'changeRole',
-          label: '',
-          icon: 'fas fa-user-tag',
-        },
-
-        {
-          action: 'relations',
-          label: 'Relations',
-          icon: 'fas fa-cogs',
-        },
-      ],
       showDisabledUsers: false,
 
-      datatableLoading: false,
-
       selectedUser: null,
+
       userEditableProps: [
         // only firstName field is required
         { field: 'firstName', required: true },
@@ -491,6 +369,7 @@ export default {
       ],
 
       currentUser: null,
+
       disabledBtnSaveRelationUser: true,
 
       isLoginAgain: false,
@@ -513,8 +392,6 @@ export default {
       'integrations',
       'messageErrorUsersIntegrations',
     ]),
-
-    ...mapGetters(['user']),
 
     showedUsers() {
       // show only actived users
@@ -583,15 +460,11 @@ export default {
     ...mapMutations('users', [
       'SET_CHECKED',
       'SET_IS_ATTORNEY_CHECKED',
-      'SET_ACTIVE',
       'CHECK_RELATION',
     ]),
 
     ...mapActions('users', [
       'assignLibrary',
-      'updateState',
-      'resetPassword',
-      'resendEmail',
       'updateUser',
       'getUsersIntegrations',
       'updateUserRelations',
@@ -603,8 +476,8 @@ export default {
     },
 
     /** verify if the current field is "target" and is not hidden */
-    isTheColumn(current, target, hidden) {
-      return current === target && !hidden;
+    isTheColumn(column, field) {
+      return column.field === field && !column.hidden;
     },
 
     /** generate full name */
@@ -628,7 +501,6 @@ export default {
       const user = this.users[index];
 
       try {
-        this.datatableLoading = true;
         // execute request
         await this.assignLibrary({
           userId: user.id,
@@ -640,8 +512,6 @@ export default {
         this.isLoginAgain = true;
       } catch (e) {
         console.error(e);
-      } finally {
-        this.datatableLoading = false;
       }
     },
 
@@ -696,118 +566,6 @@ export default {
       }
     },
 
-    /** on click user action **/
-    async onClickAction({ action, index }) {
-      const user = this.users[index];
-
-      switch (action) {
-        case 'disable':
-          try {
-            this.datatableLoading = true;
-
-            let libraries = null;
-
-            // disabled
-            if (user.active) {
-              const { isConfirmed } = await Swal.fire({
-                title: 'Are you sure you want to disable this user?',
-                text: `They will immediately lose access to Prima.
-                You will be able to reassign their license to another user immediately.
-                This does not cancel your subscription.  If you desire to cancel or modify your subscription, you must do so from the "Subscription" section of the administrator panel.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, do it!',
-              });
-
-              if (!isConfirmed) {
-                return;
-              }
-
-              // clear libraries
-              Object.keys(user.assignLibraries).forEach(key => {
-                // if true set to false
-                if (user.assignLibraries[key]) {
-                  if (libraries === null) {
-                    libraries = {};
-                  }
-
-                  libraries[key] = false;
-                }
-              });
-            }
-
-            // execute request
-            await this.updateState({
-              userId: user.id,
-              active: !user.active,
-              libraries,
-            });
-
-            // clear libraries in UI
-            if (user.active) {
-              Object.keys(user.assignLibraries).forEach(key => {
-                // if true set to false
-                if (user.assignLibraries[key]) {
-                  this.SET_CHECKED({ checked: false, library: key, index });
-                }
-              });
-            }
-
-            this.SET_ACTIVE({ index: index, value: !user.active });
-          } catch (e) {
-            console.error(e);
-          } finally {
-            this.datatableLoading = false;
-          }
-          break;
-
-        case 'resetPassword':
-          try {
-            this.datatableLoading = true;
-
-            // execute request
-            await this.resetPassword(user.id);
-          } catch (err) {
-            console.error(err);
-          } finally {
-            this.datatableLoading = false;
-          }
-
-          break;
-
-        case 'resendEmail':
-          try {
-            this.datatableLoading = true;
-
-            // execute request
-            await this.resendEmail(user.id);
-          } catch (err) {
-            console.error(err);
-          } finally {
-            this.datatableLoading = false;
-          }
-          break;
-
-        case 'edit':
-          this.selectedUser = cloneObject(user);
-          break;
-
-        case 'relations':
-          // GET INTEGRATIONS && GET INTEGRATION USERS (ITERATE INTEGRATIONS)
-          this.currentUser = user;
-
-          this.getUsersIntegrations({
-            userId: user.id,
-          });
-          break;
-
-        default:
-          console.log(action);
-      }
-    },
-
     /** edit user modal submit event **/
     async onUserEdit() {
       if (this.disabledBtnEditUser) return;
@@ -848,52 +606,6 @@ export default {
       }
     },
 
-    /* disable dropdown actions items */
-    dropdownActionItemIsDisabled(action, isActive, userId) {
-      if (this.user.id === userId && action === 'disable') {
-        return true;
-      }
-
-      if (this.coreIsFull && action === 'disable' && !isActive) {
-        return true;
-      }
-
-      return action !== 'disable' && !isActive;
-    },
-
-    /* print text in dropdown actions items */
-    dropdownActionItemPrintLabel(label, action, isActive, isAdmin) {
-      switch (action) {
-        case 'disable':
-          return isActive ? label : 'Enable';
-        case 'changeRole':
-          return !isAdmin ? 'Change to admin' : 'Change to user';
-        default:
-          return label;
-      }
-    },
-
-    /* print icon in dropdown actions items */
-    dropdownActionItemPrintIcon(icon, action, isActive) {
-      if (action !== 'disable') {
-        return icon;
-      }
-
-      return isActive ? icon : 'fas fa-thumbs-up';
-    },
-
-    /** bind modal properties in "Edit" item **/
-    bindModalProps(action) {
-      if (action === 'relations') {
-        return { 'data-toggle': 'modal', 'data-target': '#relationsModal' };
-      }
-      if (action !== 'edit') {
-        return {};
-      }
-
-      return { 'data-toggle': 'modal', 'data-target': '#editUserModal' };
-    },
-
     setRelation(payload) {
       this.disabledBtnSaveRelationUser = false;
 
@@ -916,14 +628,12 @@ export default {
         }
       });
 
-      // REQUEST TO SAVE RELATIONS GRAPH
-
-      this.updateUserRelations({
+      // request to save relations graph
+      await this.updateUserRelations({
         relations: relationsToSave,
       });
 
-      // close modal
-      this.$refs.relationModal.querySelector('.custom-close-modal').click();
+      this.modal.relations = false; // close modal
     },
   },
 };
