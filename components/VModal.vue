@@ -17,13 +17,8 @@ export default {
     event: 'change',
   },
 
-  data: () => ({
-    isOpen: false,
-  }),
-
   render(createElement) {
     const attrs = {
-      id: this.id,
       tabindex: -1,
       role: 'dialog',
       'aria-hidden': 'true',
@@ -40,9 +35,7 @@ export default {
         attrs,
         ref: 'modal',
       },
-      this.$scopedSlots.default({
-        toggleFn: this.toggle,
-      }),
+      this.$slots.default,
     );
   },
 

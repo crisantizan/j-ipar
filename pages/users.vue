@@ -229,31 +229,15 @@
       </template>
     </datatable>
 
-    <!-- EDIT USER MODAL -->
-    <div
-      class="modal fade"
-      id="editUserModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="editUserModalLabel"
-      aria-hidden="true"
-      data-backdrop="static"
-      ref="modal"
-    >
-      <div class="modal-dialog" role="document" v-if="!!selectedUser">
+    <!-- edit user modal -->
+    <VModal v-model="modal.editUser" persistent>
+      <VModalDialog>
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="editUserModalLabel">Edit user data</h5>
-            <button
-              type="button"
-              class="close custom-close-modal"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <h5 class="modal-title">Edit user data</h5>
+            <VModalCloseButton />
           </div>
-          <form @submit.prevent="onUserEdit">
+          <form v-if="selectedUser !== null" @submit.prevent="onUserEdit">
             <div class="modal-body">
               <div class="form-group">
                 <input
@@ -294,8 +278,8 @@
             </div>
           </form>
         </div>
-      </div>
-    </div>
+      </VModalDialog>
+    </VModal>
 
     <!-- RELATIONS MODAL -->
     <div
@@ -540,6 +524,12 @@ export default {
       disabledBtnSaveRelationUser: true,
 
       isLoginAgain: false,
+
+      // show/hide modals
+      modal: {
+        editUser: false,
+        relations: false,
+      },
     };
   },
 
@@ -719,7 +709,7 @@ export default {
         // edit user modal
         case 'edit-user':
           this.selectedUser = data;
-          $('#editUserModal').modal('show');
+          this.modal.editUser = true;
           break;
 
         // relations modal
@@ -875,7 +865,6 @@ export default {
       }, {});
 
       try {
-        this.datatableLoading = true;
         await this.updateUser({
           index: this.selectedUser.index,
           userId: this.selectedUser.id,
@@ -883,11 +872,9 @@ export default {
         });
 
         // close modal
-        this.$refs.modal.querySelector('.custom-close-modal').click();
+        this.modal.editUser = false;
       } catch (err) {
         console.error(err);
-      } finally {
-        this.datatableLoading = false;
       }
     },
 
