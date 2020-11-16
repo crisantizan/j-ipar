@@ -22,15 +22,27 @@ export const state = () => ({
 export const mutations = {
   SET_ALL(state, plans) {
     state.all = plans;
+    let found = false;
 
     // set default period
-    plans.forEach(plan => {
-      if (state.coreIds.includes(plan.id) && plan.checked) {
+    for (const plan of plans) {
+      if (!state.coreIds.includes(plan.id)) continue;
+
+      if (plan.checked) {
         state.defaultPeriod = plan.interval;
         state.period = plan.interval;
-        return;
+        found = true;
+
+        state.subscribed = true;
+        break;
       }
-    });
+    }
+
+    if (!found) {
+      // monthly is default checked period
+      const index = state.all.findIndex(plan => state.coreIds[0] === plan.id);
+      state.all[index].checked = true;
+    }
   },
 
   SET_MONTHLY(state, plans) {
@@ -243,6 +255,10 @@ export const getters = {
     return state.defaultCheckedPlans[state.defaultPeriod];
   },
 
+  mirrorDefaultCheckedPlans(state, getters) {
+    return state.defaultCheckedPlans[getters.mirrorPeriod];
+  },
+
   totalPaid(state) {
     return state[state.period].reduce((acc, plan) => {
       if (!plan.checked) {
@@ -289,7 +305,7 @@ export const getters = {
   },
 
   isSubscribed(state, getters) {
-    return !!getters.defaultCheckedPlans.length;
+    return !!getters.defaultCheckedPlans.length && state.subscribed;
   },
 };
 
@@ -361,6 +377,8 @@ export const actions = {
           console.log(errors);
           return reject(errors);
         }
+
+        console.log(data.stripeSubscripterAdd);
 
         resolve(data.stripeSubscripterAdd);
       } catch (err) {

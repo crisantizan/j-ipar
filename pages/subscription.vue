@@ -374,30 +374,30 @@
             <div class="text-right mb-3" v-if="!!paymentMethods.length">
               <button
                 class="btn btn-warning mr-2"
-                v-if="subscriptionIsCanceled"
-                :disabled="this.paymentPeriod !== this.defaultPeriod"
                 @click="resetSubscription"
               >
+                <!-- :disabled="this.paymentPeriod !== this.defaultPeriod" -->
+                <!-- v-if="subscriptionIsCanceled" -->
                 Resubscribe
               </button>
 
               <button
-                v-else
                 type="button"
                 class="btn btn-danger mr-2"
                 :title="
                   disabledBtnCancel ? 'Already canceled' : 'Cancel subscription'
                 "
-                :disabled="disabledBtnCancel"
                 @click="cancelSubscription"
               >
+                <!-- v-else -->
+                <!-- :disabled="disabledBtnCancel" -->
                 Cancel Subscription
               </button>
 
               <button
                 type="button"
                 class="btn btn-success"
-                :disabled="loading || disabledBtnCancel"
+                :disabled="loading"
                 @click="subscribeUpdatePlan"
               >
                 Subscribe / Update
@@ -441,6 +441,7 @@ export default {
       'mirrorPeriod',
       'show',
       'mirrorSubscriptionPlans',
+      'mirrorDefaultCheckedPlans',
       'plans',
       'defaultCheckedPlans',
       'totalPaid',
@@ -580,7 +581,7 @@ export default {
     ...mapMutations(['SET_LOADING']),
 
     printStatusPlan(plan) {
-      if (this.paymentPeriod !== this.defaultPeriod) {
+      if (!this.isSubscribed || this.paymentPeriod !== this.defaultPeriod) {
         return '-';
       }
 
@@ -1217,6 +1218,7 @@ export default {
 
       try {
         const results = await this.cancelSubscriptions(plans);
+        console.log(results);
 
         // update view
         for (const planResult of results) {
@@ -1323,6 +1325,7 @@ export default {
       }
 
       const plans = this.show
+        // .filter(plan => plan.checked && plan.cancelAtPeriodEnd)
         .filter(plan => plan.checked && !plan.cancelAtPeriodEnd)
         .map(plan => {
           const obj = {
@@ -1343,6 +1346,23 @@ export default {
 
     async updateSubscription(plans, updateDefaultTotalPaid = false) {
       try {
+        // remove old period subscription
+        if (this.paymentPeriod !== this.defaultPeriod) {
+          // set the current period as default
+          // this.SET_DEFAULT_PERIOD(this.paymentPeriod);
+
+          // cancel plans of the other period
+          // const toCancelPlans = this.mirrorSubscriptionPlans.map(plan => ({
+          //   planId: plan.id,
+          // }));
+
+             const toCancelPlans = this.mirrorDefaultCheckedPlans.map(plan => ({
+            planId: plan.id,
+          }));
+
+          await this.cancelSubscriptions(toCancelPlans);
+        }
+
         // execute request
         await this.addSubscription(plans);
 
@@ -1353,19 +1373,6 @@ export default {
 
         // apply changes in template
         this.CONFIRM_COUPONS();
-
-        // remove old period subscription
-        if (this.paymentPeriod !== this.defaultPeriod) {
-          // set the current period as default
-          this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-
-          // cancel plans of the other period
-          const toCancelPlans = this.mirrorSubscriptionPlans.map(plan => ({
-            planId: plan.id,
-          }));
-
-          await this.cancelSubscriptions(toCancelPlans);
-        }
 
         // update default checked plans
         this.SET_DEFAULT_CHECKED_PLANS();
