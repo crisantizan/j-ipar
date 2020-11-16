@@ -584,7 +584,7 @@ export default {
         return '-';
       }
 
-      if (!plan.checked || !this.defaultCheckedPlans.includes(plan.id)) {
+      if (!plan.checked || !this.defaultCheckedPlans.some(v => v.id === plan.id)) {
         return '-';
       }
 
@@ -930,14 +930,15 @@ export default {
         }
 
         // cancel plan
-        if (!data.value && this.defaultCheckedPlans.includes(data.planId)) {
+        if (!data.value && this.defaultCheckedPlans.some(v => v.id === data.planId)) {
           data.event.preventDefault();
           delete data.event;
 
           const { isConfirmed } = await Swal.fire({
             position: 'center',
             title: 'Cancel plan',
-            text: 'Are you sure you want to cancel this product? You will continue to have access to this product until the next billing cycle and your subscription will not renew.',
+            text:
+              'Are you sure you want to cancel this product? You will continue to have access to this product until the next billing cycle and your subscription will not renew.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -1032,6 +1033,23 @@ export default {
       if (Number(event.target.value) < 0) {
         value = 0;
         event.target.value = 0;
+      }
+
+      const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
+
+      // reduce users on active plan
+      if (!!defaultPlan && value < defaultPlan.users) {
+        event.target.value = defaultPlan.users;
+
+        Swal.fire({
+          position: 'center',
+          text: 'Please, reduce the licences at the end of the payment period.',
+          showConfirmButton: false,
+          timer: 1800,
+        });
+
+        event.preventDefault();
+        return;
       }
 
       // update from main plan
@@ -1182,7 +1200,8 @@ export default {
     async cancelSubscription() {
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
-        text: 'Are you sure you want to cancel this product? You will continue to have access to this product until the next billing cycle and your subscription will not renew.',
+        text:
+          'Are you sure you want to cancel this product? You will continue to have access to this product until the next billing cycle and your subscription will not renew.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -1194,7 +1213,7 @@ export default {
         return;
       }
 
-      const plans = this.defaultCheckedPlans.map(planId => ({ planId }));
+      const plans = this.defaultCheckedPlans.map(plan => ({ planId: plan.id }));
 
       try {
         const results = await this.cancelSubscriptions(plans);
@@ -1277,7 +1296,7 @@ export default {
       if (this.defaultTotalPaid !== this.totalPaid) {
         let rest = null;
         let action = '';
-  
+
         if (this.defaultTotalPaid > this.totalPaid) {
           rest = enUsFormatter.format(this.defaultTotalPaid - this.totalPaid);
           action = 'decrease';
@@ -1286,7 +1305,7 @@ export default {
           action = 'increase';
         }
 
-        text +=` This will ${action} your monthly bill to ${rest}`;
+        text += ` This will ${action} your monthly bill to ${rest}`;
       }
 
       const { isConfirmed } = await Swal.fire({
