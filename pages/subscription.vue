@@ -1353,7 +1353,7 @@ export default {
 
         // old canceled plans, update
         this.show.forEach((plan, index) => {
-          if (plan.checked && !plan.cancelAtPeriodEnd) {
+          if (plan.checked && plan.cancelAtPeriodEnd) {
             this.SET_CANCELED_STATUS_PLAN({
               cancelAt: null,
               canceledAt: null,
