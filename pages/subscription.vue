@@ -380,7 +380,7 @@
               </button>
 
               <button
-                v-if="isSubscribed"
+                v-if="isSubscribed && !subscriptionIsCanceled"
                 type="button"
                 class="btn btn-danger mr-2"
                 :title="
@@ -480,9 +480,14 @@ export default {
       );
     },
 
+    /** change payment period yearly to monthly */
+    yearlyToMonthly() {
+      return this.defaultPeriod === 'year' && this.paymentPeriod === 'month';
+    },
+
     /** disabled button "Subscribe / Update" */
     disabledBtnSubscribeUpdate() {
-      if (!this.totalPaid) {
+      if (!this.totalPaid || this.yearlyToMonthly) {
         return true;
       }
 
