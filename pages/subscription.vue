@@ -439,9 +439,9 @@ export default {
       'mirrorPeriod',
       'show',
       'mirrorSubscriptionPlans',
-      'mirrorDefaultCheckedPlans',
       'plans',
       'defaultCheckedPlans',
+      'mirrorDefaultCheckedPlans',
       'totalPaid',
       'customer',
       'paymentMethods',
@@ -1287,7 +1287,7 @@ export default {
 
         let canceled = true;
         for (const plan of this.show) {
-          if (this.planIsMain) continue;
+          if (this.planIsMain(plan.id)) continue;
 
           if (plan.checked) {
             canceled = false;
@@ -1340,6 +1340,8 @@ export default {
     },
 
     async subscribeUpdatePlan() {
+      // TODO:: text for first subscription
+      // TODO:: text for anual subscription
       let text = this.isSubscribed
         ? 'Are you sure you want to update?'
         : 'Are you sure you want to subscribe?';
@@ -1397,19 +1399,13 @@ export default {
       try {
         // remove old period subscription
         if (this.isSubscribed && this.paymentPeriod !== this.defaultPeriod) {
-          // set the current period as default
-          // this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-
           // cancel plans of the other period
-          // const toCancelPlans = this.mirrorSubscriptionPlans.map(plan => ({
-          //   planId: plan.id,
-          // }));
-
           const toCancelPlans = this.mirrorDefaultCheckedPlans.map(plan => ({
             planId: plan.id,
           }));
 
-          await this.cancelSubscriptions(toCancelPlans);
+          const results = await this.cancelSubscriptions(toCancelPlans);
+          console.log(results);
         }
 
         // execute request
