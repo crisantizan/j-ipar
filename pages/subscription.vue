@@ -117,7 +117,6 @@
                     v-model="paymentPeriod"
                     name="payment-period"
                     value="month"
-                    @change="periodChange()"
                   />
                   <label for="payment-period-month">Month</label>
                 </div>
@@ -129,7 +128,6 @@
                     v-model="paymentPeriod"
                     name="payment-period"
                     value="year"
-                    @change="periodChange()"
                   />
                   <label for="payment-period-year">Year</label>
                 </div>
@@ -488,17 +486,21 @@ export default {
       return this.defaultPeriod === 'year' && this.paymentPeriod === 'month';
     },
 
+    monthlyToYearly() {
+      return this.defaultPeriod === 'month' && this.paymentPeriod === 'year';
+    },
+
     /** disabled button "Subscribe / Update" */
     disabledBtnSubscribeUpdate() {
+      if (!!this.totalPaid && this.monthlyToYearly) {
+        return false;
+      }
+
       if (!this.totalPaid || !this.valuesChange || this.yearlyToMonthly) {
         return true;
       }
 
       return false;
-
-      // return !this.show.some(plan => {
-      //   return !this.planIsMain(plan.id) && plan.checked;
-      // });
     },
   },
 
@@ -1182,18 +1184,6 @@ export default {
       });
     },
 
-    periodChange() {
-      let productsToSwitch = [];
-      let planToUncheck = [];
-
-      this.plans.forEach(plan => {
-        if (plan.checked) {
-          productsToSwitch.push(plan.product);
-          planToUncheck.push(plan.id);
-        }
-      });
-    },
-
     getCurrentCheckedPlans() {
       return this.show.filter(plan => plan.checked).map(plan => plan.id);
     },
@@ -1436,7 +1426,6 @@ export default {
       }
 
       const plans = this.show
-        // .filter(plan => plan.checked && plan.cancelAtPeriodEnd)
         .filter(plan => plan.checked && !plan.cancelAtPeriodEnd)
         .map(plan => {
           const obj = {
@@ -1464,8 +1453,7 @@ export default {
             planId: plan.id,
           }));
 
-          const results = await this.cancelSubscriptions(toCancelPlans);
-          console.log(results);
+          await this.cancelSubscriptions(toCancelPlans);
         }
 
         // execute request

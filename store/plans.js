@@ -10,6 +10,13 @@ export const state = () => ({
   paymentMethods: [],
   customer: null,
   coreIds: ['price_1Gv7zkEHlNK1KgjMGy4WHzUf', 'price_1Gv80DEHlNK1KgjMaPRisapB'],
+  /** excluded plans */
+  excludedPlans: [
+    'price_1GtI4KEHlNK1KgjMpyCRDirK',
+    'price_1GtI4KEHlNK1KgjMFDN3sLqS',
+    'price_1GsV8CEHlNK1KgjMMIOTbDXs',
+    'price_1GsV8CEHlNK1KgjM69Jm0McK',
+  ],
   lastChangedPlan: null,
   subscribed: false,
   defaultCheckedPlans: {
@@ -21,11 +28,11 @@ export const state = () => ({
 
 export const mutations = {
   SET_ALL(state, plans) {
-    state.all = plans;
+    state.all = plans.filter(v => !state.excludedPlans.includes(v.id));
     let found = false;
 
     // set default period
-    for (const plan of plans) {
+    for (const plan of state.all) {
       if (!state.coreIds.includes(plan.id)) continue;
 
       if (plan.checked) {
@@ -64,13 +71,21 @@ export const mutations = {
   SET_DEFAULT_CHECKED_PLANS(state) {
     state.defaultCheckedPlans[state.period] = state[state.period]
       .filter(plan => plan.checked)
-      .map(plan => ({ id: plan.id, users: plan.users, coupon: plan.couponId.value }));
+      .map(plan => ({
+        id: plan.id,
+        users: plan.users,
+        coupon: plan.couponId.value,
+      }));
 
     state.defaultCheckedPlans[this.getters['plans/mirrorPeriod']] = state[
       this.getters['plans/mirrorPeriod']
     ]
       .filter(plan => plan.checked)
-      .map(plan => ({ id: plan.id, users: plan.users, coupon: plan.couponId.value }));
+      .map(plan => ({
+        id: plan.id,
+        users: plan.users,
+        coupon: plan.couponId.value,
+      }));
   },
 
   SET_PERIOD(state, period) {
@@ -223,7 +238,7 @@ export const mutations = {
 
   SET_SUBSCRIBED(state, payload) {
     state.subscribed = payload;
-  }
+  },
 };
 
 export const getters = {
