@@ -135,7 +135,6 @@
                 </div>
               </div>
 
-              <!-- <client-only> -->
               <table class="table table-striped table-hover table-plans">
                 <thead>
                   <tr>
@@ -368,36 +367,35 @@
                   </tr>
                 </tbody>
               </table>
-              <!-- </client-only> -->
             </div>
 
             <div class="text-right mb-3" v-if="!!paymentMethods.length">
               <button
+                v-if="subscriptionIsCanceled"
                 class="btn btn-warning mr-2"
                 @click="resetSubscription"
+                :disabled="this.paymentPeriod !== this.defaultPeriod"
               >
-                <!-- :disabled="this.paymentPeriod !== this.defaultPeriod" -->
-                <!-- v-if="subscriptionIsCanceled" -->
                 Resubscribe
               </button>
 
               <button
+                v-if="isSubscribed"
                 type="button"
                 class="btn btn-danger mr-2"
                 :title="
                   disabledBtnCancel ? 'Already canceled' : 'Cancel subscription'
                 "
+                :disabled="disabledBtnCancel"
                 @click="cancelSubscription"
               >
-                <!-- v-else -->
-                <!-- :disabled="disabledBtnCancel" -->
                 Cancel Subscription
               </button>
 
               <button
                 type="button"
                 class="btn btn-success"
-                :disabled="loading"
+                :disabled="loading || disabledBtnSubscribeUpdate"
                 @click="subscribeUpdatePlan"
               >
                 Subscribe / Update
@@ -480,6 +478,17 @@ export default {
         this.paymentPeriod !== this.defaultPeriod &&
         (this.isSubscribed || this.subscriptionIsCanceled)
       );
+    },
+
+    /** disabled button "Subscribe / Update" */
+    disabledBtnSubscribeUpdate() {
+      if (!this.totalPaid) {
+        return true;
+      }
+
+      return !this.show.some(plan => {
+        return !this.planIsMain(plan.id) && plan.checked;
+      });
     },
   },
 
