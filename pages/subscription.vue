@@ -400,6 +400,8 @@
               >
                 Subscribe / Update
               </button>
+
+              <pre>valuesChange: {{ valuesChange }}</pre>
             </div>
           </div>
         </div>
@@ -418,6 +420,7 @@ import { enUsFormatter } from '@/helpers/number-format';
 export default {
   data: () => ({
     currentVerifyCuponPlan: null,
+    valuesChange: false,
   }),
 
   filters: {
@@ -487,7 +490,7 @@ export default {
 
     /** disabled button "Subscribe / Update" */
     disabledBtnSubscribeUpdate() {
-      if (!this.totalPaid || this.yearlyToMonthly) {
+      if (!this.totalPaid || !this.valuesChange || this.yearlyToMonthly) {
         return true;
       }
 
@@ -562,6 +565,39 @@ export default {
           }
 
           this.SET_DEFAULT_CHECKED_PLANS();
+        }
+      },
+    },
+
+    show: {
+      immediate: true,
+      deep: true,
+      handler(plans) {
+        let change = false;
+        for (const plan of plans) {
+          const defaultPlan = this.defaultCheckedPlans.find(
+            v => v.id === plan.id,
+          );
+
+          if (!!defaultPlan) {
+            if (defaultPlan.users !== plan.users) {
+              this.valuesChange = true;
+              change = true;
+              break;
+            }
+
+            continue;
+          }
+
+          if (plan.checked) {
+            this.valuesChange = true;
+            change = true;
+            break;
+          }
+        }
+
+        if (!change && this.valuesChange) {
+          this.valuesChange = false;
         }
       },
     },
