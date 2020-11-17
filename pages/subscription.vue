@@ -494,9 +494,11 @@ export default {
         return true;
       }
 
-      return !this.show.some(plan => {
-        return !this.planIsMain(plan.id) && plan.checked;
-      });
+      return false;
+
+      // return !this.show.some(plan => {
+      //   return !this.planIsMain(plan.id) && plan.checked;
+      // });
     },
   },
 
@@ -575,6 +577,12 @@ export default {
       handler(plans, oldPlans) {
         if (this.typingCupon) return;
 
+        // checked plan with zero licences
+        if (plans.some(v => v.checked && v.users === 0)) {
+          this.valuesChange = false;
+          return;
+        }
+
         let change = false;
         for (const plan of plans) {
           const defaultPlan = this.defaultCheckedPlans.find(
@@ -598,8 +606,8 @@ export default {
             continue;
           }
 
-          if (plan.checked) {
-            this.valuesChange = true;
+          if (plan.checked && plan.users !== 0) {
+            this.valuesChange = false;
             change = true;
             break;
           }
