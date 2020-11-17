@@ -220,6 +220,10 @@ export const mutations = {
     state[state.period][index].canceledAt = payload.canceledAt;
     state[state.period][index].cancelAtPeriodEnd = payload.cancelAtPeriodEnd;
   },
+
+  SET_SUBSCRIBED(state, payload) {
+    state.subscribed = payload;
+  }
 };
 
 export const getters = {

@@ -579,6 +579,7 @@ export default {
       'SET_DEFAULT_PERIOD',
       'SET_CANCELED_STATUS_PLAN',
       'SET_DEFAULT_TOTAL_PAID',
+      'SET_SUBSCRIBED',
     ]),
 
     ...mapActions('plans', [
@@ -594,7 +595,10 @@ export default {
         return '-';
       }
 
-      if (!plan.checked || !this.defaultCheckedPlans.some(v => v.id === plan.id)) {
+      if (
+        !plan.checked ||
+        !this.defaultCheckedPlans.some(v => v.id === plan.id)
+      ) {
         return '-';
       }
 
@@ -940,7 +944,10 @@ export default {
         }
 
         // cancel plan
-        if (!data.value && this.defaultCheckedPlans.some(v => v.id === data.planId)) {
+        if (
+          !data.value &&
+          this.defaultCheckedPlans.some(v => v.id === data.planId)
+        ) {
           data.event.preventDefault();
           delete data.event;
 
@@ -1227,7 +1234,6 @@ export default {
 
       try {
         const results = await this.cancelSubscriptions(plans);
-        console.log(results);
 
         // update view
         for (const planResult of results) {
@@ -1235,6 +1241,7 @@ export default {
             plan => plan.id === planResult.plan.id,
           );
 
+          const { plan } = planResult;
           delete planResult.plan;
 
           if (planResult.cancelAtPeriodEnd) {
@@ -1250,16 +1257,40 @@ export default {
               index,
             });
 
-            // quit checked
+            // quit users quantity
             this.SET_CHECKED_OR_USERS({
-              prop: 'checked',
-              value: false,
+              prop: 'users',
+              value: 0,
               index,
             });
+
+            // quit checked
+            if (!this.planIsMain(plan.id)) {
+              this.SET_CHECKED_OR_USERS({
+                prop: 'checked',
+                value: false,
+                index,
+              });
+            }
 
             // update default checked plan
             this.SET_DEFAULT_CHECKED_PLANS();
           }
+        }
+
+        let canceled = true;
+        for (const plan of this.show) {
+          if (this.planIsMain) continue;
+
+          if (plan.checked) {
+            canceled = false;
+            break;
+          }
+        }
+
+        // canceled immediatly
+        if (canceled) {
+          this.SET_SUBSCRIBED(false);
         }
       } catch (e) {
         console.error(e);
@@ -1302,9 +1333,11 @@ export default {
     },
 
     async subscribeUpdatePlan() {
-      let text = 'Are you sure you want to update?';
+      let text = this.isSubscribed
+        ? 'Are you sure you want to update?'
+        : 'Are you sure you want to subscribe?';
 
-      if (this.defaultTotalPaid !== this.totalPaid) {
+      if (this.defaultTotalPaid !== this.totalPaid && this.isSubscribed) {
         let rest = null;
         let action = '';
 
@@ -1356,7 +1389,7 @@ export default {
     async updateSubscription(plans, updateDefaultTotalPaid = false) {
       try {
         // remove old period subscription
-        if (this.paymentPeriod !== this.defaultPeriod) {
+        if (this.isSubscribed && this.paymentPeriod !== this.defaultPeriod) {
           // set the current period as default
           // this.SET_DEFAULT_PERIOD(this.paymentPeriod);
 
@@ -1365,7 +1398,7 @@ export default {
           //   planId: plan.id,
           // }));
 
-             const toCancelPlans = this.mirrorDefaultCheckedPlans.map(plan => ({
+          const toCancelPlans = this.mirrorDefaultCheckedPlans.map(plan => ({
             planId: plan.id,
           }));
 
@@ -1374,6 +1407,16 @@ export default {
 
         // execute request
         await this.addSubscription(plans);
+
+        // first subscription
+        if (!this.isSubscribed) {
+          this.SET_SUBSCRIBED(true);
+        }
+
+        // update default payment period
+        if (this.paymentPeriod !== this.defaultPeriod) {
+          this.SET_DEFAULT_PERIOD(this.paymentPeriod);
+        }
 
         // update default total paid
         if (updateDefaultTotalPaid) {
