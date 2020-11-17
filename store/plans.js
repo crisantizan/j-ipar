@@ -64,13 +64,13 @@ export const mutations = {
   SET_DEFAULT_CHECKED_PLANS(state) {
     state.defaultCheckedPlans[state.period] = state[state.period]
       .filter(plan => plan.checked)
-      .map(plan => ({ id: plan.id, users: plan.users }));
+      .map(plan => ({ id: plan.id, users: plan.users, coupon: plan.couponId.value }));
 
     state.defaultCheckedPlans[this.getters['plans/mirrorPeriod']] = state[
       this.getters['plans/mirrorPeriod']
     ]
       .filter(plan => plan.checked)
-      .map(plan => ({ id: plan.id, users: plan.users }));
+      .map(plan => ({ id: plan.id, users: plan.users, coupon: plan.couponId.value }));
   },
 
   SET_PERIOD(state, period) {

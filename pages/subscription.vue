@@ -229,6 +229,7 @@
                             :disabled="
                               !plan.checked ||
                                 subscriptionIsCanceled ||
+                                plan.cancelAtPeriodEnd ||
                                 disabledMirrorPeriod
                             "
                             :title="inputCuponTitle(plan.couponId.valid)"
@@ -286,9 +287,9 @@
                                   <span class="sr-only">Loading...</span>
                                 </div>
                               </template>
-                              <span v-else style="pointer-events: none"
-                                >Add</span
-                              >
+                              <span v-else style="pointer-events: none">
+                                Add
+                              </span>
                             </button>
                           </div>
                         </div>
@@ -400,8 +401,6 @@
               >
                 Subscribe / Update
               </button>
-
-              <pre>valuesChange: {{ valuesChange }}</pre>
             </div>
           </div>
         </div>
@@ -421,6 +420,7 @@ export default {
   data: () => ({
     currentVerifyCuponPlan: null,
     valuesChange: false,
+    typingCupon: false,
   }),
 
   filters: {
@@ -572,7 +572,9 @@ export default {
     show: {
       immediate: true,
       deep: true,
-      handler(plans) {
+      handler(plans, oldPlans) {
+        if (this.typingCupon) return;
+
         let change = false;
         for (const plan of plans) {
           const defaultPlan = this.defaultCheckedPlans.find(
@@ -581,6 +583,13 @@ export default {
 
           if (!!defaultPlan) {
             if (defaultPlan.users !== plan.users) {
+              this.valuesChange = true;
+              change = true;
+              break;
+            }
+
+            // coupon changed
+            if (plan.couponId.valid && defaultPlan.coupon !== plan.couponId.value) {
               this.valuesChange = true;
               change = true;
               break;
@@ -688,6 +697,7 @@ export default {
 
     /** update cupon value on type **/
     onTypeCupon(data) {
+      !this.typingCupon && (this.typingCupon = true);
       // data: { value, index }
       this.SET_CUPON(data);
     },
@@ -711,6 +721,7 @@ export default {
 
     /** **/
     onBlurInputCoupon({ index, valid }) {
+      this.typingCupon && (this.typingCupon = false);
       if (valid !== false) {
         return;
       }
@@ -1472,6 +1483,10 @@ export default {
 
         // update default checked plans
         this.SET_DEFAULT_CHECKED_PLANS();
+
+        if (this.valuesChange) {
+          this.valuesChange = false;
+        }
 
         // old canceled plans, update
         this.show.forEach((plan, index) => {
