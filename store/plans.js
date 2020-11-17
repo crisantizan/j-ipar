@@ -382,8 +382,6 @@ export const actions = {
           return reject(errors);
         }
 
-        console.log(data.stripeSubscripterAdd);
-
         resolve(data.stripeSubscripterAdd);
       } catch (err) {
         console.error(err);

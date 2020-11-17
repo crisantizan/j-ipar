@@ -993,6 +993,13 @@ export default {
                   index: data.index,
                 });
 
+                // quit users
+                this.SET_CHECKED_OR_USERS({
+                  prop: 'users',
+                  value: 0,
+                  index: data.index,
+                });
+
                 // update default checked plan
                 this.SET_DEFAULT_CHECKED_PLANS();
               }
