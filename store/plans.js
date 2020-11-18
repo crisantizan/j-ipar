@@ -9,13 +9,7 @@ export const state = () => ({
   year: [],
   paymentMethods: [],
   customer: null,
-  /** excluded plans */
-  excludedPlans: [
-    'price_1GtI4KEHlNK1KgjMpyCRDirK',
-    'price_1GtI4KEHlNK1KgjMFDN3sLqS',
-    'price_1GsV8CEHlNK1KgjMMIOTbDXs',
-    'price_1GsV8CEHlNK1KgjM69Jm0McK',
-  ],
+  displayPlans: ['california', 'immigration'],
   lastChangedPlan: null,
   subscribed: false,
   defaultCheckedPlans: {
@@ -27,7 +21,16 @@ export const state = () => ({
 
 export const mutations = {
   SET_ALL(state, plans) {
-    state.all = plans.filter(v => !state.excludedPlans.includes(v.id));
+    state.all = plans.filter(plan => {
+      if (planIsCore(plan.nickname)) {
+        return true;
+      };
+
+      return state.displayPlans.some(nickname => {
+        return plan.nickname.toLowerCase().includes(nickname);
+      });
+    });
+
     let found = false;
 
     // set default period
