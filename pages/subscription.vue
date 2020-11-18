@@ -1337,7 +1337,7 @@ export default {
 
         let canceled = true;
         for (const plan of this.show) {
-          if (planIsCore(plan.nickname)) continue;
+          if (planIsCore(plan.nickname) && !plan.users) continue;
 
           if (plan.checked) {
             canceled = false;
