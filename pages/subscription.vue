@@ -412,7 +412,11 @@
 import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
 import dayjs from 'dayjs';
-import { camelToSnakeCaseObj, calcPlanDiscount, planIsCore } from '@/helpers/utils';
+import {
+  camelToSnakeCaseObj,
+  calcPlanDiscount,
+  planIsCore,
+} from '@/helpers/utils';
 import { enUsFormatter } from '@/helpers/number-format';
 
 export default {
@@ -447,9 +451,7 @@ export default {
       'totalPaid',
       'customer',
       'paymentMethods',
-      'planIsMain', // TODO:: remove
       'mainPlan',
-      'coreIds', // TODO:: remove
       'subscriptionIsCanceled',
       'isSubscribed',
       'defaultTotalPaid',
@@ -600,7 +602,10 @@ export default {
             }
 
             // coupon changed
-            if (plan.couponId.valid && defaultPlan.coupon !== plan.couponId.value) {
+            if (
+              plan.couponId.valid &&
+              defaultPlan.coupon !== plan.couponId.value
+            ) {
               this.valuesChange = true;
               change = true;
               break;
@@ -1384,6 +1389,23 @@ export default {
     },
 
     async subscribeUpdatePlan() {
+      // change from monthly to yearly subscription
+      if (
+        this.isSubscribed &&
+        this.monthlyToYearly &&
+        !this.subscriptionIsCanceled
+      ) {
+        Swal.fire({
+          position: 'center',
+          icon: 'info',
+          html: '<h4>Please cancel the monthly subscription first!</h4>',
+          showConfirmButton: false,
+          timer: 2200,
+        });
+
+        return;
+      }
+
       // TODO:: text for first subscription
       // TODO:: text for anual subscription
       let text = this.isSubscribed
@@ -1440,18 +1462,23 @@ export default {
 
     async updateSubscription(plans, updateDefaultTotalPaid = false) {
       try {
-        // remove old period subscription
-        if (this.isSubscribed && this.paymentPeriod !== this.defaultPeriod) {
-          // cancel plans of the other period
-          const toCancelPlans = this.mirrorDefaultCheckedPlans.map(plan => ({
-            planId: plan.id,
-          }));
-
-          await this.cancelSubscriptions(toCancelPlans);
-        }
-
         // execute request
         await this.addSubscription(plans);
+
+        // update last subscription period UI
+        if (this.isSubscribed && this.paymentPeriod !== this.defaultPeriod) {
+          this.mirrorSubscriptionPlans.forEach((plan, index) => {
+            if (plan.checked && plan.cancelAtPeriodEnd) {
+              this.SET_CANCELED_STATUS_PLAN({
+                cancelAt: null,
+                canceledAt: null,
+                cancelAtPeriodEnd: false,
+                index,
+                period: this.mirrorPeriod,
+              });
+            }
+          });
+        }
 
         // first subscription
         if (!this.isSubscribed) {

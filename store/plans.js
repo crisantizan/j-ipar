@@ -232,13 +232,15 @@ export const mutations = {
      * canceledAt: numeric string,
      * cancelAtPeriodEnd: boolean,
      * index: number,
+     * period: string, optional
      * }
      **/
     const { index } = payload;
+    const period = payload.period || state.period;
 
-    state[state.period][index].cancelAt = payload.cancelAt;
-    state[state.period][index].canceledAt = payload.canceledAt;
-    state[state.period][index].cancelAtPeriodEnd = payload.cancelAtPeriodEnd;
+    state[period][index].cancelAt = payload.cancelAt;
+    state[period][index].canceledAt = payload.canceledAt;
+    state[period][index].cancelAtPeriodEnd = payload.cancelAtPeriodEnd;
   },
 
   SET_SUBSCRIBED(state, payload) {
