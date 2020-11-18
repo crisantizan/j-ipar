@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { calcPlanDiscount } from '@/helpers/utils';
+import { calcPlanDiscount, planIsCore } from '@/helpers/utils';
 
 export const state = () => ({
   all: [],
@@ -9,7 +9,6 @@ export const state = () => ({
   year: [],
   paymentMethods: [],
   customer: null,
-  coreIds: ['price_1HopqfEHlNK1KgjMEmNB2EcN', 'price_1HoprVEHlNK1KgjMNy4pIIkz'],
   /** excluded plans */
   excludedPlans: [
     'price_1GtI4KEHlNK1KgjMpyCRDirK',
@@ -33,7 +32,7 @@ export const mutations = {
 
     // set default period
     for (const plan of state.all) {
-      if (!state.coreIds.includes(plan.id)) continue;
+      if (!planIsCore(plan.nickname)) continue;
 
       if (plan.checked) {
         state.defaultPeriod = plan.interval;
@@ -47,7 +46,10 @@ export const mutations = {
 
     if (!found) {
       // monthly is default checked period
-      const index = state.all.findIndex(plan => state.coreIds[0] === plan.id);
+      const index = state.all.findIndex(plan => {
+        return planIsCore(plan.nickname) && plan.interval === 'month';
+      });
+
       state.all[index].checked = true;
     }
   },
@@ -291,17 +293,9 @@ export const getters = {
     }, 0);
   },
 
-  coreIds(state) {
-    return state.coreIds;
-  },
-
-  planIsMain(state) {
-    return id => state.coreIds.includes(id);
-  },
-
   mainPlan(state) {
     return period => {
-      const index = state[period].findIndex(v => state.coreIds.includes(v.id));
+      const index = state[period].findIndex(plan => planIsCore(plan.nickname));
 
       return { index, value: state[period][index] };
     };

@@ -177,6 +177,7 @@
                           @click="
                             onCheckedPlan({
                               event: $event,
+                              nickname: plan.nickname,
                               planId: plan.id,
                               value: !plan.checked,
                               isCanceled: plan.cancelAtPeriodEnd,
@@ -411,7 +412,7 @@
 import { mapMutations, mapGetters, mapActions } from 'vuex';
 import gql from 'graphql-tag';
 import dayjs from 'dayjs';
-import { camelToSnakeCaseObj, calcPlanDiscount } from '@/helpers/utils';
+import { camelToSnakeCaseObj, calcPlanDiscount, planIsCore } from '@/helpers/utils';
 import { enUsFormatter } from '@/helpers/number-format';
 
 export default {
@@ -446,9 +447,9 @@ export default {
       'totalPaid',
       'customer',
       'paymentMethods',
-      'planIsMain',
+      'planIsMain', // TODO:: remove
       'mainPlan',
-      'coreIds',
+      'coreIds', // TODO:: remove
       'subscriptionIsCanceled',
       'isSubscribed',
       'defaultTotalPaid',
@@ -852,7 +853,7 @@ export default {
 
       /** sort values */
       const sorted = plans.sort((a, b) => {
-        if (this.planIsMain(a.id)) {
+        if (planIsCore(a.nickname)) {
           return -1;
         }
 
@@ -890,15 +891,10 @@ export default {
                 couponId.confirmed = true;
               }
 
-              let checked = plan.checked;
               let active = plan.active;
 
-              // set Core plan as checked
-              if (this.planIsMain(plan.id)) {
-                active = false;
-
-                !plan.checked && (checked = false);
-              }
+              // disabled core
+              if (planIsCore(plan.nickname)) active = false;
 
               return {
                 ...acc,
@@ -908,7 +904,6 @@ export default {
                     ...plan,
                     discount,
                     couponId,
-                    checked,
                     active,
                   },
                 ],
@@ -977,13 +972,13 @@ export default {
 
     /** on checked plan handler */
     async onCheckedPlan(data) {
-      // data { planId, value, isCanceled, index });
+      // data { planId, nickname, value, isCanceled, index });
 
       // canceled or core, stop
       if (
         this.subscriptionIsCanceled ||
         this.disabledMirrorPeriod ||
-        this.planIsMain(data.planId)
+        planIsCore(data.nickname)
       ) {
         return;
       }
@@ -1138,8 +1133,8 @@ export default {
         return;
       }
 
-      // update from main plan
-      if (this.planIsMain(plan.id)) {
+      // update from core plan
+      if (planIsCore(plan.nickname)) {
         // const sum = immigration.value.users + california.value.users;
         const sum = this.getCheckedSum({ planMainId: plan.id });
 
@@ -1322,7 +1317,7 @@ export default {
             });
 
             // quit checked
-            if (!this.planIsMain(plan.id)) {
+            if (!planIsCore(plan.nickname)) {
               this.SET_CHECKED_OR_USERS({
                 prop: 'checked',
                 value: false,
@@ -1337,7 +1332,7 @@ export default {
 
         let canceled = true;
         for (const plan of this.show) {
-          if (this.planIsMain(plan.id)) continue;
+          if (planIsCore(plan.nickname)) continue;
 
           if (plan.checked) {
             canceled = false;
@@ -1385,7 +1380,6 @@ export default {
           return obj;
         });
 
-      // console.log(JSON.parse(JSON.stringify(plans)))
       this.updateSubscription(plans);
     },
 

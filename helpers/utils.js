@@ -36,3 +36,8 @@ export function calcPlanDiscount(plan) {
 export function cloneObject(obj) {
 	return JSON.parse(JSON.stringify(obj));
 }
+
+/** plan is core */
+export function planIsCore(nickname) {
+	return nickname.toLocaleLowerCase().includes('core')
+}
