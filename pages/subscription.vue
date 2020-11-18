@@ -418,6 +418,7 @@ import {
   planIsCore,
 } from '@/helpers/utils';
 import { enUsFormatter } from '@/helpers/number-format';
+import { librariesKeys } from '@/utils/constants';
 
 export default {
   data: () => ({
@@ -647,6 +648,8 @@ export default {
       'SET_DEFAULT_TOTAL_PAID',
       'SET_SUBSCRIBED',
     ]),
+
+    ...mapMutations('users', ['UPDATE_LIBRARIES_QUANTITY']),
 
     ...mapActions('plans', [
       'getPaymentMethods',
@@ -1505,6 +1508,8 @@ export default {
           this.valuesChange = false;
         }
 
+        const librariesQuantity = {};
+
         // old canceled plans, update
         this.show.forEach((plan, index) => {
           if (plan.checked && plan.cancelAtPeriodEnd) {
@@ -1515,7 +1520,25 @@ export default {
               index,
             });
           }
+
+          if (plan.nickname.toLowerCase().includes('core')) {
+            librariesQuantity[librariesKeys.CORE] = plan.users;
+          }
+
+          if (plan.nickname.toLowerCase().includes('california')) {
+            librariesQuantity[librariesKeys.CALIFORNIA] = plan.users;
+          }
+
+          if (plan.nickname.toLowerCase().includes('immigration')) {
+            librariesQuantity[librariesKeys.IMMIGRATION] = plan.users;
+          }
         });
+
+        // update librariesQuantity
+        if (!!Object.keys(librariesQuantity).length) {
+          this.UPDATE_LIBRARIES_QUANTITY(librariesQuantity);
+        }
+
       } catch (err) {
         console.error(err);
       }

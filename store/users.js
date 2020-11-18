@@ -5,7 +5,7 @@ export const state = () => ({
   librariesQuantity: {},
   usersIntegrations: [],
   integrations: null,
-  messageErrorUsersIntegrations: null
+  messageErrorUsersIntegrations: null,
 });
 
 export const mutations = {
@@ -35,6 +35,16 @@ export const mutations = {
     state.librariesQuantity = payload;
   },
 
+  UPDATE_LIBRARIES_QUANTITY(state, payload) {
+    const keys = Object.keys(payload);
+
+    for (const library of keys) {
+      if (typeof state.librariesQuantity[library] === 'undefined') continue;
+
+      state.librariesQuantity[library] = payload[library];
+    }
+  },
+
   SET_USERS_INTEGRATIONS(state, payload) {
     state.usersIntegrations = payload;
   },
@@ -44,12 +54,16 @@ export const mutations = {
   },
 
   CHECK_RELATION(state, payload) {
-    state.usersIntegrations[state.usersIntegrations.map(a => a.userId).indexOf(payload.userIntegrationId)].linked = payload.linked
+    state.usersIntegrations[
+      state.usersIntegrations
+        .map(a => a.userId)
+        .indexOf(payload.userIntegrationId)
+    ].linked = payload.linked;
   },
 
   SET_MESSAGE_ERROR_USERS_INTEGRATIONS(state, payload) {
-    state.messageErrorUsersIntegrations = payload.message
-  }
+    state.messageErrorUsersIntegrations = payload.message;
+  },
 };
 
 export const getters = {
@@ -267,37 +281,40 @@ export const actions = {
           variables: payload,
         });
 
-        if (
-          data.usersIntegrations &&
-          data.usersIntegrations !== null
-        ) {
+        if (data.usersIntegrations && data.usersIntegrations !== null) {
           commit('SET_USERS_INTEGRATIONS', data.usersIntegrations);
 
           // SET INFO FOR INTEGRATIONS FOR LIST ON USER RELATIONS MODAL
 
-          let integrations = []
+          let integrations = [];
 
           data.usersIntegrations.forEach(user => {
-            if (integrations.map(a => a.id).indexOf(user.integrationId) === -1) {
+            if (
+              integrations.map(a => a.id).indexOf(user.integrationId) === -1
+            ) {
               integrations.push({
                 id: user.integrationId,
                 prefix: user.prefix,
                 users: [user],
-                name: user.integration
-              })
+                name: user.integration,
+              });
             } else {
-              integrations[integrations.map(a => a.id).indexOf(user.integrationId)].users.push(user)
+              integrations[
+                integrations.map(a => a.id).indexOf(user.integrationId)
+              ].users.push(user);
             }
-          })
+          });
 
           commit('SET_INTEGRATIONS', integrations);
         } else {
-          commit('SET_MESSAGE_ERROR_USERS_INTEGRATIONS', { message: errors[0].message });
+          commit('SET_MESSAGE_ERROR_USERS_INTEGRATIONS', {
+            message: errors[0].message,
+          });
         }
 
         resolve(true);
       } catch (error) {
-        console.log(error)
+        console.log(error);
         reject(error);
       }
     });
@@ -321,7 +338,7 @@ export const actions = {
           variables: payload,
         });
 
-        console.log(data)
+        console.log(data);
 
         resolve(true);
       } catch (error) {
