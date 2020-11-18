@@ -615,7 +615,7 @@ export default {
           }
 
           if (plan.checked && plan.users !== 0) {
-            this.valuesChange = false;
+            this.valuesChange = true;
             change = true;
             break;
           }
