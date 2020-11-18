@@ -9,7 +9,7 @@ export const state = () => ({
   year: [],
   paymentMethods: [],
   customer: null,
-  coreIds: ['price_1Gv7zkEHlNK1KgjMGy4WHzUf', 'price_1Gv80DEHlNK1KgjMaPRisapB'],
+  coreIds: ['price_1HopqfEHlNK1KgjMEmNB2EcN', 'price_1HoprVEHlNK1KgjMNy4pIIkz'],
   /** excluded plans */
   excludedPlans: [
     'price_1GtI4KEHlNK1KgjMpyCRDirK',
