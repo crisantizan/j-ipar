@@ -1,4 +1,4 @@
-import { librariesKeys } from '@/utils/constants';
+import { libraryKeys } from '@/utils/constants';
 
 /** convert camel case string to snake case **/
 export function camelToSnakeCase(str) {
@@ -56,9 +56,9 @@ export function includeValue(value, searchValue) {
 }
 
 export function getPlanLibraryName(nickname) {
-  for (const prop of librariesKeys) {
-    if (includeValue(nickname, librariesKeys[prop].staticValue)) {
-      return librariesKeys[prop].key;
+  for (const prop in libraryKeys) {
+    if (includeValue(nickname, libraryKeys[prop].staticValue)) {
+      return libraryKeys[prop].key;
     }
   }
 

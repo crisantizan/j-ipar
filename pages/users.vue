@@ -272,7 +272,7 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { generateCheckboxHTML } from '@/helpers/generate-html';
 import { cloneObject } from '@/helpers/functions';
-import { librariesKeys } from '@/utils/constants';
+import { libraryKeys } from '@/utils/constants';
 
 export default {
   components: {
@@ -426,7 +426,7 @@ export default {
       }
 
       return this.librariesCounter.find(
-        ({ library }) => library === librariesKeys.CORE.key,
+        ({ library }) => library === libraryKeys.CORE.key,
       ).isFull;
     },
 

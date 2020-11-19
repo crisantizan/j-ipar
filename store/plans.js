@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import { calcPlanDiscount, planIsCore } from '@/helpers/functions';
-import { librariesKeys } from '@/utils/constants';
+import { libraryKeys } from '@/utils/constants';
 
 export const state = () => ({
   all: [],
@@ -22,8 +22,8 @@ export const state = () => ({
 export const mutations = {
   SET_ALL(state, plans) {
     const displayPlans = [
-      librariesKeys.CALIFORNIA.staticValue,
-      librariesKeys.IMMIGRATION.staticValue,
+      libraryKeys.CALIFORNIA.staticValue,
+      libraryKeys.IMMIGRATION.staticValue,
     ];
 
     state.all = plans.filter(plan => {

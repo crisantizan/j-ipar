@@ -417,9 +417,10 @@ import {
   calcPlanDiscount,
   planIsCore,
   includeValue,
+  getPlanLibraryName,
 } from '@/helpers/functions';
 import { enUsFormatter } from '@/helpers/number-format';
-import { librariesKeys } from '@/utils/constants';
+import { libraryKeys } from '@/utils/constants';
 
 export default {
   data: () => ({
@@ -1120,6 +1121,8 @@ export default {
 
     /** on change users handler */
     onChangeUsers({ event = null, value, plan, index }) {
+      console.log(getPlanLibraryName(plan.nickname));
+      const libraryKey = getPlanLibraryName(plan.nickname);
       // no negative numbers accepted
       if (Number(event.target.value) < 0) {
         value = 0;
@@ -1523,9 +1526,9 @@ export default {
             });
           }
 
-          for (const prop in librariesKeys) {
-            if (includeValue(plan.nickname, librariesKeys[prop].staticValue)) {
-              librariesQuantity[librariesKeys[prop].key] = plan.users;
+          for (const prop in libraryKeys) {
+            if (includeValue(plan.nickname, libraryKeys[prop].staticValue)) {
+              librariesQuantity[libraryKeys[prop].key] = plan.users;
             }
           }
         });

@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { librariesKeys } from '@/utils/constants';
+import { libraryKeys } from '@/utils/constants';
 
 export const state = () => ({
   authenticated: false,
@@ -146,7 +146,7 @@ export const actions = {
           }
 
           // change "Core" key to "Prima Facie"
-          return { ...acc, [librariesKeys.CORE.key]: libraries[key] };
+          return { ...acc, [libraryKeys.CORE.key]: libraries[key] };
         }, {});
 
         commit('users/SET_LIBRARIES_QUANTITY', obj);

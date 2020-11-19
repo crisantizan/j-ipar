@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { librariesKeys } from '@/utils/constants';
+import { libraryKeys } from '@/utils/constants';
 
 export const state = () => ({
   users: [],
@@ -88,7 +88,7 @@ export const getters = {
     const libraries = getters.librariesQuantity;
 
     const sorted = Object.keys(libraries).sort((a, b) => {
-      if (a === librariesKeys.CORE.key) {
+      if (a === libraryKeys.CORE.key) {
         return -1;
       }
 
@@ -113,7 +113,7 @@ export const getters = {
 
     const availables = [
       ...Object.keys(state.users[0].assignLibraries),
-      librariesKeys.CORE.key,
+      libraryKeys.CORE.key,
     ];
 
     return keys.reduce((acc, key) => {
@@ -142,12 +142,18 @@ export const getters = {
       return acc;
     }, {});
 
-    obj[librariesKeys.CORE.key] = getters.users.reduce(
+    obj[libraryKeys.CORE.key] = getters.users.reduce(
       (acc, user) => (user.active ? acc + 1 : acc),
       0,
     );
 
     return obj;
+  },
+
+  getLibrariesAvailable(state, getters) {
+    return key => {
+      return getters.librariesQuantity[key] - getters.selected[key];
+    };
   },
 
   usersIntegrations: state => state.usersIntegrations,
