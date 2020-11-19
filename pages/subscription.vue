@@ -459,7 +459,7 @@ export default {
       'isSubscribed',
       'defaultTotalPaid',
     ]),
-    ...mapGetters('users', ['isUpdate']),
+    ...mapGetters('users', ['isUpdate', 'getLibrariesAvailable']),
     ...mapGetters('users', { selectedLibraries: 'selected' }),
     ...mapGetters(['loaded', 'loading']),
 
@@ -1121,12 +1121,11 @@ export default {
 
     /** on change users handler */
     onChangeUsers({ event = null, value, plan, index }) {
-      console.log(getPlanLibraryName(plan.nickname));
-      const libraryKey = getPlanLibraryName(plan.nickname);
-      // no negative numbers accepted
-      if (Number(event.target.value) < 0) {
-        value = 0;
-        event.target.value = 0;
+
+      // no negative and zero accepted
+      if (Number(event.target.value) < 1) {
+        value = 1;
+        event.target.value = 1;
       }
 
       const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
@@ -1135,12 +1134,28 @@ export default {
       if (!!defaultPlan && value < defaultPlan.users) {
         event.target.value = defaultPlan.users;
 
+        const libraryKey = getPlanLibraryName(plan.nickname);
+
+        const available = this.getLibrariesAvailable(libraryKey);
+        const toReduce = defaultPlan.users - value;
+
+        console.log({available, toReduce});
+
+        if (available >= toReduce) return;
+
         Swal.fire({
+          icon: 'info',
           position: 'center',
-          text: 'Please, reduce the licences at the end of the payment period.',
-          showConfirmButton: false,
-          timer: 1800,
+          text: `Please reduce ${toReduce - available} libraries of ${libraryKey} first!`,
+          showConfirmButton: true,
         });
+
+        // Swal.fire({
+        //   position: 'center',
+        //   text: 'Please, reduce the licences at the end of the payment period.',
+        //   showConfirmButton: false,
+        //   timer: 1800,
+        // });
 
         event.preventDefault();
         return;
