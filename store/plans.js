@@ -1,5 +1,6 @@
 import gql from 'graphql-tag';
-import { calcPlanDiscount, planIsCore } from '@/helpers/utils';
+import { calcPlanDiscount, planIsCore } from '@/helpers/functions';
+import { librariesKeys } from '@/utils/constants';
 
 export const state = () => ({
   all: [],
@@ -9,7 +10,6 @@ export const state = () => ({
   year: [],
   paymentMethods: [],
   customer: null,
-  displayPlans: ['california', 'immigration'],
   lastChangedPlan: null,
   subscribed: false,
   defaultCheckedPlans: {
@@ -21,14 +21,17 @@ export const state = () => ({
 
 export const mutations = {
   SET_ALL(state, plans) {
-    state.all = plans.filter(plan => {
-      if (planIsCore(plan.nickname)) {
-        return true;
-      };
+    const displayPlans = [
+      librariesKeys.CALIFORNIA.staticValue,
+      librariesKeys.IMMIGRATION.staticValue,
+    ];
 
-      return state.displayPlans.some(nickname => {
-        return plan.nickname.toLowerCase().includes(nickname);
-      });
+    state.all = plans.filter(plan => {
+      if (planIsCore(plan.nickname)) return true;
+
+      return displayPlans.some(val =>
+        plan.nickname.toLowerCase().includes(val),
+      );
     });
 
     let found = false;

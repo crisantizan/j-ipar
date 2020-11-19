@@ -271,7 +271,8 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { generateCheckboxHTML } from '@/helpers/generate-html';
-import { cloneObject } from '@/helpers/utils';
+import { cloneObject } from '@/helpers/functions';
+import { librariesKeys } from '@/utils/constants';
 
 export default {
   components: {
@@ -425,7 +426,7 @@ export default {
       }
 
       return this.librariesCounter.find(
-        ({ library }) => library === 'Prima Facie',
+        ({ library }) => library === librariesKeys.CORE.key,
       ).isFull;
     },
 

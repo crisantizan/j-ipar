@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+import { librariesKeys } from '@/utils/constants';
 
 export const state = () => ({
   authenticated: false,
@@ -145,14 +146,13 @@ export const actions = {
           }
 
           // change "Core" key to "Prima Facie"
-          return { ...acc, 'Prima Facie': libraries[key] };
+          return { ...acc, [librariesKeys.CORE.key]: libraries[key] };
         }, {});
 
         commit('users/SET_LIBRARIES_QUANTITY', obj);
 
         // users module
         commit('users/SET_USERS', data.users);
-        // commit('users/SET_USERS', data.users.slice(0, obj['Prima Facie']));
       }
     } catch (error) {
       console.error(error);

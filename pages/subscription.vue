@@ -416,7 +416,8 @@ import {
   camelToSnakeCaseObj,
   calcPlanDiscount,
   planIsCore,
-} from '@/helpers/utils';
+  includeValue,
+} from '@/helpers/functions';
 import { enUsFormatter } from '@/helpers/number-format';
 import { librariesKeys } from '@/utils/constants';
 
@@ -458,6 +459,7 @@ export default {
       'defaultTotalPaid',
     ]),
     ...mapGetters('users', ['isUpdate']),
+    ...mapGetters('users', { selectedLibraries: 'selected' }),
     ...mapGetters(['loaded', 'loading']),
 
     paymentPeriod: {
@@ -1521,16 +1523,10 @@ export default {
             });
           }
 
-          if (plan.nickname.toLowerCase().includes('core')) {
-            librariesQuantity[librariesKeys.CORE] = plan.users;
-          }
-
-          if (plan.nickname.toLowerCase().includes('california')) {
-            librariesQuantity[librariesKeys.CALIFORNIA] = plan.users;
-          }
-
-          if (plan.nickname.toLowerCase().includes('immigration')) {
-            librariesQuantity[librariesKeys.IMMIGRATION] = plan.users;
+          for (const prop in librariesKeys) {
+            if (includeValue(plan.nickname, librariesKeys[prop].staticValue)) {
+              librariesQuantity[librariesKeys[prop].key] = plan.users;
+            }
           }
         });
 
@@ -1538,7 +1534,6 @@ export default {
         if (!!Object.keys(librariesQuantity).length) {
           this.UPDATE_LIBRARIES_QUANTITY(librariesQuantity);
         }
-
       } catch (err) {
         console.error(err);
       }

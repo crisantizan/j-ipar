@@ -66,7 +66,7 @@
 
 <script>
 import { mapMutations, mapActions, mapGetters } from 'vuex';
-import { cloneObject } from '@/helpers/utils';
+import { cloneObject } from '@/helpers/functions';
 
 export default {
   props: {
