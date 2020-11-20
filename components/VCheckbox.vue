@@ -4,7 +4,7 @@
       <input
         type="checkbox"
         :class="{ 'cursor-default': disabled }"
-        :id="checkId"
+        :id="$_id"
         :checked="isChecked"
         :disabled="disabled"
         @click.prevent
@@ -12,7 +12,7 @@
       <label
         class="custom-control-label"
         :class="{ 'cursor-pointer': !disabled }"
-        :for="checkId"
+        :for="$_id"
         @click="onClick"
       >
         {{ $props.label }}
@@ -34,6 +34,11 @@ export default {
     label: {
       type: String,
       default: 'Label',
+    },
+
+    id: {
+      type: String,
+      required: false,
     },
 
     disabled: {
@@ -64,12 +69,6 @@ export default {
     event: 'change',
   },
 
-  data: () => ({
-    checkId: `check${Date.now()
-      .toString()
-      .substr(-8)}`,
-  }),
-
   computed: {
     isChecked() {
       return !this.$props.invert ? this.$props.checked : !this.$props.checked;
@@ -77,6 +76,15 @@ export default {
 
     colorClass() {
       return `checkbox-${this.color}`;
+    },
+
+    $_id() {
+      return (
+        this.id ||
+        `check${Date.now()
+          .toString()
+          .substr(-8)}`
+      );
     },
   },
 

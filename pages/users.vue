@@ -95,35 +95,24 @@
           <template
             v-for="(libraryValue, libraryKey) in props.row.assignLibraries"
           >
-            <div
-              :key="libraryKey"
-              class="custom-control custom-checkbox d-flex"
+            <VCheckbox
               v-if="displayLibraryCheckbox(libraryKey)"
-            >
-              <input
-                type="checkbox"
-                class="custom-control-input"
-                :id="generateCheckboxId(libraryKey, props.row.id)"
-                :value="libraryKey"
-                :checked="isChecked(props.row.index, libraryKey)"
-                :disabled="
-                  isDisabled(props.row.index, libraryKey) || !props.row.active
-                "
-                @change="
-                  onChange({
-                    checked: $event.target.checked,
-                    library: $event.target.value,
-                    index: props.row.index,
-                  })
-                "
-              />
-              <label
-                class="custom-control-label d-flex align-items-center"
-                :for="generateCheckboxId(libraryKey, props.row.id)"
-              >
-                {{ libraryKey }}
-              </label>
-            </div>
+              v-model="users[props.row.index].assignLibraries[libraryKey]"
+              async
+              :id="generateCheckboxId(libraryKey, props.row.id)"
+              :label="libraryKey"
+              :key="libraryKey"
+              :disabled="
+                isDisabled(props.row.index, libraryKey) || !props.row.active
+              "
+              @change-async="
+                onCheckedAsync({
+                  checked: $event,
+                  library: libraryKey,
+                  index: props.row.index,
+                })
+              "
+            />
           </template>
         </template>
 
@@ -498,7 +487,7 @@ export default {
     },
 
     /** checboxe «libraries» change event **/
-    async onChange({ checked, library, index }) {
+    async onCheckedAsync({ checked, library, index }) {
       const user = this.users[index];
 
       try {
@@ -507,6 +496,7 @@ export default {
           userId: user.id,
           library: { [library]: checked },
         });
+
         // update ui
         this.SET_CHECKED({ checked, library, index });
 
