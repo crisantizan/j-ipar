@@ -1120,8 +1120,7 @@ export default {
     },
 
     /** on change users handler */
-    onChangeUsers({ event = null, value, plan, index }) {
-
+    async onChangeUsers({ event = null, value, plan, index }) {
       // no negative and zero accepted
       if (Number(event.target.value) < 1) {
         value = 1;
@@ -1132,38 +1131,59 @@ export default {
 
       // reduce users on active plan
       if (!!defaultPlan && value < defaultPlan.users) {
-        event.target.value = defaultPlan.users;
-
         const libraryKey = getPlanLibraryName(plan.nickname);
-
+        // libraries available amount
         const available = this.getLibrariesAvailable(libraryKey);
+        // amout to reduce
         const toReduce = defaultPlan.users - value;
 
-        console.log({available, toReduce});
+        // well, it can reduce
+        if (available >= toReduce) {
+          if (planIsCore(plan.nickname)) {
+            const sum = this.getCheckedSum({ planMainId: plan.id });
+            // the new value is less than the sum of the another checked plans. Restart it
+            if (value < sum) {
+              event.target.value = defaultPlan.users;
+              return;
+            }
+          }
 
-        if (available >= toReduce) return;
+          // notify to user
+          const { isConfirmed } = await Swal.fire({
+            title: 'Warning!',
+            icon: 'warning',
+            position: 'center',
+            text: `Está bajando sus licencias de ${libraryKey} de ${defaultPlan.users} a ${value}, este cambio va a ser de manera inmediata. A usted le quedan x días que ya pagó, si hace el cambio pierde sus ${defaultPlan.users} licencias y se quedará con ${value}. Le recomendamos que haga este cambio el día de su fecha de facturación.`,
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, do It!',
+          });
 
-        Swal.fire({
-          icon: 'info',
-          position: 'center',
-          text: `Please reduce ${toReduce - available} libraries of ${libraryKey} first!`,
-          showConfirmButton: true,
-        });
+          // cancel action
+          if (!isConfirmed) return;
+        } else {
+          // if the plan is core reset his value to default
+          if (planIsCore(plan.nickname)) {
+            event.target.value = defaultPlan.users;
+            return;
+          }
 
-        // Swal.fire({
-        //   position: 'center',
-        //   text: 'Please, reduce the licences at the end of the payment period.',
-        //   showConfirmButton: false,
-        //   timer: 1800,
-        // });
+          // show alert to user and stop execution
+          Swal.fire({
+            icon: 'info',
+            position: 'center',
+            text: `Please reduce ${toReduce -
+              available} libraries of ${libraryKey} first!`,
+            showConfirmButton: true,
+          });
 
-        event.preventDefault();
-        return;
+          return;
+        }
       }
 
       // update from core plan
       if (planIsCore(plan.nickname)) {
-        // const sum = immigration.value.users + california.value.users;
         const sum = this.getCheckedSum({ planMainId: plan.id });
 
         if (value < sum) {
