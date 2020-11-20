@@ -152,42 +152,23 @@
                     :class="{ 'package-selected': plan.checked }"
                   >
                     <td>
-                      <div class="checkbox checkbox-success">
-                        <input
-                          type="checkbox"
-                          :id="plan.id"
-                          :checked="plan.checked"
-                          :disabled="
-                            loading ||
-                              !plan.active ||
-                              subscriptionIsCanceled ||
-                              disabledMirrorPeriod
-                          "
-                          @click.prevent
-                        />
-                        <label
-                          :for="plan.id"
-                          :class="{
-                            'cursor-pointer':
-                              !loading &&
-                              plan.active &&
-                              !subscriptionIsCanceled &&
-                              !disabledMirrorPeriod,
-                          }"
-                          @click="
-                            onCheckedPlan({
-                              event: $event,
-                              nickname: plan.nickname,
-                              planId: plan.id,
-                              value: !plan.checked,
-                              isCanceled: plan.cancelAtPeriodEnd,
-                              index,
-                            })
-                          "
-                        >
-                          {{ plan.nickname }}
-                        </label>
-                      </div>
+                      <VCheckbox
+                        v-model="plan.checked"
+                        async
+                        :label="plan.nickname"
+                        :id="plan.id"
+                        color="success"
+                        :disabled="checkboxIsDisabled(plan.active)"
+                        @change-async="
+                          onCheckedPlan({
+                            nickname: plan.nickname,
+                            planId: plan.id,
+                            value: $event,
+                            isCanceled: plan.cancelAtPeriodEnd,
+                            index,
+                          })
+                        "
+                      />
 
                       <div
                         :class="[
@@ -662,6 +643,15 @@ export default {
 
     ...mapMutations(['SET_LOADING']),
 
+    checkboxIsDisabled(active) {
+      return (
+        this.loading ||
+        !active ||
+        this.subscriptionIsCanceled ||
+        this.disabledMirrorPeriod
+      );
+    },
+
     printStatusPlan(plan) {
       if (!this.isSubscribed || this.paymentPeriod !== this.defaultPeriod) {
         return '-';
@@ -998,7 +988,7 @@ export default {
       if (this.paymentPeriod === this.defaultPeriod) {
         // subscription already canceled
         if (!data.value && data.isCanceled) {
-          data.event.preventDefault();
+          // data.event.preventDefault();
 
           Swal.fire({
             position: 'center',
@@ -1016,8 +1006,8 @@ export default {
           !data.value &&
           this.defaultCheckedPlans.some(v => v.id === data.planId)
         ) {
-          data.event.preventDefault();
-          delete data.event;
+          // data.event.preventDefault();
+          // delete data.event;
 
           const { isConfirmed } = await Swal.fire({
             position: 'center',
@@ -1079,7 +1069,7 @@ export default {
         }
       }
 
-      delete data.event;
+      // delete data.event;
       this.SET_CHECKED_OR_USERS({ prop: 'checked', ...data });
 
       if (!data.value) {
