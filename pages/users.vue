@@ -65,28 +65,20 @@
 
         <!-- printo isAttorney checkbox -->
         <template v-else-if="isTheColumn(props.column, 'isAttorney')">
-          <div
-            class="custom-control custom-checkbox d-flex justify-content-center"
-          >
-            <input
-              type="checkbox"
-              class="custom-control-input"
-              :disabled="!props.row.active"
-              :id="generateCheckboxId('isAttorney', props.row.id)"
-              :checked="isAttorneyChecked(props.row.index)"
-              @change="
-                onChangeIsAttorney({
-                  index: props.row.index,
-                  checked: $event.target.checked,
-                })
-              "
-            />
-            <label
-              class="custom-control-label d-flex align-items-center"
-              :for="generateCheckboxId('isAttorney', props.row.id)"
-            >
-            </label>
-          </div>
+          <VCheckbox
+            v-model="users[props.row.index].isAttorney"
+            async
+            color="dark"
+            :id="generateCheckboxId('isAttorney', props.row.id)"
+            :disabled="!props.row.active"
+            class="d-flex justify-content-center"
+            @change-async="
+              onChangeIsAttorney({
+                index: props.row.index,
+                checked: $event,
+              })
+            "
+          />
         </template>
 
         <!-- generate checkboxes in "assignLibraries" field -->

@@ -7,6 +7,7 @@
         :id="$_id"
         :checked="isChecked"
         :disabled="disabled"
+        style="pointer-events: none"
         @click.prevent
       />
       <label
@@ -33,7 +34,7 @@ export default {
 
     label: {
       type: String,
-      default: 'Label',
+      default: '',
     },
 
     id: {
@@ -111,5 +112,9 @@ export default {
 
 .custom-control-label {
   padding-top: 1px;
+}
+
+.checkbox label::before {
+  pointer-events: auto;
 }
 </style>
