@@ -71,6 +71,7 @@ export const actions = {
 
             plans: stripePlans {
               id
+              currentPeriodEnd
               cancelAt
               canceledAt
               cancelAtPeriodEnd

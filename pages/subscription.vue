@@ -1138,12 +1138,25 @@ export default {
             }
           }
 
+          let text = '';
+          const days = dayjs
+            .unix(plan.currentPeriodEnd)
+            .diff(new Date(), 'day');
+
+          if (days !== 0) {
+            const formatted = dayjs.unix(plan.currentPeriodEnd).format('DD/MM/YYYY');
+
+            text = `You have ${days} ${
+              days > 1 ? 'days' : 'day'
+            } left (${formatted}) that you have already paid. `;
+          }
+
           // notify to user
           const { isConfirmed } = await Swal.fire({
             title: 'Warning!',
             icon: 'warning',
             position: 'center',
-            text: `Está bajando sus licencias de ${libraryKey} de ${defaultPlan.users} a ${value}, este cambio va a ser de manera inmediata. A usted le quedan x días que ya pagó, si hace el cambio pierde sus ${defaultPlan.users} licencias y se quedará con ${value}. Le recomendamos que haga este cambio el día de su fecha de facturación.`,
+            text: `You are lowering your ${libraryKey} licenses from ${defaultPlan.users} to ${value}, this change is going to be immediate. ${text}If you make the change you lose your ${defaultPlan.users} licenses and you will keep ${value}. We recommend that you make this change on the day of your billing date.`,
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
@@ -1151,13 +1164,13 @@ export default {
           });
 
           // cancel action
-          if (!isConfirmed) return;
-        } else {
-          // if the plan is core reset his value to default
-          if (planIsCore(plan.nickname)) {
+          if (!isConfirmed) {
             event.target.value = defaultPlan.users;
             return;
           }
+        } else {
+          // restart value
+          event.target.value = defaultPlan.users;
 
           // show alert to user and stop execution
           Swal.fire({
