@@ -19,6 +19,14 @@ export function camelToSnakeCaseObj(obj) {
   }, {});
 }
 
+/** calculate total plan */
+export function calcTotalPlan(plan) {
+  const total = (plan.amount * plan.users) / 100;
+  const discount = calcPlanDiscount(plan);
+
+  return discount > total ? 0 : total - discount;
+}
+
 /** calculate plan discount **/
 export function calcPlanDiscount(plan) {
   if (plan.discount === null) {

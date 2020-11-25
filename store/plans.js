@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { calcPlanDiscount, planIsCore } from '@/helpers/functions';
+import { calcPlanDiscount, planIsCore, calcTotalPlan } from '@/helpers/functions';
 import { libraryKeys } from '@/utils/constants';
 
 export const state = () => ({
@@ -83,6 +83,7 @@ export const mutations = {
         id: plan.id,
         users: plan.users,
         coupon: plan.couponId.value,
+        totalPaid: calcTotalPlan(plan),
       }));
 
     state.defaultCheckedPlans[this.getters['plans/mirrorPeriod']] = state[
@@ -93,6 +94,7 @@ export const mutations = {
         id: plan.id,
         users: plan.users,
         coupon: plan.couponId.value,
+        totalPaid: calcTotalPlan(plan),
       }));
   },
 

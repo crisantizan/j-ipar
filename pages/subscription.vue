@@ -318,8 +318,8 @@
                       :class="{ 'text-danger': plan.cancelAtPeriodEnd }"
                     >
                       <client-only>
-                        <div class="d-flex flex-column" v-html="printStatusPlan(plan)">
-                            <!-- {{ printStatusPlan(plan) }} -->
+                        <div class="d-flex flex-column">
+                          <span v-html="printStatusPlan(plan)"></span>
                           <!-- reset plan  -->
                           <a
                             class="text-primary"
@@ -334,7 +334,7 @@
                       </client-only>
                     </td>
                     <td class="text-center">
-                      {{ plan | calcTotalPlan | enUsFormatter }}
+                      {{ plan | calcTotalPlanFil | enUsFormatter }}
                     </td>
                   </tr>
 
@@ -399,6 +399,7 @@ import {
   planIsCore,
   includeValue,
   getPlanLibraryName,
+  calcTotalPlan,
 } from '@/helpers/functions';
 import { enUsFormatter } from '@/helpers/number-format';
 import { libraryKeys } from '@/utils/constants';
@@ -408,6 +409,7 @@ export default {
     currentVerifyCuponPlan: null,
     valuesChange: false,
     typingCupon: false,
+    planChangesData: [],
   }),
 
   filters: {
@@ -415,12 +417,7 @@ export default {
       return calcPlanDiscount(plan);
     },
 
-    calcTotalPlan(plan) {
-      const total = (plan.amount * plan.users) / 100;
-      const discount = calcPlanDiscount(plan);
-
-      return discount > total ? 0 : total - discount;
-    },
+    calcTotalPlanFil: plan => calcTotalPlan(plan),
   },
 
   computed: {
@@ -666,7 +663,9 @@ export default {
 
       return plan.cancelAtPeriodEnd
         ? `Will cancel on ${dayjs.unix(plan.cancelAt).format('MM/DD/YYYY')}`
-        : `Subscribed <br/> (${dayjs.unix(plan.currentPeriodEnd).format('MM/DD/YYYY')})`;
+        : `Subscribed <br/> (${dayjs
+            .unix(plan.currentPeriodEnd)
+            .format('MM/DD/YYYY')})`;
     },
 
     /** create payment method (with apollo) */
@@ -1118,10 +1117,11 @@ export default {
       }
 
       const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
+      const libraryKey = getPlanLibraryName(plan.nickname);
+      let isReduce = false;
 
       // reduce users on active plan
       if (!!defaultPlan && value < defaultPlan.users) {
-        const libraryKey = getPlanLibraryName(plan.nickname);
         // libraries available amount
         const available = this.getLibrariesAvailable(libraryKey);
         // amout to reduce
@@ -1144,7 +1144,9 @@ export default {
             .diff(new Date(), 'day');
 
           if (days !== 0) {
-            const formatted = dayjs.unix(plan.currentPeriodEnd).format('MM/DD/YYYY');
+            const formatted = dayjs
+              .unix(plan.currentPeriodEnd)
+              .format('MM/DD/YYYY');
 
             text = `You currently have ${days} ${
               days > 1 ? 'days' : 'day'
@@ -1168,6 +1170,20 @@ export default {
             event.target.value = defaultPlan.users;
             return;
           }
+
+          isReduce = true;
+
+          // bind data
+          this.planChangesData.push({
+            type: 'Decrease',
+            library: libraryKey,
+            from: defaultPlan.users,
+            to: value,
+            cost: `-${enUsFormatter.format(
+              defaultPlan.totalPaid - calcTotalPlan({ ...plan, users: value }),
+            )}`,
+            text: `${text}We recommend you make this modification close to your license expiration date to fully utilize this license`,
+          });
         } else {
           // restart value
           event.target.value = defaultPlan.users;
@@ -1176,7 +1192,8 @@ export default {
           Swal.fire({
             icon: 'info',
             position: 'center',
-            text: 'Before you can reduce your number of licenses, you must un-assign the corresponding number of licenses from your users under the "Users" tab of this subscription panel.',
+            text:
+              'Before you can reduce your number of licenses, you must un-assign the corresponding number of licenses from your users under the "Users" tab of this subscription panel.',
             showConfirmButton: true,
           });
 
@@ -1200,6 +1217,19 @@ export default {
           mainPlan: null,
         });
 
+        if (!isReduce) {
+          this.planChangesData.push({
+            type: 'Increase',
+            library: libraryKey,
+            from: defaultPlan.users,
+            to: value,
+            cost: `+${enUsFormatter.format(
+              calcTotalPlan({ ...plan, users: value }) - defaultPlan.totalPaid,
+            )}`,
+            text: '',
+          });
+        }
+
         return;
       }
 
@@ -1219,6 +1249,18 @@ export default {
           newValue: value + sum,
           index: mainPlan.index,
         };
+
+        this.planChangesData.push({
+          type: 'Increase',
+          library: libraryKeys.CORE.key,
+          from: mainPlan.value.users,
+          to: value + sum,
+          cost: `+${enUsFormatter.format(
+            calcTotalPlan({ ...mainPlan.value, users: value + sum }) -
+              calcTotalPlan(mainPlan.value),
+          )}`,
+          text: '',
+        });
       }
 
       this.UPDATE_USERS({
@@ -1227,6 +1269,19 @@ export default {
         index,
         mainPlan: mainValues,
       });
+
+      if (!isReduce) {
+        this.planChangesData.push({
+          type: 'Increase',
+          library: libraryKey,
+          from: defaultPlan.users,
+          to: value,
+          cost: `+${enUsFormatter.format(
+            calcTotalPlan({ ...plan, users: value }) - defaultPlan.totalPaid,
+          )}`,
+          text: '',
+        });
+      }
     },
 
     getCurrentCheckedPlans() {
@@ -1451,9 +1506,11 @@ export default {
         return;
       }
 
+      console.log(JSON.parse(JSON.stringify(this.planChangesData)));
+
       // TODO:: text for first subscription
       // TODO:: text for anual subscription
-      let text = this.isSubscribed
+      let html = this.isSubscribed
         ? 'Are you sure you want to update?'
         : 'Are you sure you want to subscribe?';
 
@@ -1469,12 +1526,28 @@ export default {
           action = 'increase';
         }
 
-        text += ` This will ${action} your monthly bill to ${rest}`;
+        html += ` This will ${action} your monthly bill to ${rest}`;
+      }
+
+      html = `<h5>${html}</h5>`;
+
+      html += `<h4 class="mt-2">Details</h4>`;
+      for (const change of this.planChangesData) {
+        html += /*html*/`
+          <div class="card" style="border: 1px solid rgba(0,0,0,.1); margin-bottom: 10px;">
+          <div class="card-body">
+            <h5 class="card-title">${change.library} (${change.cost})</h5>
+            <h5 class="card-subtitle text-muted">${change.type} - From ${change.from} to ${change.to}</h5>
+            ${!!change.text ? /*html*/`<p class="card-text mt-2">${change.text}</p>` : ''}
+          </div>
+        </div>
+        `;
       }
 
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
-        text,
+        // text,
+        html,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
