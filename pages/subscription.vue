@@ -342,7 +342,7 @@
                     <td colspan="5">
                       <b>Total to pay per {{ paymentPeriod }}</b>
                     </td>
-                    <td class="text-right">
+                    <td class="text-center">
                       <b>{{ totalPaid | enUsFormatter }}</b>
                     </td>
                   </tr>
@@ -1156,7 +1156,6 @@ export default {
             title: 'Warning!',
             icon: 'warning',
             position: 'center',
-            // text: `You are lowering your ${libraryKey} licenses from ${defaultPlan.users} to ${value}, this change is going to be immediate. ${text}If you make the change you lose your ${defaultPlan.users} licenses and you will keep ${value}. We recommend that you make this change on the day of your billing date.`,
             text: `You are changing your ${libraryKey} licenses from ${defaultPlan.users} to ${value}. This change will be immediate. ${text} We recommend you make this modification close to your license expiration date to fully utilize this license. You may alternatively reassign this license to another user in the "Users" section of this subscription panel.`,
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -1177,8 +1176,6 @@ export default {
           Swal.fire({
             icon: 'info',
             position: 'center',
-            // text: `Please reduce ${toReduce -
-            //   available} libraries of ${libraryKey} first!`,
             text: 'Before you can reduce your number of licenses, you must un-assign the corresponding number of licenses from your users under the "Users" tab of this subscription panel.',
             showConfirmButton: true,
           });
@@ -1637,6 +1634,6 @@ export default {
 }
 
 .table-plans td {
-  vertical-align: middle;
+  vertical-align: bottom;
 }
 </style>
