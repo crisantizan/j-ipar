@@ -81,6 +81,7 @@ export const mutations = {
       .filter(plan => plan.checked)
       .map(plan => ({
         id: plan.id,
+        nickname: plan.nickname,
         users: plan.users,
         coupon: plan.couponId.value,
         totalPaid: calcTotalPlan(plan),
@@ -92,6 +93,7 @@ export const mutations = {
       .filter(plan => plan.checked)
       .map(plan => ({
         id: plan.id,
+        nickname: plan.nickname,
         users: plan.users,
         coupon: plan.couponId.value,
         totalPaid: calcTotalPlan(plan),

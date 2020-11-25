@@ -1173,8 +1173,10 @@ export default {
 
           isReduce = true;
 
-          // bind data
-          this.planChangesData.push({
+          const index = this.planChangesData.findIndex(
+            v => v.library === libraryKey,
+          );
+          const obj = {
             type: 'Decrease',
             library: libraryKey,
             from: defaultPlan.users,
@@ -1182,8 +1184,12 @@ export default {
             cost: `-${enUsFormatter.format(
               defaultPlan.totalPaid - calcTotalPlan({ ...plan, users: value }),
             )}`,
-            text: `${text}We recommend you make this modification close to your license expiration date to fully utilize this license`,
-          });
+            text: `${text}We recommend you make this modification close to your license expiration date to fully utilize this license.`,
+          };
+
+          index === -1
+            ? this.planChangesData.push(obj)
+            : (this.planChangesData[index] = obj);
         } else {
           // restart value
           event.target.value = defaultPlan.users;
@@ -1218,7 +1224,11 @@ export default {
         });
 
         if (!isReduce) {
-          this.planChangesData.push({
+          const index = this.planChangesData.findIndex(
+            v => v.library === libraryKey,
+          );
+
+          const obj = {
             type: 'Increase',
             library: libraryKey,
             from: defaultPlan.users,
@@ -1227,7 +1237,11 @@ export default {
               calcTotalPlan({ ...plan, users: value }) - defaultPlan.totalPaid,
             )}`,
             text: '',
-          });
+          };
+
+          index === -1
+            ? this.planChangesData.push(obj)
+            : (this.planChangesData[index] = obj);
         }
 
         return;
@@ -1250,17 +1264,27 @@ export default {
           index: mainPlan.index,
         };
 
-        this.planChangesData.push({
+        const index = this.planChangesData.findIndex(
+          v => v.library === libraryKeys.CORE.key,
+        );
+
+        const defaultMain = this.defaultCheckedPlans.find(p => planIsCore(p.nickname));
+
+        const obj = {
           type: 'Increase',
           library: libraryKeys.CORE.key,
-          from: mainPlan.value.users,
+          from: defaultMain.users,
           to: value + sum,
           cost: `+${enUsFormatter.format(
-            calcTotalPlan({ ...mainPlan.value, users: value + sum }) -
-              calcTotalPlan(mainPlan.value),
+            calcTotalPlan({...mainPlan.value, users: value + sum}) -
+            calcTotalPlan({ ...mainPlan.value, users: defaultMain.users })
           )}`,
           text: '',
-        });
+        };
+
+        index === -1
+          ? this.planChangesData.push(obj)
+          : (this.planChangesData[index] = obj);
       }
 
       this.UPDATE_USERS({
@@ -1271,7 +1295,11 @@ export default {
       });
 
       if (!isReduce) {
-        this.planChangesData.push({
+        const index = this.planChangesData.findIndex(
+          v => v.library === libraryKey,
+        );
+
+        const obj = {
           type: 'Increase',
           library: libraryKey,
           from: defaultPlan.users,
@@ -1280,7 +1308,11 @@ export default {
             calcTotalPlan({ ...plan, users: value }) - defaultPlan.totalPaid,
           )}`,
           text: '',
-        });
+        };
+
+        index === -1
+          ? this.planChangesData.push(obj)
+          : (this.planChangesData[index] = obj);
       }
     },
 
@@ -1506,8 +1538,6 @@ export default {
         return;
       }
 
-      console.log(JSON.parse(JSON.stringify(this.planChangesData)));
-
       // TODO:: text for first subscription
       // TODO:: text for anual subscription
       let html = this.isSubscribed
@@ -1526,19 +1556,28 @@ export default {
           action = 'increase';
         }
 
-        html += ` This will ${action} your monthly bill to ${rest}`;
+        // TODO:: period text
+        const period = this.paymentPeriod === 'month' ? 'monthly' : 'yearly';
+        html += ` This will ${action} your ${period} bill to ${rest}`;
       }
 
       html = `<h5>${html}</h5>`;
 
       html += `<h4 class="mt-2">Details</h4>`;
+
       for (const change of this.planChangesData) {
-        html += /*html*/`
+        html += /*html*/ `
           <div class="card" style="border: 1px solid rgba(0,0,0,.1); margin-bottom: 10px;">
-          <div class="card-body">
+          <div class="card-body" style="padding: 0.5rem;">
             <h5 class="card-title">${change.library} (${change.cost})</h5>
-            <h5 class="card-subtitle text-muted">${change.type} - From ${change.from} to ${change.to}</h5>
-            ${!!change.text ? /*html*/`<p class="card-text mt-2">${change.text}</p>` : ''}
+            <h5 class="card-subtitle text-muted">
+              ${change.type} - From ${change.from} to ${change.to} licences
+            </h5>
+            ${
+              !!change.text
+                ? /*html*/ `<p class="card-text mt-2">${change.text}</p>`
+                : ''
+            }
           </div>
         </div>
         `;
@@ -1546,7 +1585,6 @@ export default {
 
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
-        // text,
         html,
         icon: 'warning',
         showCancelButton: true,
@@ -1558,6 +1596,8 @@ export default {
       if (!isConfirmed) {
         return;
       }
+
+      this.planChangesData = [];
 
       const plans = this.show
         .filter(plan => plan.checked && !plan.cancelAtPeriodEnd)
