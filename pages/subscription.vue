@@ -282,7 +282,7 @@
                       </div>
                     </td>
                     <td class="users-td">
-                      <div class="d-flex align-items-center">
+                      <div class="d-flex justify-content-center">
                         <input
                           class="form-control form-control-sm"
                           type="number"
@@ -318,8 +318,8 @@
                       :class="{ 'text-danger': plan.cancelAtPeriodEnd }"
                     >
                       <client-only>
-                        <div class="d-flex flex-column">
-                          {{ printStatusPlan(plan) }}
+                        <div class="d-flex flex-column" v-html="printStatusPlan(plan)">
+                            <!-- {{ printStatusPlan(plan) }} -->
                           <!-- reset plan  -->
                           <a
                             class="text-primary"
@@ -666,7 +666,7 @@ export default {
 
       return plan.cancelAtPeriodEnd
         ? `Will cancel on ${dayjs.unix(plan.cancelAt).format('MM/DD/YYYY')}`
-        : 'Subscribed';
+        : `Subscribed <br/> (${dayjs.unix(plan.currentPeriodEnd).format('MM/DD/YYYY')})`;
     },
 
     /** create payment method (with apollo) */
