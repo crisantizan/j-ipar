@@ -1106,25 +1106,25 @@ export default {
           }
 
           // notify to user
-          const { isConfirmed } = await Swal.fire({
-            title: 'Warning!',
-            icon: 'warning',
-            position: 'center',
-            text: `You are changing your ${libraryKey} licenses from ${defaultPlan.users} to ${value}. This change will be immediate. ${text} We recommend you make this modification close to your license expiration date to fully utilize this license. You may alternatively reassign this license to another user in the "Users" section of this subscription panel.`,
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, do It!',
-          });
+          // const { isConfirmed } = await Swal.fire({
+          //   title: 'Warning!',
+          //   icon: 'warning',
+          //   position: 'center',
+          //   text: `You are changing your ${libraryKey} licenses from ${defaultPlan.users} to ${value}. This change will be immediate. ${text} We recommend you make this modification close to your license expiration date to fully utilize this license. You may alternatively reassign this license to another user in the "Users" section of this subscription panel.`,
+          //   showCancelButton: true,
+          //   confirmButtonColor: '#3085d6',
+          //   cancelButtonColor: '#d33',
+          //   confirmButtonText: 'Yes, do It!',
+          // });
 
-          // cancel action
-          if (!isConfirmed) {
-            this.UPDATE_USERS({
-              value: defaultPlan.users,
-              index,
-            });
-            return;
-          }
+          // // cancel action
+          // if (!isConfirmed) {
+          //   this.UPDATE_USERS({
+          //     value: defaultPlan.users,
+          //     index,
+          //   });
+          //   return;
+          // }
 
           isReduce = true;
 
