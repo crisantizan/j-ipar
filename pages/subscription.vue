@@ -45,17 +45,12 @@
             <div
               v-bind:class="{
                 'credit-card-default':
-                  paymentMethod.id ==
-                  customer.invoiceSettings.default_payment_method,
+                  paymentMethod.id == customer.invoiceSettings.default_payment_method,
               }"
               class="card-box ribbon-box"
             >
               <div class="ribbon ribbon-primary float-left">
-                <span
-                  v-if="
-                    paymentMethod.id ===
-                      customer.invoiceSettings.default_payment_method
-                  "
+                <span v-if="paymentMethod.id === customer.invoiceSettings.default_payment_method"
                   >Active</span
                 >
                 Payment Method
@@ -80,10 +75,7 @@
                     <a
                       class="btn btn-sm btn-secondary"
                       href="#"
-                      v-if="
-                        paymentMethod.id !=
-                          customer.invoiceSettings.default_payment_method
-                      "
+                      v-if="paymentMethod.id != customer.invoiceSettings.default_payment_method"
                       @click="changeDefaultPaymentMethod(paymentMethod.id)"
                       >Set Default</a
                     >
@@ -171,11 +163,7 @@
                       />
 
                       <div
-                        :class="[
-                          plan.couponId.confirmed
-                            ? 'text-success'
-                            : 'text-grey',
-                        ]"
+                        :class="[plan.couponId.confirmed ? 'text-success' : 'text-grey']"
                         v-if="plan.couponId.valid && plan.checked"
                       >
                         <div class="d-flex align-items-center">
@@ -239,31 +227,19 @@
                             <button
                               class="btn btn-sm btn-outline-secondary"
                               type="button"
-                              :disabled="
-                                !plan.checked ||
-                                  btnAddCuponDisabledState(plan.couponId)
-                              "
+                              :disabled="!plan.checked || btnAddCuponDisabledState(plan.couponId)"
                               title="Add coupon"
                               @click="
                                 verifyCupon({
                                   index,
                                   couponId: plan.couponId,
                                   plan: plan,
-                                  input:
-                                    $event.target.parentNode
-                                      .previousElementSibling,
+                                  input: $event.target.parentNode.previousElementSibling,
                                 })
                               "
                             >
-                              <template
-                                v-if="
-                                  loading && currentVerifyCuponPlan === plan.id
-                                "
-                              >
-                                <div
-                                  class="spinner-border text-primary"
-                                  role="status"
-                                >
+                              <template v-if="loading && currentVerifyCuponPlan === plan.id">
+                                <div class="spinner-border text-primary" role="status">
                                   <span class="sr-only">Loading...</span>
                                 </div>
                               </template>
@@ -313,19 +289,14 @@
                     <td class="text-center">
                       {{ plan | calcDiscount | enUsFormatter }}
                     </td>
-                    <td
-                      class="text-center"
-                      :class="{ 'text-danger': plan.cancelAtPeriodEnd }"
-                    >
+                    <td class="text-center" :class="{ 'text-danger': plan.cancelAtPeriodEnd }">
                       <client-only>
                         <div class="d-flex flex-column">
                           <span v-html="printStatusPlan(plan)"></span>
                           <!-- reset plan  -->
                           <a
                             class="text-primary"
-                            v-if="
-                              plan.cancelAtPeriodEnd && !subscriptionIsCanceled
-                            "
+                            v-if="plan.cancelAtPeriodEnd && !subscriptionIsCanceled"
                             style="cursor: pointer; text-decoration: underline"
                             @click="onResetPlan({ plan, index })"
                             >Resubscribe</a
@@ -364,9 +335,7 @@
                 v-if="isSubscribed && !subscriptionIsCanceled"
                 type="button"
                 class="btn btn-danger mr-2"
-                :title="
-                  disabledBtnCancel ? 'Already canceled' : 'Cancel subscription'
-                "
+                :title="disabledBtnCancel ? 'Already canceled' : 'Cancel subscription'"
                 :disabled="disabledBtnCancel"
                 @click="cancelSubscription"
               >
@@ -453,9 +422,7 @@ export default {
 
     disabledBtnCancel() {
       return (
-        this.loading ||
-        this.paymentPeriod !== this.defaultPeriod ||
-        this.subscriptionIsCanceled
+        this.loading || this.paymentPeriod !== this.defaultPeriod || this.subscriptionIsCanceled
       );
     },
 
@@ -572,9 +539,7 @@ export default {
 
         let change = false;
         for (const plan of plans) {
-          const defaultPlan = this.defaultCheckedPlans.find(
-            v => v.id === plan.id,
-          );
+          const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
 
           if (!!defaultPlan) {
             if (defaultPlan.users !== plan.users) {
@@ -584,10 +549,7 @@ export default {
             }
 
             // coupon changed
-            if (
-              plan.couponId.valid &&
-              defaultPlan.coupon !== plan.couponId.value
-            ) {
+            if (plan.couponId.valid && defaultPlan.coupon !== plan.couponId.value) {
               this.valuesChange = true;
               change = true;
               break;
@@ -632,21 +594,12 @@ export default {
 
     ...mapMutations('users', ['UPDATE_LIBRARIES_QUANTITY']),
 
-    ...mapActions('plans', [
-      'getPaymentMethods',
-      'addSubscription',
-      'cancelSubscriptions',
-    ]),
+    ...mapActions('plans', ['getPaymentMethods', 'addSubscription', 'cancelSubscriptions']),
 
     ...mapMutations(['SET_LOADING']),
 
     checkboxIsDisabled(active) {
-      return (
-        this.loading ||
-        !active ||
-        this.subscriptionIsCanceled ||
-        this.disabledMirrorPeriod
-      );
+      return this.loading || !active || this.subscriptionIsCanceled || this.disabledMirrorPeriod;
     },
 
     printStatusPlan(plan) {
@@ -654,18 +607,13 @@ export default {
         return '-';
       }
 
-      if (
-        !plan.checked ||
-        !this.defaultCheckedPlans.some(v => v.id === plan.id)
-      ) {
+      if (!plan.checked || !this.defaultCheckedPlans.some(v => v.id === plan.id)) {
         return '-';
       }
 
       return plan.cancelAtPeriodEnd
         ? `Will cancel on ${dayjs.unix(plan.cancelAt).format('MM/DD/YYYY')}`
-        : `Subscribed <br/> (${dayjs
-            .unix(plan.currentPeriodEnd)
-            .format('MM/DD/YYYY')})`;
+        : `Subscribed <br/> (${dayjs.unix(plan.currentPeriodEnd).format('MM/DD/YYYY')})`;
     },
 
     /** create payment method (with apollo) */
@@ -871,10 +819,7 @@ export default {
               let discount = null;
               const couponId = { value: '', valid: null, confirmed: false };
 
-              const hasCoupon =
-                plan.coupon === null
-                  ? false
-                  : !!Object.keys(plan.coupon).length;
+              const hasCoupon = plan.coupon === null ? false : !!Object.keys(plan.coupon).length;
 
               // load values of coupon applied
               if (hasCoupon) {
@@ -921,9 +866,7 @@ export default {
 
     copyValues(from, to) {
       return to.map((plan, index) => {
-        const { checked, users, coupon, discount, couponId, active } = from[
-          index
-        ];
+        const { checked, users, coupon, discount, couponId, active } = from[index];
         return { ...plan, checked, users, coupon, discount, couponId, active };
       });
     },
@@ -975,11 +918,7 @@ export default {
       // data { planId, nickname, value, isCanceled, index });
 
       // canceled or core, stop
-      if (
-        this.subscriptionIsCanceled ||
-        this.disabledMirrorPeriod ||
-        planIsCore(data.nickname)
-      ) {
+      if (this.subscriptionIsCanceled || this.disabledMirrorPeriod || planIsCore(data.nickname)) {
         return;
       }
 
@@ -1001,10 +940,7 @@ export default {
         }
 
         // cancel plan
-        if (
-          !data.value &&
-          this.defaultCheckedPlans.some(v => v.id === data.planId)
-        ) {
+        if (!data.value && this.defaultCheckedPlans.some(v => v.id === data.planId)) {
           // data.event.preventDefault();
           // delete data.event;
 
@@ -1023,9 +959,7 @@ export default {
           // execute cancel subscription request
           if (isConfirmed) {
             try {
-              const [result] = await this.cancelSubscriptions([
-                { planId: data.planId },
-              ]);
+              const [result] = await this.cancelSubscriptions([{ planId: data.planId }]);
 
               delete result.plan;
 
@@ -1097,10 +1031,7 @@ export default {
     /** get sum of checked plans **/
     getCheckedSum({ planMainId, currentPlanId = null }) {
       return this.show.reduce((sum, plan) => {
-        if (
-          planMainId === plan.id ||
-          (currentPlanId !== null && currentPlanId === plan.id)
-        ) {
+        if (planMainId === plan.id || (currentPlanId !== null && currentPlanId === plan.id)) {
           return sum;
         }
 
@@ -1139,14 +1070,10 @@ export default {
           }
 
           let text = '';
-          const days = dayjs
-            .unix(plan.currentPeriodEnd)
-            .diff(new Date(), 'day');
+          const days = dayjs.unix(plan.currentPeriodEnd).diff(new Date(), 'day');
 
           if (days !== 0) {
-            const formatted = dayjs
-              .unix(plan.currentPeriodEnd)
-              .format('MM/DD/YYYY');
+            const formatted = dayjs.unix(plan.currentPeriodEnd).format('MM/DD/YYYY');
 
             text = `You currently have ${days} ${
               days > 1 ? 'days' : 'day'
@@ -1167,15 +1094,16 @@ export default {
 
           // cancel action
           if (!isConfirmed) {
-            event.target.value = defaultPlan.users;
+            this.UPDATE_USERS({
+              value: defaultPlan.users,
+              index,
+            });
             return;
           }
 
           isReduce = true;
 
-          const index = this.planChangesData.findIndex(
-            v => v.library === libraryKey,
-          );
+          const idx = this.planChangesData.findIndex(v => v.library === libraryKey);
           const obj = {
             type: 'Decrease',
             library: libraryKey,
@@ -1187,12 +1115,13 @@ export default {
             text: `${text}We recommend you make this modification close to your license expiration date to fully utilize this license.`,
           };
 
-          index === -1
-            ? this.planChangesData.push(obj)
-            : (this.planChangesData[index] = obj);
+          idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
         } else {
           // restart value
-          event.target.value = defaultPlan.users;
+          this.UPDATE_USERS({
+            value: defaultPlan.users,
+            index,
+          });
 
           // show alert to user and stop execution
           Swal.fire({
@@ -1218,15 +1147,11 @@ export default {
 
         this.UPDATE_USERS({
           value,
-          oldValue: plan.users,
           index,
-          mainPlan: null,
         });
 
         if (!isReduce) {
-          const index = this.planChangesData.findIndex(
-            v => v.library === libraryKey,
-          );
+          const idx = this.planChangesData.findIndex(v => v.library === libraryKey);
 
           const obj = {
             type: 'Increase',
@@ -1239,9 +1164,7 @@ export default {
             text: '',
           };
 
-          index === -1
-            ? this.planChangesData.push(obj)
-            : (this.planChangesData[index] = obj);
+          idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
         }
 
         return;
@@ -1264,9 +1187,7 @@ export default {
           index: mainPlan.index,
         };
 
-        const index = this.planChangesData.findIndex(
-          v => v.library === libraryKeys.CORE.key,
-        );
+        const idx = this.planChangesData.findIndex(v => v.library === libraryKeys.CORE.key);
 
         const defaultMain = this.defaultCheckedPlans.find(p => planIsCore(p.nickname));
 
@@ -1276,28 +1197,23 @@ export default {
           from: defaultMain.users,
           to: value + sum,
           cost: `+${enUsFormatter.format(
-            calcTotalPlan({...mainPlan.value, users: value + sum}) -
-            calcTotalPlan({ ...mainPlan.value, users: defaultMain.users })
+            calcTotalPlan({ ...mainPlan.value, users: value + sum }) -
+              calcTotalPlan({ ...mainPlan.value, users: defaultMain.users }),
           )}`,
           text: '',
         };
 
-        index === -1
-          ? this.planChangesData.push(obj)
-          : (this.planChangesData[index] = obj);
+        idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
       }
 
       this.UPDATE_USERS({
         value,
-        oldValue: plan.users,
         index,
         mainPlan: mainValues,
       });
 
       if (!isReduce) {
-        const index = this.planChangesData.findIndex(
-          v => v.library === libraryKey,
-        );
+        const idx = this.planChangesData.findIndex(v => v.library === libraryKey);
 
         const obj = {
           type: 'Increase',
@@ -1310,9 +1226,7 @@ export default {
           text: '',
         };
 
-        index === -1
-          ? this.planChangesData.push(obj)
-          : (this.planChangesData[index] = obj);
+        idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
       }
     },
 
@@ -1426,9 +1340,7 @@ export default {
 
         // update view
         for (const planResult of results) {
-          const index = this.show.findIndex(
-            plan => plan.id === planResult.plan.id,
-          );
+          const index = this.show.findIndex(plan => plan.id === planResult.plan.id);
 
           const { plan } = planResult;
           delete planResult.plan;
@@ -1522,11 +1434,7 @@ export default {
 
     async subscribeUpdatePlan() {
       // change from monthly to yearly subscription
-      if (
-        this.isSubscribed &&
-        this.monthlyToYearly &&
-        !this.subscriptionIsCanceled
-      ) {
+      if (this.isSubscribed && this.monthlyToYearly && !this.subscriptionIsCanceled) {
         Swal.fire({
           position: 'center',
           icon: 'info',
@@ -1589,11 +1497,7 @@ export default {
             <h5 class="card-subtitle text-muted">
               ${change.type} - From ${change.from} to ${change.to} licences
             </h5>
-            ${
-              !!change.text
-                ? /*html*/ `<p class="card-text mt-2">${change.text}</p>`
-                : ''
-            }
+            ${!!change.text ? /*html*/ `<p class="card-text mt-2">${change.text}</p>` : ''}
           </div>
         </div>
         `;

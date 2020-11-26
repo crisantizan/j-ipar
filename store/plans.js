@@ -166,7 +166,7 @@ export const mutations = {
     state.lastChangedPlan = id;
   },
 
-  UPDATE_USERS(state, { value, oldValue, index, mainPlan }) {
+  UPDATE_USERS(state, { value, index, mainPlan = null }) {
     const mirrorPeriod = this.getters['plans/mirrorPeriod'];
 
     state[state.period][index].users = value;
