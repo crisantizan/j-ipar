@@ -173,7 +173,7 @@
                             v-if="!plan.couponId.confirmed"
                             class="quit-cupon"
                             title="Remove coupon"
-                            @click="quitCoupon(index)"
+                            @click="quitCoupon(index, plan)"
                           >
                             <i class="fas fa-times text-danger"></i>
                           </span>
@@ -183,7 +183,7 @@
                       <div v-else>
                         <div class="input-group input-group-sm mt-1">
                           <span
-                            @click="quitCoupon(index)"
+                            @click="quitCoupon(index, plan)"
                             class="quit-cupon"
                             title="Remove coupon"
                             v-if="plan.couponId.valid"
@@ -689,10 +689,33 @@ export default {
       this.SET_CUPON({ index, value: '' });
     },
 
+    /** update «planChangesData» array on coupon events */
+    updatePlanChangesDataOnCoupon(plan) {
+      const library = getPlanLibraryName(plan.nickname);
+      const idx = this.planChangesData.findIndex(v => v.library === library);
+
+      if (idx !== -1) {
+        const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
+        const obj = this.planChangesData[idx];
+
+        let cost = null;
+
+        // decrease
+        if (obj.from < obj.to) {
+          cost = `+${enUsFormatter.format(calcTotalPlan(plan) - defaultPlan.totalPaid)}`;
+        } else {
+          cost = `-${enUsFormatter.format(defaultPlan.totalPaid - calcTotalPlan(plan))}`;
+        }
+
+        obj.cost = cost;
+      }
+    },
+
     /** quit cupon **/
-    quitCoupon(index) {
+    quitCoupon(index, plan) {
       // reset
       this.SET_CUPON({ index, value: '' });
+      this.updatePlanChangesDataOnCoupon(plan);
     },
 
     /** set "title" property to input add cupon **/
@@ -779,6 +802,8 @@ export default {
           value: isValid,
           discount,
         });
+
+        this.updatePlanChangesDataOnCoupon(plan);
       } catch (err) {
         // invalid cupon
         this.SET_CUPON_STATE({
