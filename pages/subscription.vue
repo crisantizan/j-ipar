@@ -1538,6 +1538,22 @@ export default {
         return;
       }
 
+      // sanitize «planChangesData» array
+      if (!!this.planChangesData.length) {
+        for (const changePlan of this.planChangesData) {
+          const defaultPlan = this.defaultCheckedPlans.find(v => v.library === changePlan.library);
+          const currentPlan = this.show.find(p => p.id === defaultPlan.id);
+
+          // remove, has been reseted
+          if (defaultPlan.users === currentPlan.users) {
+            const index = this.planChangesData.findIndex(v => v.library === defaultPlan.library);
+            this.planChangesData.splice(index, 1);
+
+            continue;
+          }
+        }
+      }
+
       // TODO:: text for first subscription
       // TODO:: text for anual subscription
       let html = this.isSubscribed

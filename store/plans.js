@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { calcPlanDiscount, planIsCore, calcTotalPlan } from '@/helpers/functions';
+import { calcPlanDiscount, planIsCore, calcTotalPlan, getPlanLibraryName } from '@/helpers/functions';
 import { libraryKeys } from '@/utils/constants';
 
 export const state = () => ({
@@ -82,6 +82,7 @@ export const mutations = {
       .map(plan => ({
         id: plan.id,
         nickname: plan.nickname,
+        library: getPlanLibraryName(plan.nickname),
         users: plan.users,
         coupon: plan.couponId.value,
         totalPaid: calcTotalPlan(plan),
@@ -94,6 +95,7 @@ export const mutations = {
       .map(plan => ({
         id: plan.id,
         nickname: plan.nickname,
+        library: getPlanLibraryName(plan.nickname),
         users: plan.users,
         coupon: plan.couponId.value,
         totalPaid: calcTotalPlan(plan),
