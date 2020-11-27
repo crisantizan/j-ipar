@@ -1148,11 +1148,18 @@ export default {
           this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
           // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
         } else {
-          // restart value
-          this.UPDATE_USERS({
-            value: defaultPlan.users,
-            index,
-          });
+          const oldValue = this.show.find(p => p.id === defaultPlan.id).users;
+
+          if (oldValue !== defaultPlan.users) {
+            // restart value on state
+            this.UPDATE_USERS({
+              value: defaultPlan.users,
+              index,
+            });
+          } else {
+            // only reset input value
+            event.target.value = defaultPlan.users;
+          }
 
           // show alert to user and stop execution
           Swal.fire({
@@ -1196,7 +1203,6 @@ export default {
           };
 
           this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
-          // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
         }
 
         return;
@@ -1236,7 +1242,6 @@ export default {
         };
 
         this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
-        // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
       }
 
       this.UPDATE_USERS({
@@ -1260,7 +1265,6 @@ export default {
         };
 
         this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
-        // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
       }
     },
 
@@ -1489,8 +1493,8 @@ export default {
           // remove, has been reseted
           if (defaultPlan.users === currentPlan.users) {
             const index = this.planChangesData.findIndex(v => v.library === defaultPlan.library);
-            this.planChangesData.splice(index, 1);
 
+            this.UPDATE_PLAN_CHANGES_DATA({ remove: true, index });
             continue;
           }
         }
@@ -1550,8 +1554,6 @@ export default {
       if (!isConfirmed) {
         return;
       }
-
-      this.planChangesData = [];
 
       const plans = this.show
         .filter(plan => plan.checked && !plan.cancelAtPeriodEnd)
@@ -1641,6 +1643,9 @@ export default {
         if (!!Object.keys(librariesQuantity).length) {
           this.UPDATE_LIBRARIES_QUANTITY(librariesQuantity);
         }
+
+        // reset array
+        this.UPDATE_PLAN_CHANGES_DATA({ data: null });
       } catch (err) {
         console.error(err);
       }

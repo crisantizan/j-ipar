@@ -257,10 +257,17 @@ export const mutations = {
     state.subscribed = payload;
   },
 
-  UPDATE_PLAN_CHANGES_DATA(state, { data, index = null }) {
-    // update existing
+  UPDATE_PLAN_CHANGES_DATA(state, { data, index = null, reset = false, remove = false }) {
+    // reset array
+    if (reset) {
+      state.planChangesData = [];
+      return;
+    }
+
+    // update existing or remove
     if (index !== null && index !== -1) {
-      state.planChangesData[index] = data;
+      // update                                         // remove
+      !remove ? (state.planChangesData[index] = data) : state.planChangesData.splice(index, 1);
       return;
     }
 
