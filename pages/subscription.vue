@@ -1660,7 +1660,7 @@ export default {
         }
 
         // reset array
-        this.UPDATE_PLAN_CHANGES_DATA({ data: null });
+        this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
       } catch (err) {
         console.error(err);
       }
