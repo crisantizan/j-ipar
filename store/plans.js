@@ -118,7 +118,7 @@ export const mutations = {
       v => v.id === planMirror.id,
     );
 
-    state.defaultCheckedPlans[mirrorPeriod].splice(defaultPdefaultMirrorPlanIndexlanIndex, 1);
+    state.defaultCheckedPlans[mirrorPeriod].splice(defaultMirrorPlanIndex, 1);
   },
 
   SET_PERIOD(state, period) {

@@ -379,7 +379,6 @@ export default {
     currentVerifyCuponPlan: null,
     valuesChange: false,
     typingCupon: false,
-    // planChangesData: [],
   }),
 
   filters: {
@@ -424,7 +423,10 @@ export default {
 
     disabledBtnCancel() {
       return (
-        this.loading || this.paymentPeriod !== this.defaultPeriod || this.subscriptionIsCanceled
+        this.loading ||
+        this.paymentPeriod !== this.defaultPeriod ||
+        this.subscriptionIsCanceled ||
+        this.valuesChange
       );
     },
 
@@ -703,13 +705,15 @@ export default {
       const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
       const obj = cloneObject(this.planChangesData[idx]);
 
-      let cost = null;
-
-      // decrease
-      if (obj.from < obj.to) {
-        cost = `+${enUsFormatter.format(calcTotalPlan(plan) - defaultPlan.totalPaid)}`;
+      let cost = '';
+      if (!!defaultPlan) {
+        if (obj.from < obj.to) {
+          cost = `+${enUsFormatter.format(calcTotalPlan(plan) - defaultPlan.totalPaid)}`;
+        } else {
+          cost = `-${enUsFormatter.format(defaultPlan.totalPaid - calcTotalPlan(plan))}`;
+        }
       } else {
-        cost = `-${enUsFormatter.format(defaultPlan.totalPaid - calcTotalPlan(plan))}`;
+        cost = `+${enUsFormatter.format(calcTotalPlan(plan))}`;
       }
 
       obj.cost = cost;
@@ -811,6 +815,7 @@ export default {
 
         this.updatePlanChangesDataOnCoupon(plan);
       } catch (err) {
+        console.log(err);
         // invalid cupon
         this.SET_CUPON_STATE({
           index,
@@ -957,8 +962,6 @@ export default {
       if (this.paymentPeriod === this.defaultPeriod) {
         // subscription already canceled
         if (!data.value && data.isCanceled) {
-          // data.event.preventDefault();
-
           Swal.fire({
             position: 'center',
             icon: 'info',
@@ -972,9 +975,6 @@ export default {
 
         // cancel plan
         if (!data.value && this.defaultCheckedPlans.some(v => v.id === data.planId)) {
-          // data.event.preventDefault();
-          // delete data.event;
-
           const { isConfirmed } = await Swal.fire({
             position: 'center',
             title: 'Cancel plan',
@@ -994,15 +994,15 @@ export default {
 
               delete result.plan;
 
+              const plan = this.show.find(p => p.id === data.planId);
+              const defaultPlan = this.defaultCheckedPlans.find(p => p.id === plan.id);
+
               // canceled at
               if (result.cancelAtPeriodEnd) {
                 this.SET_CANCELED_STATUS_PLAN({
                   ...result,
                   index: data.index,
                 });
-
-                const plan = this.show.find(p => p.id === data.planId);
-                const defaultPlan = this.defaultCheckedPlans.find(p => p.id === plan.id);
 
                 // restart our default value if has been changed
                 if (plan.users !== defaultPlan.users) {
@@ -1033,6 +1033,12 @@ export default {
                   index: data.index,
                 });
 
+                const index = this.planChangesData.findIndex(
+                  v => v.library === defaultPlan.library,
+                );
+                // remove from changes data
+                this.UPDATE_PLAN_CHANGES_DATA({ remove: true, index });
+
                 // update default checked plan
                 this.REMOVE_DEFAULT_CHECKED_PLAN(data.index);
               }
@@ -1062,10 +1068,13 @@ export default {
 
           this.UPDATE_USERS({
             value: 0,
-            oldValue: plan.users,
             index: data.index,
-            mainPlan: null,
           });
+
+          // remove from changes data
+          const index = this.planChangesData.findIndex(v => v.planId === plan.id);
+          // remove from changes data
+          this.UPDATE_PLAN_CHANGES_DATA({ remove: true, index });
         }
       }
     },
@@ -1122,31 +1131,11 @@ export default {
             } left (until ${formatted}) on this pre-paid subscription. `;
           }
 
-          // notify to user
-          // const { isConfirmed } = await Swal.fire({
-          //   title: 'Warning!',
-          //   icon: 'warning',
-          //   position: 'center',
-          //   text: `You are changing your ${libraryKey} licenses from ${defaultPlan.users} to ${value}. This change will be immediate. ${text} We recommend you make this modification close to your license expiration date to fully utilize this license. You may alternatively reassign this license to another user in the "Users" section of this subscription panel.`,
-          //   showCancelButton: true,
-          //   confirmButtonColor: '#3085d6',
-          //   cancelButtonColor: '#d33',
-          //   confirmButtonText: 'Yes, do It!',
-          // });
-
-          // // cancel action
-          // if (!isConfirmed) {
-          //   this.UPDATE_USERS({
-          //     value: defaultPlan.users,
-          //     index,
-          //   });
-          //   return;
-          // }
-
           isReduce = true;
 
           const idx = this.planChangesData.findIndex(v => v.library === libraryKey);
           const obj = {
+            planId: plan.id,
             type: 'Decrease',
             library: libraryKey,
             from: defaultPlan.users,
@@ -1158,7 +1147,6 @@ export default {
           };
 
           this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
-          // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
         } else {
           const oldValue = this.show.find(p => p.id === defaultPlan.id).users;
 
@@ -1204,6 +1192,7 @@ export default {
           const idx = this.planChangesData.findIndex(v => v.library === libraryKey);
 
           const obj = {
+            planId: plan.id,
             type: 'Increase',
             library: libraryKey,
             from: defaultPlan.users,
@@ -1242,6 +1231,7 @@ export default {
         const defaultMain = this.defaultCheckedPlans.find(p => planIsCore(p.nickname));
 
         const obj = {
+          planId: mainPlan.value.id,
           type: 'Increase',
           library: libraryKeys.CORE.key,
           from: defaultMain.users,
@@ -1265,14 +1255,22 @@ export default {
       if (!isReduce) {
         const idx = this.planChangesData.findIndex(v => v.library === libraryKey);
 
+        let cost = '+';
+        if (!!defaultPlan) {
+          cost += `${enUsFormatter.format(
+            calcTotalPlan({ ...plan, users: value }) - defaultPlan.totalPaid,
+          )}`;
+        } else {
+          cost += enUsFormatter.format(calcTotalPlan({ ...plan, users: value }));
+        }
+
         const obj = {
+          planId: plan.id,
           type: 'Increase',
           library: libraryKey,
-          from: defaultPlan.users,
+          from: !!defaultPlan ? defaultPlan.users : 0,
           to: value,
-          cost: `+${enUsFormatter.format(
-            calcTotalPlan({ ...plan, users: value }) - defaultPlan.totalPaid,
-          )}`,
+          cost,
           text: '',
         };
 
@@ -1499,8 +1497,10 @@ export default {
       // sanitize «planChangesData» array
       if (!!this.planChangesData.length) {
         for (const changePlan of this.planChangesData) {
+          const currentPlan = this.show.find(p => p.id === changePlan.planId);
           const defaultPlan = this.defaultCheckedPlans.find(v => v.library === changePlan.library);
-          const currentPlan = this.show.find(p => p.id === defaultPlan.id);
+
+          if (!defaultPlan) continue;
 
           // remove, has been reseted
           if (defaultPlan.users === currentPlan.users) {
@@ -1541,12 +1541,20 @@ export default {
         html += `<h4 class="mt-2">Details</h4>`;
 
         for (const change of this.planChangesData) {
+          let licencesCountLabel = '';
+
+          if (change.from > 0) {
+            licencesCountLabel = `From ${change.from} to ${change.to}`;
+          } else {
+            licencesCountLabel = change.to;
+          }
+
           html += /*html*/ `
             <div class="card" style="border: 1px solid rgba(0,0,0,.1); margin-bottom: 10px;">
             <div class="card-body" style="padding: 0.5rem;">
               <h5 class="card-title">${change.library} (${change.cost})</h5>
               <h5 class="card-subtitle text-muted">
-                ${change.type} - From ${change.from} to ${change.to} licences
+                ${change.type} - ${licencesCountLabel} licences
               </h5>
               ${!!change.text ? /*html*/ `<p class="card-text mt-2">${change.text}</p>` : ''}
             </div>
@@ -1554,7 +1562,6 @@ export default {
           `;
         }
       }
-
 
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
