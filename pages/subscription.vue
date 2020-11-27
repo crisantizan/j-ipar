@@ -593,6 +593,7 @@ export default {
       'SET_DEFAULT_TOTAL_PAID',
       'SET_SUBSCRIBED',
       'UPDATE_PLAN_CHANGES_DATA',
+      'REMOVE_DEFAULT_CHECKED_PLAN',
     ]),
 
     ...mapMutations('users', ['UPDATE_LIBRARIES_QUANTITY']),
@@ -999,6 +1000,17 @@ export default {
                   ...result,
                   index: data.index,
                 });
+
+                const plan = this.show.find(p => p.id === data.planId);
+                const defaultPlan = this.defaultCheckedPlans.find(p => p.id === plan.id);
+
+                // restart our default value if has been changed
+                if (plan.users !== defaultPlan.users) {
+                  this.UPDATE_USERS({
+                    value: defaultPlan.users,
+                    index: data.index,
+                  });
+                }
               } else {
                 // set «canceledAt» as null
                 this.SET_CANCELED_STATUS_PLAN({
@@ -1022,7 +1034,7 @@ export default {
                 });
 
                 // update default checked plan
-                this.SET_DEFAULT_CHECKED_PLANS();
+                this.REMOVE_DEFAULT_CHECKED_PLAN(data.index);
               }
             } catch (e) {
               console.error(e);
@@ -1525,21 +1537,24 @@ export default {
 
       html = `<h5>${html}</h5>`;
 
-      html += `<h4 class="mt-2">Details</h4>`;
+      if (!!this.planChangesData.length) {
+        html += `<h4 class="mt-2">Details</h4>`;
 
-      for (const change of this.planChangesData) {
-        html += /*html*/ `
-          <div class="card" style="border: 1px solid rgba(0,0,0,.1); margin-bottom: 10px;">
-          <div class="card-body" style="padding: 0.5rem;">
-            <h5 class="card-title">${change.library} (${change.cost})</h5>
-            <h5 class="card-subtitle text-muted">
-              ${change.type} - From ${change.from} to ${change.to} licences
-            </h5>
-            ${!!change.text ? /*html*/ `<p class="card-text mt-2">${change.text}</p>` : ''}
+        for (const change of this.planChangesData) {
+          html += /*html*/ `
+            <div class="card" style="border: 1px solid rgba(0,0,0,.1); margin-bottom: 10px;">
+            <div class="card-body" style="padding: 0.5rem;">
+              <h5 class="card-title">${change.library} (${change.cost})</h5>
+              <h5 class="card-subtitle text-muted">
+                ${change.type} - From ${change.from} to ${change.to} licences
+              </h5>
+              ${!!change.text ? /*html*/ `<p class="card-text mt-2">${change.text}</p>` : ''}
+            </div>
           </div>
-        </div>
-        `;
+          `;
+        }
       }
+
 
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',

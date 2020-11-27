@@ -103,6 +103,24 @@ export const mutations = {
       }));
   },
 
+  REMOVE_DEFAULT_CHECKED_PLAN(state, index) {
+    const plan = state[state.period][index];
+    const defaultPlanIndex = state.defaultCheckedPlans[state.period].findIndex(
+      v => v.id === plan.id,
+    );
+
+    state.defaultCheckedPlans[state.period].splice(defaultPlanIndex, 1);
+
+    const mirrorPeriod = this.getters['plans/mirrorPeriod'];
+    const planMirror = state[mirrorPeriod][index];
+
+    const defaultMirrorPlanIndex = state.defaultCheckedPlans[mirrorPeriod].findIndex(
+      v => v.id === planMirror.id,
+    );
+
+    state.defaultCheckedPlans[mirrorPeriod].splice(defaultPdefaultMirrorPlanIndexlanIndex, 1);
+  },
+
   SET_PERIOD(state, period) {
     state.period = period;
   },
