@@ -369,6 +369,7 @@ import {
   includeValue,
   getPlanLibraryName,
   calcTotalPlan,
+  cloneObject,
 } from '@/helpers/functions';
 import { enUsFormatter } from '@/helpers/number-format';
 import { libraryKeys } from '@/utils/constants';
@@ -378,7 +379,7 @@ export default {
     currentVerifyCuponPlan: null,
     valuesChange: false,
     typingCupon: false,
-    planChangesData: [],
+    // planChangesData: [],
   }),
 
   filters: {
@@ -405,6 +406,7 @@ export default {
       'subscriptionIsCanceled',
       'isSubscribed',
       'defaultTotalPaid',
+      'planChangesData',
     ]),
     ...mapGetters('users', ['isUpdate', 'getLibrariesAvailable']),
     ...mapGetters('users', { selectedLibraries: 'selected' }),
@@ -590,6 +592,7 @@ export default {
       'SET_CANCELED_STATUS_PLAN',
       'SET_DEFAULT_TOTAL_PAID',
       'SET_SUBSCRIBED',
+      'UPDATE_PLAN_CHANGES_DATA',
     ]),
 
     ...mapMutations('users', ['UPDATE_LIBRARIES_QUANTITY']),
@@ -694,21 +697,23 @@ export default {
       const library = getPlanLibraryName(plan.nickname);
       const idx = this.planChangesData.findIndex(v => v.library === library);
 
-      if (idx !== -1) {
-        const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
-        const obj = this.planChangesData[idx];
+      if (idx === -1) return;
 
-        let cost = null;
+      const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
+      const obj = cloneObject(this.planChangesData[idx]);
 
-        // decrease
-        if (obj.from < obj.to) {
-          cost = `+${enUsFormatter.format(calcTotalPlan(plan) - defaultPlan.totalPaid)}`;
-        } else {
-          cost = `-${enUsFormatter.format(defaultPlan.totalPaid - calcTotalPlan(plan))}`;
-        }
+      let cost = null;
 
-        obj.cost = cost;
+      // decrease
+      if (obj.from < obj.to) {
+        cost = `+${enUsFormatter.format(calcTotalPlan(plan) - defaultPlan.totalPaid)}`;
+      } else {
+        cost = `-${enUsFormatter.format(defaultPlan.totalPaid - calcTotalPlan(plan))}`;
       }
+
+      obj.cost = cost;
+
+      this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
     },
 
     /** quit cupon **/
@@ -1140,7 +1145,8 @@ export default {
             text: `${text}We recommend you make this modification close to your license expiration date to fully utilize this license.`,
           };
 
-          idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
+          this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
+          // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
         } else {
           // restart value
           this.UPDATE_USERS({
@@ -1189,7 +1195,8 @@ export default {
             text: '',
           };
 
-          idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
+          this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
+          // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
         }
 
         return;
@@ -1228,7 +1235,8 @@ export default {
           text: '',
         };
 
-        idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
+        this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
+        // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
       }
 
       this.UPDATE_USERS({
@@ -1251,7 +1259,8 @@ export default {
           text: '',
         };
 
-        idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
+        this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
+        // idx === -1 ? this.planChangesData.push(obj) : (this.planChangesData[idx] = obj);
       }
     },
 

@@ -1,5 +1,10 @@
 import gql from 'graphql-tag';
-import { calcPlanDiscount, planIsCore, calcTotalPlan, getPlanLibraryName } from '@/helpers/functions';
+import {
+  calcPlanDiscount,
+  planIsCore,
+  calcTotalPlan,
+  getPlanLibraryName,
+} from '@/helpers/functions';
 import { libraryKeys } from '@/utils/constants';
 
 export const state = () => ({
@@ -17,21 +22,17 @@ export const state = () => ({
     year: [],
   },
   defaultTotalPaid: null,
+  planChangesData: [],
 });
 
 export const mutations = {
   SET_ALL(state, plans) {
-    const displayPlans = [
-      libraryKeys.CALIFORNIA.staticValue,
-      libraryKeys.IMMIGRATION.staticValue,
-    ];
+    const displayPlans = [libraryKeys.CALIFORNIA.staticValue, libraryKeys.IMMIGRATION.staticValue];
 
     state.all = plans.filter(plan => {
       if (planIsCore(plan.nickname)) return true;
 
-      return displayPlans.some(val =>
-        plan.nickname.toLowerCase().includes(val),
-      );
+      return displayPlans.some(val => plan.nickname.toLowerCase().includes(val));
     });
 
     let found = false;
@@ -255,6 +256,17 @@ export const mutations = {
   SET_SUBSCRIBED(state, payload) {
     state.subscribed = payload;
   },
+
+  UPDATE_PLAN_CHANGES_DATA(state, { data, index = null }) {
+    // update existing
+    if (index !== null && index !== -1) {
+      state.planChangesData[index] = data;
+      return;
+    }
+
+    // insert new
+    state.planChangesData.push(data);
+  },
 };
 
 export const getters = {
@@ -333,6 +345,10 @@ export const getters = {
 
   isSubscribed(state, getters) {
     return !!getters.defaultCheckedPlans.length && state.subscribed;
+  },
+
+  planChangesData(state) {
+    return state.planChangesData;
   },
 };
 
