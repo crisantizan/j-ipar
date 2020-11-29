@@ -1074,6 +1074,15 @@ export default {
               }
             } catch (e) {
               console.error(e);
+
+              this.$toast.error('Error on cancel plan', {
+                duration: 3000,
+                position: 'bottom-right',
+                icon: {
+                  name: 'exclamation',
+                  after: true,
+                },
+              });
             }
           }
           return;
@@ -1128,7 +1137,6 @@ export default {
         event.target.value = 1;
       }
 
-      // const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
       const defaultPlan = this.currentCheckedPlans.find(v => v.id === plan.id);
       const libraryKey = getPlanLibraryName(plan.nickname);
       let isReduce = false;
@@ -1243,7 +1251,6 @@ export default {
       }
 
       // children plans change
-
       const mainPlan = this.mainPlan(this.paymentPeriod);
       let mainValues = null;
 
@@ -1261,7 +1268,6 @@ export default {
 
         const idx = this.planChangesData.findIndex(v => v.library === libraryKeys.CORE.key);
 
-        // const defaultMain = this.defaultCheckedPlans.find(p => planIsCore(p.nickname));
         const defaultMain = this.currentCheckedPlans.find(p => planIsCore(p.nickname));
 
         const obj = {
