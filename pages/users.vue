@@ -28,13 +28,25 @@
           </div>
         </div>
 
-        <center>
-          <span v-if="isLoginAgain">
-            <h4 class="text-danger">
-              After modifying user privileges, the user must re-login to Prima.
-            </h4>
-          </span>
-        </center>
+        <!-- INVITE USER LINK -->
+        
+        <span>
+          <a
+            class="text-info mb-5 ml-1"
+            style="cursor:pointer;"
+            @click="fromActionsOpenModal({
+              modal: 'invite-user',
+            })"
+          >
+            Invite New User
+          </a> 
+        </span>
+
+        <span v-if="isLoginAgain" class="message-re-login">
+          <h4 class="text-danger">
+            After modifying user privileges, the user must re-login to Prima.
+          </h4>
+        </span>
       </template>
       <!-- available libraries -->
       <template slot="header-right">
@@ -161,6 +173,22 @@
                   placeholder="Last name"
                 />
               </div>
+
+              <div class="form-group">
+                <input
+                  id="txtEditEmail"
+                  v-model="selectedUser.email"
+                  type="text"
+                  class="form-control"
+                  placeholder="Email"
+                  @input="removeInvalid"
+                />
+
+                <small
+                  v-if="validateMessage !== null"
+                  class="text-danger"
+                >{{ validateMessage }}</small>
+              </div>
             </div>
             <div class="modal-footer">
               <button
@@ -241,6 +269,70 @@
               :disabled="disabledBtnSaveRelationUser"
             >
               Save
+            </button>
+          </div>
+        </div>
+      </VModalDialog>
+    </VModal>
+
+    <!-- INVITE USER MODAL -->
+
+    <VModal v-model="modal.inviteUser" persistent>
+      <VModalDialog>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Invite User</h5>
+            <VModalCloseButton />
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <input
+                id="inviteEmail"
+                class="form-control"
+                v-model="inviteEmail"
+                placeholder="Email"
+                type="text"
+              >
+
+              <small
+                v-if="validateMessage !== null"
+                class="text-danger"
+              >{{ validateMessage }}</small>
+            </div>
+
+            <div class="form-group">
+              <input
+                class="form-control"
+                v-model="inviteFirstName"
+                placeholder="First Name"
+                type="text"
+              >
+            </div>
+
+            <div class="form-group">
+              <input
+                class="form-control"
+                v-model="inviteLastName"
+                placeholder="Last Name"
+                type="text"
+              >
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="inviteUser"
+              :disabled="disabledBtnInviteUser"
+            >
+              Invite
             </button>
           </div>
         </div>
@@ -348,9 +440,10 @@ export default {
         { field: 'firstName', required: true },
         { field: 'middleName', required: false },
         { field: 'lastName', required: false },
+        { field: 'email', required: true },
       ],
 
-      currentUser: null,
+      userForRelation: null,
 
       disabledBtnSaveRelationUser: true,
 
@@ -360,8 +453,21 @@ export default {
       modal: {
         editUser: false,
         relations: false,
+        inviteUser: false,
       },
+
+      inviteEmail: null,
+      inviteFirstName: null,
+      inviteLastName: null,
+      validateMessage: null,
     };
+  },
+
+  watch: {
+    inviteEmail (val) {
+      this.validateMessage = null;
+      document.getElementById('inviteEmail').classList.remove('is-invalid');
+    },
   },
 
   computed: {
@@ -374,6 +480,12 @@ export default {
       'integrations',
       'messageErrorUsersIntegrations',
     ]),
+
+    ...mapGetters('tenant', [
+      'tenant',
+    ]),
+
+    ...mapGetters({ currentUser: 'user' }),
 
     showedUsers() {
       // show only actived users
@@ -436,6 +548,22 @@ export default {
 
       return true;
     },
+
+    disabledBtnInviteUser () {
+      if (
+          this.inviteEmail === null ||
+          this.inviteEmail === '' ||
+          this.inviteFirstName === null ||
+          this.inviteFirstName === '' ||
+          this.inviteLastName === null ||
+          this.inviteLastName === ''
+      ) return true;
+      else return false;
+    },
+  },
+
+  mounted () {
+    this.getUsers();
   },
 
   methods: {
@@ -450,6 +578,9 @@ export default {
       'updateUser',
       'getUsersIntegrations',
       'updateUserRelations',
+      'checkUserEmailExist',
+      'adminInviteUser',
+      'getUsers',
     ]),
 
     /** generate custom checkbox id */
@@ -492,7 +623,7 @@ export default {
         // update ui
         this.SET_CHECKED({ checked, library, index });
 
-        this.isLoginAgain = true;
+        if (this.currentUser.id === user.id) this.isLoginAgain = true;
       } catch (e) {
         console.error(e);
       }
@@ -538,13 +669,18 @@ export default {
         // relations modal
         case 'relations':
           // get integrations & get integration users (iterate integrations)
-          this.currentUser = data;
+          this.userForRelation = data;
 
           await this.getUsersIntegrations({
-            userId: this.currentUser.id,
+            userId: this.userForRelation.id,
           });
 
           this.modal.relations = true; // open modal
+          break;
+
+        // invite new user modal
+        case 'invite-user':
+          this.modal.inviteUser = true; // open modal
           break;
       }
     },
@@ -553,7 +689,31 @@ export default {
     async onUserEdit() {
       if (this.disabledBtnEditUser) return;
 
+      // VALIDATE EMAIL
+
+      if (!this.validateUserEmail(this.selectedUser.email)) {
+        document.getElementById('txtEditEmail').classList.add('is-invalid');
+
+        this.validateMessage = 'Invalid Email.';
+
+        return;
+      } else document.getElementById('txtEditEmail').classList.remove('is-invalid')
+
       const columnUser = this.users[this.selectedUser.index];
+
+      // VERIFY IF EXIST EMAIL
+
+      if (columnUser.email !== this.selectedUser.email) {
+        let existEmail = await this.existUserEmail(this.selectedUser.email);
+
+        if (existEmail) {
+          document.getElementById('txtEditEmail').classList.add('is-invalid');
+
+          this.validateMessage = 'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
+
+          return;
+        }
+      }
 
       // get only changed data
       const newData = Object.keys(this.selectedUser).reduce((obj, key) => {
@@ -606,7 +766,7 @@ export default {
           relationsToSave.push({
             integrationId: user.integrationId,
             userIntegrationId: user.userId,
-            userPrimaId: this.currentUser.id,
+            userPrimaId: this.userForRelation.id,
           });
         }
       });
@@ -617,6 +777,79 @@ export default {
       });
 
       this.modal.relations = false; // close modal
+    },
+
+    removeInvalid () {
+      document.getElementById('txtEditEmail').classList.remove('is-invalid');
+      this.validateMessage = null;
+    },
+
+    validateUserEmail (email) {
+      // VALIDATE EMAIL
+
+      var regex = new RegExp('^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$');
+
+      if (!regex.test(email)) return false;
+      else return true;
+    },
+
+    async existUserEmail (email) {
+      // IF EXIST EMAIL
+      let existEmail = false;
+
+      await this.checkUserEmailExist(email).then(response => {
+        if (response === 1) existEmail = true;
+        else if (response === 0) existEmail = false;
+      });
+
+      return existEmail;
+    },
+
+    async inviteUser () {
+      // VALIDATE EMAIL
+
+      if (!this.validateUserEmail(this.inviteEmail)) {
+        document.getElementById('inviteEmail').classList.add('is-invalid');
+
+        this.validateMessage = 'Invalid Email.';
+
+        return;
+      } else document.getElementById('inviteEmail').classList.remove('is-invalid')
+
+      // IF EXIST EMAIL
+      let existEmail = await this.existUserEmail(this.inviteEmail);
+
+      if (existEmail) {
+        document.getElementById('inviteEmail').classList.add('is-invalid');
+
+        this.validateMessage = 'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
+      } else {
+        // INVITE USER
+
+        this.adminInviteUser({
+          email: this.inviteEmail,
+          firstName: this.inviteFirstName,
+          lastName: this.inviteLastName,
+          tenant: this.tenant,
+        }).then(responseInvite => {
+          if (responseInvite === 'ok') {
+            this.$toast.success('User invited.!', {
+              position: 'top-center'
+            }).goAway(1500);
+          } else {
+            this.$toast.error(responseInvite, {
+              position: 'top-center'
+            }).goAway(1500);
+          }
+
+          this.modal.inviteUser = false; // close modal
+          this.inviteEmail = null;
+          this.inviteFirstName = null;
+          this.inviteLastName = null;
+
+          this.getUsers();
+        });
+      }
     },
   },
 };
@@ -635,5 +868,12 @@ export default {
 
 .show-disabled-users-check .custom-control-label {
   color: rgba(0, 0, 0, 0.3);
+}
+
+.message-re-login {
+  position: absolute;
+  top: 170px;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }
 </style>

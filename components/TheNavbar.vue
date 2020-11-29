@@ -43,6 +43,17 @@
           </nuxt-link>
         </li>
       </ul>
+
+      <!-- BTN CLOSE ADMIN PANEL -->
+
+      <button
+        v-if="messageGoToPrima !== ''"
+        class="btn btn-danger"
+        @click="openModalReturn"
+      >
+        {{ messageGoToPrima }}
+        <i class="fas fa-window-close"></i>
+      </button>
     </div>
   </nav>
 </template>
@@ -58,6 +69,9 @@ export default {
       { path: '/users', name: 'Users' },
       { path: '/bills', name: 'Bills' },
     ],
+    titleModal: '',
+    textModal: '',
+    messageGoToPrima: '',
   }),
 
   computed: {
@@ -65,6 +79,43 @@ export default {
       'tenant',
     ]),
   },
+
+  mounted () {
+    if (this.tenant.statusId === 4) {
+      this.messageGoToPrima = 'Go to Prima.'
+      this.titleModal = 'Are you sure you want to go to Prima?'
+      this.textModal = `Remember subscribe before you go to Prima.`
+    } else {
+      this.messageGoToPrima = 'Finish and Return to Prima.'
+      this.titleModal = 'Are you sure you want to return to Prima?'
+      this.textModal = `Remember, after any changes a user must log into Prima again.`
+    }
+  },
+
+  methods: {
+    async openModalReturn () {
+      const { isConfirmed } = await Swal.fire({
+        title: this.titleModal,
+        text: this.textModal,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, do it!',
+      });
+
+      if (!isConfirmed) {
+        return;
+      }
+
+      this.closeWindow();
+    },
+
+    closeWindow () {
+      if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
+      else window.close();
+    }
+  }
 };
 </script>
 

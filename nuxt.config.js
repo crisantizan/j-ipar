@@ -1,3 +1,6 @@
+import path from 'path';
+import fs from 'fs';
+
 export default {
   /*
    ** Nuxt rendering mode
@@ -11,20 +14,20 @@ export default {
   target: 'server',
   // CHANGE SERVER
   server: {
-    port: 8090, // default: 3000
-    host: '0.0.0.0' // default: localhost
+    port: 3006, // default: 3000
+    host: '0.0.0.0', // default: localhost
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'server/https-certificates/localhost.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'server/https-certificates/localhost.crt')),
+    },
   },
   /** Environment variables **/
   env: {
     BASE_IMAGE_URL:
-      process.env.BASE_IMAGE_URL ||
-      'https://s3-us-west-2.amazonaws.com/prima-pictures',
-    GRAPHQL_URL:
-      process.env.GRAPHQL_URL ||
-      'https://graph-staging.primafacieapp.com/graphql/',
-    PRIMA_URL:
-      process.env.PRIMA_URL ||
-      'https://staging.primafacieapp.com/'
+      process.env.BASE_IMAGE_URL || 'https://s3-us-west-2.amazonaws.com/prima-pictures',
+    GRAPHQL_URL: process.env.GRAPHQL_URL || 'https://graphql.primafacieapp.com/graphql/',
+    PRIMA_URL: process.env.PRIMA_URL || 'https://www.primafacieapp.com/',
+    STRIPE_PUBLISHABLE_KEY: 'pk_live_GT6Lt8D3fuzOiHkQnzQMwszN',
   },
   /*
    ** Headers of the page
@@ -44,17 +47,15 @@ export default {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/prima.ico' },
       {
-        href:
-          'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
+        href: 'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
         rel: 'stylesheet',
-        integrity:
-          'sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN',
+        integrity: 'sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN',
         crossorigin: 'anonymous',
       },
 
       { rel: 'stylesheet', href: '/css/ubold/bootstrap.min.css' },
       { rel: 'stylesheet', href: '/css/ubold/app.min.css' },
-      
+
       {
         href:
           'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap',
@@ -70,10 +71,8 @@ export default {
         crossorigin: 'anonymous',
       },
       {
-        src:
-          'https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js',
-        integrity:
-          'sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo',
+        src: 'https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js',
+        integrity: 'sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo',
         crossorigin: 'anonymous',
       },
       { src: 'https://js.stripe.com/v3/' },
@@ -114,8 +113,8 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/axios'],
-  
+  modules: ['@nuxtjs/axios', '@nuxtjs/toast'],
+
   // Axios module configuration
   axios: {
     baseURL: process.env.API_URL,

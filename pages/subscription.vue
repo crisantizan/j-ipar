@@ -412,6 +412,10 @@ export default {
     ...mapGetters('users', { selectedLibraries: 'selected' }),
     ...mapGetters(['loaded', 'loading']),
 
+    ...mapGetters('tenant', [
+      'tenant',
+    ]),
+
     paymentPeriod: {
       get() {
         return this.$store.getters['plans/period'];
@@ -469,7 +473,7 @@ export default {
 
   mounted() {
     // Create a Stripe client.
-    var stripe = Stripe('pk_test_2AcUtig3rQa3DK0LTJQIGTrm');
+    var stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
 
     // Create an instance of Elements.
     var elements = stripe.elements();
@@ -1707,7 +1711,13 @@ export default {
         }
 
         // reset array
+        this.UPDATE_PLAN_CHANGES_DATA({ data: null });
+
         this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
+
+        // REDIRECT TO LOGIN PRIMA
+
+        if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top')
       } catch (err) {
         console.error(err);
       }

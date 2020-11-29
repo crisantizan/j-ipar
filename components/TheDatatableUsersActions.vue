@@ -163,7 +163,9 @@ export default {
     async onResetPasswordClick() {
       try {
         await this.resetPassword(this.user.id);
+        this.$toast.success('Password reset successfully!').goAway(1500);
       } catch (err) {
+        this.$toast.error('Error while password reset.').goAway(1500);
         console.error(err);
       }
     },
@@ -171,8 +173,10 @@ export default {
     async onResendEmailClick() {
       try {
         await this.resendEmail(this.user.id);
-      } catch (err) {
-        console.error(err);
+        this.$toast.success('Email resend successfully!').goAway(1500);
+      } catch (error) {
+        this.$toast.error('Error while email resend.').goAway(1500);
+        console.error(error);
       }
     },
 

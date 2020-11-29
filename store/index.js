@@ -58,6 +58,7 @@ export const actions = {
               billingFirstName
               billingLastName
               statusId
+              code
             }
 
             invoices: stripeInvoices {

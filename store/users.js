@@ -234,7 +234,7 @@ export const actions = {
     return new Promise(async (resolve, reject) => {
       try {
         await this.$axios({
-          url: `https://staging.primafacieapp.com/resend-email-from-admin?userId=${userId}`,
+          url: process.env.PRIMA_URL + `resend-email-from-admin?userId=${userId}`,
           method: 'post',
           data: {
             token: this.getters.token,
@@ -253,7 +253,7 @@ export const actions = {
     return new Promise(async (resolve, reject) => {
       try {
         await this.$axios({
-          url: `https://staging.primafacieapp.com/reset-password-from-admin?userId=${userId}`,
+          url: process.env.PRIMA_URL + `reset-password-from-admin?userId=${userId}`,
           method: 'post',
           data: {
             token: this.getters.token,
@@ -375,5 +375,84 @@ export const actions = {
         reject(error);
       }
     });
+  },
+
+  // CHECK USER EMAIL EXIST PRIMA PHP
+  async checkUserEmailExist(store, email) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await this.$axios({
+          url: process.env.PRIMA_URL + `admin-check-user-exist-from-admin?email=${email}`,
+          method: 'post',
+          data: {
+            token: this.getters.token,
+          },
+        });
+
+        resolve(data);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  // INVITE USER PRIMA PHP
+  async adminInviteUser(store, payload) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await this.$axios({
+          url: process.env.PRIMA_URL + `admin-invite-user-from-admin?email=${payload.email}&firstName=${payload.firstName}&lastName=${payload.lastName}&tenantCode=${payload.tenant.code}&tenantName=${payload.tenant.name}`,
+          method: 'post',
+          data: {
+            token: this.getters.token,
+          },
+        });
+
+        resolve(data);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  // GET USERS
+
+  async getUsers({ commit, state }) {
+    // data al ready loaded
+    if (state.loaded) {
+      return;
+    }
+
+    try {
+      const { data } = await this.$axios.graphql({
+        query: gql`
+          query {
+            users {
+              id
+              firstName
+              middleName
+              lastName
+              email
+              tenantCode
+              isAttorney
+              admin
+              tenantCode
+              active
+              assignLibraries
+              librariesQuantity
+            }
+          }
+        `,
+      });
+
+      // set libraries quantity
+      if (!!data.users.length) {
+
+        // users module
+        commit('SET_USERS', data.users);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   },
 };
