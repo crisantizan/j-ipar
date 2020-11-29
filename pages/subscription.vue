@@ -412,9 +412,7 @@ export default {
     ...mapGetters('users', { selectedLibraries: 'selected' }),
     ...mapGetters(['loaded', 'loading']),
 
-    ...mapGetters('tenant', [
-      'tenant',
-    ]),
+    ...mapGetters('tenant', ['tenant']),
 
     paymentPeriod: {
       get() {
@@ -603,7 +601,7 @@ export default {
 
         this.UPDATE_PLAN_CHANGES_DATA({ data: newChangeData, index });
       }
-    }
+    },
   },
 
   methods: {
@@ -1717,9 +1715,17 @@ export default {
 
         // REDIRECT TO LOGIN PRIMA
 
-        if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top')
+        if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
       } catch (err) {
         console.error(err);
+        this.$toast.error('Add/Update subscription error', {
+          duration: 3000,
+          position: 'bottom-right',
+          icon: {
+            name: 'exclamation',
+            after: true,
+          },
+        });
       }
     },
   },

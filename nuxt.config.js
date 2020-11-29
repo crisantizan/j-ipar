@@ -129,6 +129,10 @@ export default {
     baseURL: process.env.API_URL,
   },
 
+  toast: {
+    iconPack: 'fontawesome',
+  },
+
   router: {
     linkExactActiveClass: 'active',
     middleware: ['authenticated'],

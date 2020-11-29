@@ -37,6 +37,9 @@ export default function ({ $axios, store, redirect }) {
 		// only in client side
 		if (process.server) return;
 
+		// hide loading
+		store.state.loading && store.commit('SET_LOADING', false);
+
 		// unauthorized and forbidden status codes
 		const codes = [401, 403];
 
