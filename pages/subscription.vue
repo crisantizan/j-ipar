@@ -4,6 +4,7 @@
     <!-- <pre>{{ planChangesData }}</pre> -->
     <!-- <pre>{{ defaultCheckedPlans }}</pre> -->
     <!-- <pre>{{ currentCheckedPlans }}</pre> -->
+    <pre>{{ valuesChange }}</pre>
 
       <div class="card p-2">
         <h2 class="mb-0">Card Information</h2>
@@ -548,7 +549,7 @@ export default {
 
         let change = false;
         for (const plan of plans) {
-          const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
+          const defaultPlan = this.currentCheckedPlans.find(v => v.id === plan.id);
 
           if (!!defaultPlan) {
             if (defaultPlan.users !== plan.users) {
@@ -581,9 +582,9 @@ export default {
     },
 
     paymentPeriod(val) {
-      console.log(val);
       if (!this.planChangesData.length || this.isSubscribed) return;
 
+      // update changes data
       for (const changeData of this.planChangesData) {
         const currentPlan = this.show.find(p => {
           const currentLibrary = getPlanLibraryName(p.nickname);
@@ -732,7 +733,7 @@ export default {
 
       if (idx === -1) return;
 
-      const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
+      const defaultPlan = this.currentCheckedPlans.find(v => v.id === plan.id);
       const obj = cloneObject(this.planChangesData[idx]);
 
       let cost = '';
@@ -781,6 +782,8 @@ export default {
       if (this.btnAddCuponDisabledState(couponId)) {
         return;
       }
+
+      this.typingCupon && (this.typingCupon = false);
 
       try {
         this.currentVerifyCuponPlan = plan.id;
@@ -1476,6 +1479,11 @@ export default {
         // canceled immediatly
         if (canceled) {
           this.SET_SUBSCRIBED(false);
+        }
+
+        // remove changes
+        if (!!this.planChangesData.length) {
+          this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
         }
       } catch (e) {
         console.error(e);
