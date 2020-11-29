@@ -1732,6 +1732,9 @@ export default {
         // reset array
         this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
 
+        // redirect to login prima
+        if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
+
         // // update last subscription period UI
         // if (this.isSubscribed && this.paymentPeriod !== this.defaultPeriod) {
         //   this.mirrorSubscriptionPlans.forEach((plan, index) => {

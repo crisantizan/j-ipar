@@ -2,7 +2,7 @@
   <div>
     <TheNavbar />
     <div class="container-fluid">
-      <div style="height: 69.6px"></div>
+      <div style="height: 73.94px"></div>
       <Nuxt />
     </div>
     <Loading v-model="loading" />

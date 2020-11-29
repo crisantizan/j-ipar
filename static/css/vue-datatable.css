@@ -1,11 +1,11 @@
 /* users table height */
 .users-table .vgt-responsive {
-  height: calc(100vh - 275px);
+  height: calc(100vh - 330px);
 }
 
 /* bills table height */
 .bills-table .vgt-responsive {
- height: calc(100vh - 208px); 
+  height: calc(100vh - 208px);
 }
 
 .my-table {
@@ -65,8 +65,8 @@
   appearance: none;
 }
 
-
-.my-table tr.disabled, .my-table tr.disabled:hover {
+.my-table tr.disabled,
+.my-table tr.disabled:hover {
   background-color: #ececec;
 }
 
@@ -75,7 +75,7 @@
 }
 
 .my-table tr.disabled .custom-control-label::before {
-  border: 1px solid rgba(0,0,0,.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   /*background-color: #dedcdc;*/
   background-color: #f1f1f1;
 }

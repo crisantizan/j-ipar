@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex align-items-center" style="height: calc(100vh - 69.6px)">
+  <div class="d-flex align-items-center mt-2">
     <datatable
       :columns="columns"
       :rows="showedUsers"
@@ -13,9 +13,7 @@
     >
       <template slot="second-header">
         <div class="mb-2 d-flex align-items-end">
-          <div
-            class="custom-control custom-checkbox show-disabled-users-check ml-1"
-          >
+          <div class="custom-control custom-checkbox show-disabled-users-check ml-1">
             <input
               type="checkbox"
               class="custom-control-input show-disabled-users-input"
@@ -29,17 +27,19 @@
         </div>
 
         <!-- INVITE USER LINK -->
-        
+
         <span>
           <a
             class="text-info mb-5 ml-1"
             style="cursor:pointer;"
-            @click="fromActionsOpenModal({
-              modal: 'invite-user',
-            })"
+            @click="
+              fromActionsOpenModal({
+                modal: 'invite-user',
+              })
+            "
           >
             Invite New User
-          </a> 
+          </a>
         </span>
 
         <span v-if="isLoginAgain" class="message-re-login">
@@ -96,9 +96,7 @@
         <!-- generate checkboxes in "assignLibraries" field -->
         <template v-else-if="isTheColumn(props.column, 'assignLibraries')">
           <!-- print only avaibales libraries -->
-          <template
-            v-for="(libraryValue, libraryKey) in props.row.assignLibraries"
-          >
+          <template v-for="(libraryValue, libraryKey) in props.row.assignLibraries">
             <VCheckbox
               v-if="displayLibraryCheckbox(libraryKey)"
               v-model="users[props.row.index].assignLibraries[libraryKey]"
@@ -106,9 +104,7 @@
               :id="generateCheckboxId(libraryKey, props.row.id)"
               :label="libraryKey"
               :key="libraryKey"
-              :disabled="
-                isDisabled(props.row.index, libraryKey) || !props.row.active
-              "
+              :disabled="isDisabled(props.row.index, libraryKey) || !props.row.active"
               @change-async="
                 onCheckedAsync({
                   checked: $event,
@@ -184,18 +180,13 @@
                   @input="removeInvalid"
                 />
 
-                <small
-                  v-if="validateMessage !== null"
-                  class="text-danger"
-                >{{ validateMessage }}</small>
+                <small v-if="validateMessage !== null" class="text-danger">{{
+                  validateMessage
+                }}</small>
               </div>
             </div>
             <div class="modal-footer">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                :disabled="disabledBtnEditUser"
-              >
+              <button type="submit" class="btn btn-primary" :disabled="disabledBtnEditUser">
                 Save changes
               </button>
             </div>
@@ -219,9 +210,7 @@
             }}</span>
 
             <div
-              v-show="
-                integrations && integrations !== null && integrations.length > 0
-              "
+              v-show="integrations && integrations !== null && integrations.length > 0"
               v-for="(integration, indexIntegration) in integrations"
               :key="indexIntegration"
             >
@@ -231,10 +220,7 @@
 
               <!-- CLIO USERS -->
 
-              <div
-                v-for="(user, indexUser) in integration.users"
-                :key="indexUser"
-              >
+              <div v-for="(user, indexUser) in integration.users" :key="indexUser">
                 <span>
                   <input
                     type="checkbox"
@@ -255,11 +241,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
               Close
             </button>
             <button
@@ -292,12 +274,11 @@
                 v-model="inviteEmail"
                 placeholder="Email"
                 type="text"
-              >
+              />
 
-              <small
-                v-if="validateMessage !== null"
-                class="text-danger"
-              >{{ validateMessage }}</small>
+              <small v-if="validateMessage !== null" class="text-danger">{{
+                validateMessage
+              }}</small>
             </div>
 
             <div class="form-group">
@@ -306,7 +287,7 @@
                 v-model="inviteFirstName"
                 placeholder="First Name"
                 type="text"
-              >
+              />
             </div>
 
             <div class="form-group">
@@ -315,15 +296,11 @@
                 v-model="inviteLastName"
                 placeholder="Last Name"
                 type="text"
-              >
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
               Close
             </button>
             <button
@@ -464,7 +441,7 @@ export default {
   },
 
   watch: {
-    inviteEmail (val) {
+    inviteEmail(val) {
       this.validateMessage = null;
       document.getElementById('inviteEmail').classList.remove('is-invalid');
     },
@@ -481,9 +458,7 @@ export default {
       'messageErrorUsersIntegrations',
     ]),
 
-    ...mapGetters('tenant', [
-      'tenant',
-    ]),
+    ...mapGetters('tenant', ['tenant']),
 
     ...mapGetters({ currentUser: 'user' }),
 
@@ -518,9 +493,7 @@ export default {
         return false;
       }
 
-      return this.librariesCounter.find(
-        ({ library }) => library === libraryKeys.CORE.key,
-      ).isFull;
+      return this.librariesCounter.find(({ library }) => library === libraryKeys.CORE.key).isFull;
     },
 
     /** disable button in edit user modal **/
@@ -549,29 +522,26 @@ export default {
       return true;
     },
 
-    disabledBtnInviteUser () {
+    disabledBtnInviteUser() {
       if (
-          this.inviteEmail === null ||
-          this.inviteEmail === '' ||
-          this.inviteFirstName === null ||
-          this.inviteFirstName === '' ||
-          this.inviteLastName === null ||
-          this.inviteLastName === ''
-      ) return true;
+        this.inviteEmail === null ||
+        this.inviteEmail === '' ||
+        this.inviteFirstName === null ||
+        this.inviteFirstName === '' ||
+        this.inviteLastName === null ||
+        this.inviteLastName === ''
+      )
+        return true;
       else return false;
     },
   },
 
-  mounted () {
+  mounted() {
     this.getUsers();
   },
 
   methods: {
-    ...mapMutations('users', [
-      'SET_CHECKED',
-      'SET_IS_ATTORNEY_CHECKED',
-      'CHECK_RELATION',
-    ]),
+    ...mapMutations('users', ['SET_CHECKED', 'SET_IS_ATTORNEY_CHECKED', 'CHECK_RELATION']),
 
     ...mapActions('users', [
       'assignLibrary',
@@ -643,10 +613,7 @@ export default {
     },
 
     isDisabled(index, key) {
-      return (
-        this.selected[key] >= this.librariesQuantity[key] &&
-        !this.isChecked(index, key)
-      );
+      return this.selected[key] >= this.librariesQuantity[key] && !this.isChecked(index, key);
     },
 
     displayLibraryCheckbox(key) {
@@ -697,7 +664,7 @@ export default {
         this.validateMessage = 'Invalid Email.';
 
         return;
-      } else document.getElementById('txtEditEmail').classList.remove('is-invalid')
+      } else document.getElementById('txtEditEmail').classList.remove('is-invalid');
 
       const columnUser = this.users[this.selectedUser.index];
 
@@ -709,7 +676,8 @@ export default {
         if (existEmail) {
           document.getElementById('txtEditEmail').classList.add('is-invalid');
 
-          this.validateMessage = 'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
+          this.validateMessage =
+            'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
 
           return;
         }
@@ -779,12 +747,12 @@ export default {
       this.modal.relations = false; // close modal
     },
 
-    removeInvalid () {
+    removeInvalid() {
       document.getElementById('txtEditEmail').classList.remove('is-invalid');
       this.validateMessage = null;
     },
 
-    validateUserEmail (email) {
+    validateUserEmail(email) {
       // VALIDATE EMAIL
 
       var regex = new RegExp('^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$');
@@ -793,7 +761,7 @@ export default {
       else return true;
     },
 
-    async existUserEmail (email) {
+    async existUserEmail(email) {
       // IF EXIST EMAIL
       let existEmail = false;
 
@@ -805,7 +773,7 @@ export default {
       return existEmail;
     },
 
-    async inviteUser () {
+    async inviteUser() {
       // VALIDATE EMAIL
 
       if (!this.validateUserEmail(this.inviteEmail)) {
@@ -814,7 +782,7 @@ export default {
         this.validateMessage = 'Invalid Email.';
 
         return;
-      } else document.getElementById('inviteEmail').classList.remove('is-invalid')
+      } else document.getElementById('inviteEmail').classList.remove('is-invalid');
 
       // IF EXIST EMAIL
       let existEmail = await this.existUserEmail(this.inviteEmail);
@@ -822,7 +790,8 @@ export default {
       if (existEmail) {
         document.getElementById('inviteEmail').classList.add('is-invalid');
 
-        this.validateMessage = 'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
+        this.validateMessage =
+          'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
       } else {
         // INVITE USER
 
@@ -833,13 +802,17 @@ export default {
           tenant: this.tenant,
         }).then(responseInvite => {
           if (responseInvite === 'ok') {
-            this.$toast.success('User invited.!', {
-              position: 'top-center'
-            }).goAway(1500);
+            this.$toast
+              .success('User invited.!', {
+                position: 'top-center',
+              })
+              .goAway(1500);
           } else {
-            this.$toast.error(responseInvite, {
-              position: 'top-center'
-            }).goAway(1500);
+            this.$toast
+              .error(responseInvite, {
+                position: 'top-center',
+              })
+              .goAway(1500);
           }
 
           this.modal.inviteUser = false; // close modal
@@ -860,9 +833,7 @@ export default {
   margin-bottom: 0.3rem;
 }
 
-.show-disabled-users-check
-  .custom-control-input:checked
-  ~ .custom-control-label {
+.show-disabled-users-check .custom-control-input:checked ~ .custom-control-label {
   color: rgba(0, 0, 0, 0.5);
 }
 
