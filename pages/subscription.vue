@@ -517,17 +517,7 @@ export default {
       handler(val) {
         // set monthly and yearly plans, one time
         if (val && !this.show.length) {
-          const { month, year } = this.getFilteredPlans();
-
-          if (this.defaultPeriod === 'month') {
-            this.SET_MONTHLY(month);
-            this.SET_YEARLY(this.copyValues(month, year));
-          } else {
-            this.SET_YEARLY(year);
-            this.SET_MONTHLY(this.copyValues(year, month));
-          }
-
-          this.SET_DEFAULT_CHECKED_PLANS();
+          this.refreshPlansData();
         }
       },
     },
@@ -628,9 +618,28 @@ export default {
 
     ...mapMutations('users', ['UPDATE_LIBRARIES_QUANTITY']),
 
-    ...mapActions('plans', ['getPaymentMethods', 'addSubscription', 'cancelSubscriptions']),
+    ...mapActions('plans', [
+      'getPlans',
+      'getPaymentMethods',
+      'addSubscription',
+      'cancelSubscriptions',
+    ]),
 
     ...mapMutations(['SET_LOADING']),
+
+    refreshPlansData() {
+      const { month, year } = this.getFilteredPlans();
+
+      if (this.defaultPeriod === 'month') {
+        this.SET_MONTHLY(month);
+        this.SET_YEARLY(this.copyValues(month, year));
+      } else {
+        this.SET_YEARLY(year);
+        this.SET_MONTHLY(this.copyValues(year, month));
+      }
+
+      this.SET_DEFAULT_CHECKED_PLANS();
+    },
 
     checkboxIsDisabled(active) {
       return this.loading || !active || this.subscriptionIsCanceled || this.disabledMirrorPeriod;
@@ -976,6 +985,14 @@ export default {
         });
       } catch (err) {
         console.error(err);
+        this.$toast.error('Error on resubscribe plan', {
+          duration: 3000,
+          position: 'bottom-right',
+          icon: {
+            name: 'exclamation-circle',
+            after: true,
+          },
+        });
       }
     },
 
@@ -1130,7 +1147,7 @@ export default {
     },
 
     /** get maximun licence number entered */
-    getHigherLicencesValue(currentValue=null) {
+    getHigherLicencesValue(currentValue = null) {
       currentValue = currentValue !== null ? currentValue : 0;
 
       return this.show.reduce((higher, plan) => {
@@ -1142,7 +1159,7 @@ export default {
 
     /** on change users handler */
     async onChangeUsers({ event = null, value, plan, index }) {
-      // no negative and zero accepted
+      // no negative numbers accepted
       if (Number(event.target.value) < 1) {
         value = 1;
         event.target.value = 1;
@@ -1212,15 +1229,24 @@ export default {
         } else {
           const oldValue = this.show.find(p => p.id === defaultPlan.id).users;
 
+          let resetValue = defaultPlan.users;
+
+          if (planIsCore(plan.nickname)) {
+            const higherLicenceValue = this.getHigherLicencesValue();
+            resetValue = resetValue >= higherLicenceValue ? resetValue : higherLicenceValue;
+          }
+
           if (oldValue !== defaultPlan.users) {
             // restart value on state
             this.UPDATE_USERS({
-              value: defaultPlan.users,
+              value: resetValue,
               index,
             });
+
+            event.target.value = resetValue;
           } else {
             // only reset input value
-            event.target.value = defaultPlan.users;
+            event.target.value = resetValue;
           }
 
           // show alert to user and stop execution
@@ -1241,13 +1267,12 @@ export default {
         // const sum = this.getCheckedSum({ planMainId: plan.id });
 
         // if (value < sum) {
-          //   value = sum;
+        //   value = sum;
         //   event.target.value = sum;
         // }
 
         const higherLicenceValue = this.getHigherLicencesValue();
 
-        console.log({ higherLicenceValue });
         if (value < higherLicenceValue) {
           value = higherLicenceValue;
           event.target.value = higherLicenceValue;
@@ -1314,7 +1339,7 @@ export default {
           to: higherLicenceValue,
           cost: `+${enUsFormatter.format(
             // calcTotalPlan({ ...mainPlan.value, users: value + sum }) -
-              calcTotalPlan({ ...mainPlan.value, users: higherLicenceValue }) -
+            calcTotalPlan({ ...mainPlan.value, users: higherLicenceValue }) -
               calcTotalPlan({ ...mainPlan.value, users: defaultMain.users }),
           )}`,
           text: '',
@@ -1685,29 +1710,11 @@ export default {
         // execute request
         await this.addSubscription(plans);
 
-        // update last subscription period UI
-        if (this.isSubscribed && this.paymentPeriod !== this.defaultPeriod) {
-          this.mirrorSubscriptionPlans.forEach((plan, index) => {
-            if (plan.checked && plan.cancelAtPeriodEnd) {
-              this.SET_CANCELED_STATUS_PLAN({
-                cancelAt: null,
-                canceledAt: null,
-                cancelAtPeriodEnd: false,
-                index,
-                period: this.mirrorPeriod,
-              });
-            }
-          });
-        }
+        await this.getPlans();
+        this.refreshPlansData();
 
-        // first subscription
-        if (!this.isSubscribed) {
-          this.SET_SUBSCRIBED(true);
-        }
-
-        // update default payment period
-        if (this.paymentPeriod !== this.defaultPeriod) {
-          this.SET_DEFAULT_PERIOD(this.paymentPeriod);
+        if (this.valuesChange) {
+          this.valuesChange = false;
         }
 
         // update default total paid
@@ -1715,35 +1722,7 @@ export default {
           this.SET_DEFAULT_TOTAL_PAID(this.totalPaid);
         }
 
-        // apply changes in template
-        this.CONFIRM_COUPONS();
-
-        // update default checked plans
-        this.SET_DEFAULT_CHECKED_PLANS();
-
-        if (this.valuesChange) {
-          this.valuesChange = false;
-        }
-
         const librariesQuantity = {};
-
-        // old canceled plans, update
-        this.show.forEach((plan, index) => {
-          if (plan.checked && plan.cancelAtPeriodEnd) {
-            this.SET_CANCELED_STATUS_PLAN({
-              cancelAt: null,
-              canceledAt: null,
-              cancelAtPeriodEnd: false,
-              index,
-            });
-          }
-
-          for (const prop in libraryKeys) {
-            if (includeValue(plan.nickname, libraryKeys[prop].staticValue)) {
-              librariesQuantity[libraryKeys[prop].key] = plan.users;
-            }
-          }
-        });
 
         // update librariesQuantity
         if (!!Object.keys(librariesQuantity).length) {
@@ -1751,13 +1730,80 @@ export default {
         }
 
         // reset array
-        this.UPDATE_PLAN_CHANGES_DATA({ data: null });
-
         this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
 
-        // REDIRECT TO LOGIN PRIMA
+        // // update last subscription period UI
+        // if (this.isSubscribed && this.paymentPeriod !== this.defaultPeriod) {
+        //   this.mirrorSubscriptionPlans.forEach((plan, index) => {
+        //     if (plan.checked && plan.cancelAtPeriodEnd) {
+        //       // console.log('Actualizando: ', plan.)
+        //       this.SET_CANCELED_STATUS_PLAN({
+        //         cancelAt: null,
+        //         canceledAt: null,
+        //         cancelAtPeriodEnd: false,
+        //         index,
+        //         period: this.mirrorPeriod,
+        //       });
+        //     }
+        //   });
+        // }
 
-        if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
+        // // first subscription
+        // if (!this.isSubscribed) {
+        //   this.SET_SUBSCRIBED(true);
+        // }
+
+        // // update default payment period
+        // if (this.paymentPeriod !== this.defaultPeriod) {
+        //   this.SET_DEFAULT_PERIOD(this.paymentPeriod);
+        // }
+
+        // // update default total paid
+        // if (updateDefaultTotalPaid) {
+        //   this.SET_DEFAULT_TOTAL_PAID(this.totalPaid);
+        // }
+
+        // // apply changes in template
+        // this.CONFIRM_COUPONS();
+
+        // // update default checked plans
+        // this.SET_DEFAULT_CHECKED_PLANS();
+
+        // if (this.valuesChange) {
+        //   this.valuesChange = false;
+        // }
+
+        // const librariesQuantity = {};
+
+        // // old canceled plans, update
+        // this.show.forEach((plan, index) => {
+        //   if (plan.checked && plan.cancelAtPeriodEnd) {
+        //     this.SET_CANCELED_STATUS_PLAN({
+        //       cancelAt: null,
+        //       canceledAt: null,
+        //       cancelAtPeriodEnd: false,
+        //       index,
+        //     });
+        //   }
+
+        //   for (const prop in libraryKeys) {
+        //     if (includeValue(plan.nickname, libraryKeys[prop].staticValue)) {
+        //       librariesQuantity[libraryKeys[prop].key] = plan.users;
+        //     }
+        //   }
+        // });
+
+        // // update librariesQuantity
+        // if (!!Object.keys(librariesQuantity).length) {
+        //   this.UPDATE_LIBRARIES_QUANTITY(librariesQuantity);
+        // }
+
+        // // reset array
+        // this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
+        // // this.UPDATE_PLAN_CHANGES_DATA({ data: null });
+
+        // // REDIRECT TO LOGIN PRIMA
+        // if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
       } catch (err) {
         console.error(err);
         this.$toast.error('Add/Update subscription error', {

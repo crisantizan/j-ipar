@@ -384,6 +384,58 @@ export const getters = {
 };
 
 export const actions = {
+  async getPlans({ commit, state }) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data, errors } = await this.$axios.graphql({
+          query: gql`
+            query {
+              plans: stripePlans {
+                id
+                currentPeriodEnd
+                cancelAt
+                canceledAt
+                cancelAtPeriodEnd
+                object
+                active
+                aggregateUsage
+                amount
+                amountDecimal
+                billingScheme
+                created
+                currency
+                interval
+                intervalCount
+                livemode
+                metadata
+                nickname
+                product
+                tiers
+                tiersMode
+                transformUsage
+                trialPeriodDays
+                usageType
+                checked
+                users
+                coupon
+              }
+            }
+          `,
+        });
+
+        if (!!errors) {
+          reject(errors);
+          return;
+        }
+
+        commit('SET_ALL', data.plans);
+        resolve(data.plans);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  },
+
   async cancelSubscriptions({ commit, state }, plans) {
     return new Promise(async (resolve, reject) => {
       try {
