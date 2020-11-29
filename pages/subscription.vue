@@ -1,11 +1,6 @@
 <template>
   <div class="row col-12 mt-2">
     <div class="col-md-4">
-    <!-- <pre>{{ planChangesData }}</pre> -->
-    <!-- <pre>{{ defaultCheckedPlans }}</pre> -->
-    <!-- <pre>{{ currentCheckedPlans }}</pre> -->
-    <pre>{{ valuesChange }}</pre>
-
       <div class="card p-2">
         <h2 class="mb-0">Card Information</h2>
 
