@@ -1,6 +1,10 @@
 <template>
   <div class="row col-12 mt-2">
     <div class="col-md-4">
+    <!-- <pre>{{ planChangesData }}</pre> -->
+    <!-- <pre>{{ defaultCheckedPlans }}</pre> -->
+    <!-- <pre>{{ currentCheckedPlans }}</pre> -->
+
       <div class="card p-2">
         <h2 class="mb-0">Card Information</h2>
 
@@ -397,6 +401,7 @@ export default {
       'mirrorSubscriptionPlans',
       'plans',
       'defaultCheckedPlans',
+      'currentCheckedPlans',
       'mirrorDefaultCheckedPlans',
       'totalPaid',
       'customer',
@@ -574,6 +579,31 @@ export default {
         }
       },
     },
+
+    paymentPeriod(val) {
+      console.log(val);
+      if (!this.planChangesData.length || this.isSubscribed) return;
+
+      for (const changeData of this.planChangesData) {
+        const currentPlan = this.show.find(p => {
+          const currentLibrary = getPlanLibraryName(p.nickname);
+
+          return currentLibrary === changeData.library;
+        });
+
+        if (!currentPlan) continue;
+
+        const index = this.planChangesData.findIndex(v => v.library === changeData.library);
+
+        // change «planId», «nickname» and «cost»
+        const newChangeData = cloneObject(changeData);
+        newChangeData.planId = currentPlan.id;
+        newChangeData.nickname = currentPlan.nickname;
+        newChangeData.cost = `+${enUsFormatter.format(calcTotalPlan(currentPlan))}`;
+
+        this.UPDATE_PLAN_CHANGES_DATA({ data: newChangeData, index });
+      }
+    }
   },
 
   methods: {
@@ -1098,7 +1128,8 @@ export default {
         event.target.value = 1;
       }
 
-      const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
+      // const defaultPlan = this.defaultCheckedPlans.find(v => v.id === plan.id);
+      const defaultPlan = this.currentCheckedPlans.find(v => v.id === plan.id);
       const libraryKey = getPlanLibraryName(plan.nickname);
       let isReduce = false;
 
@@ -1138,6 +1169,7 @@ export default {
             planId: plan.id,
             type: 'Decrease',
             library: libraryKey,
+            nickname: plan.nickname,
             from: defaultPlan.users,
             to: value,
             cost: `-${enUsFormatter.format(
@@ -1195,6 +1227,7 @@ export default {
             planId: plan.id,
             type: 'Increase',
             library: libraryKey,
+            nickname: plan.nickname,
             from: defaultPlan.users,
             to: value,
             cost: `+${enUsFormatter.format(
@@ -1228,12 +1261,14 @@ export default {
 
         const idx = this.planChangesData.findIndex(v => v.library === libraryKeys.CORE.key);
 
-        const defaultMain = this.defaultCheckedPlans.find(p => planIsCore(p.nickname));
+        // const defaultMain = this.defaultCheckedPlans.find(p => planIsCore(p.nickname));
+        const defaultMain = this.currentCheckedPlans.find(p => planIsCore(p.nickname));
 
         const obj = {
           planId: mainPlan.value.id,
           type: 'Increase',
           library: libraryKeys.CORE.key,
+          nickname: mainPlan.value.nickname,
           from: defaultMain.users,
           to: value + sum,
           cost: `+${enUsFormatter.format(
@@ -1268,6 +1303,7 @@ export default {
           planId: plan.id,
           type: 'Increase',
           library: libraryKey,
+          nickname: plan.nickname,
           from: !!defaultPlan ? defaultPlan.users : 0,
           to: value,
           cost,
@@ -1498,7 +1534,8 @@ export default {
       if (!!this.planChangesData.length) {
         for (const changePlan of this.planChangesData) {
           const currentPlan = this.show.find(p => p.id === changePlan.planId);
-          const defaultPlan = this.defaultCheckedPlans.find(v => v.library === changePlan.library);
+          // const defaultPlan = this.defaultCheckedPlans.find(v => v.library === changePlan.library);
+          const defaultPlan = this.currentCheckedPlans.find(v => v.library === changePlan.library);
 
           if (!defaultPlan) continue;
 
@@ -1552,7 +1589,7 @@ export default {
           html += /*html*/ `
             <div class="card" style="border: 1px solid rgba(0,0,0,.1); margin-bottom: 10px;">
             <div class="card-body" style="padding: 0.5rem;">
-              <h5 class="card-title">${change.library} (${change.cost})</h5>
+              <h5 class="card-title">${change.nickname} (${change.cost})</h5>
               <h5 class="card-subtitle text-muted">
                 ${change.type} - ${licencesCountLabel} licences
               </h5>

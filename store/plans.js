@@ -327,6 +327,10 @@ export const getters = {
     return state.defaultCheckedPlans[state.defaultPeriod];
   },
 
+  currentCheckedPlans(state) {
+    return state.defaultCheckedPlans[state.period];
+  },
+
   mirrorDefaultCheckedPlans(state, getters) {
     return state.defaultCheckedPlans[getters.mirrorPeriod];
   },
