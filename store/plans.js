@@ -30,6 +30,8 @@ export const mutations = {
     const displayPlans = [libraryKeys.CALIFORNIA.staticValue, libraryKeys.IMMIGRATION.staticValue];
 
     state.all = plans.filter(plan => {
+      if (!plan || !plan.nickname) return false;
+
       if (planIsCore(plan.nickname)) return true;
 
       return displayPlans.some(val => plan.nickname.toLowerCase().includes(val));
