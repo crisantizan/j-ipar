@@ -6,11 +6,7 @@
     </VDropdownToggleButton>
 
     <VDropdownMenu align-right class="p-0" style="min-width: 190px;">
-      <VDropdownMenuItem
-        icon="user-edit"
-        @click="onEditClick"
-        :disabled="!user.active"
-      >
+      <VDropdownMenuItem icon="user-edit" @click="onEditClick" :disabled="!user.active">
         Edit
       </VDropdownMenuItem>
 
@@ -22,29 +18,17 @@
         {{ user.active ? 'Disable' : 'Enable' }}
       </VDropdownMenuItem>
 
-      <VDropdownMenuItem
-        icon="key"
-        @click="onResetPasswordClick"
-        :disabled="!user.active"
-      >
+      <VDropdownMenuItem icon="key" @click="onResetPasswordClick" :disabled="!user.active">
         Reset Password
       </VDropdownMenuItem>
 
-      <VDropdownMenuItem
-        icon="paper-plane"
-        @click="onResendEmailClick"
-        :disabled="!user.active"
-      >
+      <VDropdownMenuItem icon="paper-plane" @click="onResendEmailClick" :disabled="!user.active">
         Resend Email
       </VDropdownMenuItem>
 
       <!-- submenu -->
       <VDropdownMenuItem submenu tag="div">
-        <VDropdownMenuItem
-          icon="user-tag"
-          arrow-indicator
-          :disabled="!user.active"
-        >
+        <VDropdownMenuItem icon="user-tag" arrow-indicator :disabled="!user.active">
           Change Role
         </VDropdownMenuItem>
         <VDropdownMenu class="p-0" pull-left>
@@ -53,11 +37,7 @@
         </VDropdownMenu>
       </VDropdownMenuItem>
 
-      <VDropdownMenuItem
-        icon="cogs"
-        @click="onRelationsClick"
-        :disabled="!user.active"
-      >
+      <VDropdownMenuItem icon="cogs" @click="onRelationsClick" :disabled="!user.active">
         Relations
       </VDropdownMenuItem>
     </VDropdownMenu>
@@ -66,7 +46,7 @@
 
 <script>
 import { mapMutations, mapActions, mapGetters } from 'vuex';
-import { cloneObject } from '@/helpers/functions';
+import { cloneObject, capitalize } from '@/helpers/functions';
 
 export default {
   props: {
@@ -157,6 +137,18 @@ export default {
         this.SET_ACTIVE({ index: this.index, value: !this.user.active });
       } catch (e) {
         console.error(e);
+        if (!Array.isArray(e)) return;
+
+        // show only first error message
+        const err = e[0];
+        this.$toast.error(capitalize(err.message), {
+          duration: 3000,
+          position: 'bottom-right',
+          icon: {
+            name: 'exclamation-circle',
+            after: true,
+          },
+        });
       }
     },
 

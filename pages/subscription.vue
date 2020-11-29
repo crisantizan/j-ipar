@@ -1079,7 +1079,7 @@ export default {
                 duration: 3000,
                 position: 'bottom-right',
                 icon: {
-                  name: 'exclamation',
+                  name: 'exclamation-circle',
                   after: true,
                 },
               });
@@ -1129,6 +1129,17 @@ export default {
       }, 0);
     },
 
+    /** get maximun licence number entered */
+    getHigherLicencesValue(currentValue=null) {
+      currentValue = currentValue !== null ? currentValue : 0;
+
+      return this.show.reduce((higher, plan) => {
+        if (planIsCore(plan.nickname) || !plan.users || plan.users < higher) return higher;
+
+        return plan.users;
+      }, currentValue);
+    },
+
     /** on change users handler */
     async onChangeUsers({ event = null, value, plan, index }) {
       // no negative and zero accepted
@@ -1151,10 +1162,21 @@ export default {
         // well, it can reduce
         if (available >= toReduce) {
           if (planIsCore(plan.nickname)) {
-            const sum = this.getCheckedSum({ planMainId: plan.id });
+            // const sum = this.getCheckedSum({ planMainId: plan.id });
             // the new value is less than the sum of the another checked plans. Restart it
-            if (value < sum) {
-              event.target.value = defaultPlan.users;
+            // if (value < sum) {
+            //   event.target.value = defaultPlan.users;
+            //   return;
+            // }
+
+            const higherLicenceValue = this.getHigherLicencesValue();
+            if (value < higherLicenceValue) {
+              event.target.value = higherLicenceValue;
+
+              this.UPDATE_USERS({
+                value: higherLicenceValue,
+                index,
+              });
               return;
             }
           }
@@ -1216,11 +1238,19 @@ export default {
 
       // update from core plan
       if (planIsCore(plan.nickname)) {
-        const sum = this.getCheckedSum({ planMainId: plan.id });
+        // const sum = this.getCheckedSum({ planMainId: plan.id });
 
-        if (value < sum) {
-          value = sum;
-          event.target.value = sum;
+        // if (value < sum) {
+          //   value = sum;
+        //   event.target.value = sum;
+        // }
+
+        const higherLicenceValue = this.getHigherLicencesValue();
+
+        console.log({ higherLicenceValue });
+        if (value < higherLicenceValue) {
+          value = higherLicenceValue;
+          event.target.value = higherLicenceValue;
         }
 
         this.UPDATE_USERS({
@@ -1254,15 +1284,19 @@ export default {
       const mainPlan = this.mainPlan(this.paymentPeriod);
       let mainValues = null;
 
-      const sum = this.getCheckedSum({
-        planMainId: mainPlan.value.id,
-        currentPlanId: plan.id,
-      });
+      // const sum = this.getCheckedSum({
+      //   planMainId: mainPlan.value.id,
+      //   currentPlanId: plan.id,
+      // });
+
+      const higherLicenceValue = this.getHigherLicencesValue(value);
 
       // update main plan
-      if (value + sum > mainPlan.value.users) {
+      // if (value + sum > mainPlan.value.users) {
+      if (higherLicenceValue > mainPlan.value.users) {
         mainValues = {
-          newValue: value + sum,
+          // newValue: value + sum,
+          newValue: higherLicenceValue,
           index: mainPlan.index,
         };
 
@@ -1276,9 +1310,11 @@ export default {
           library: libraryKeys.CORE.key,
           nickname: mainPlan.value.nickname,
           from: defaultMain.users,
-          to: value + sum,
+          // to: value + sum,
+          to: higherLicenceValue,
           cost: `+${enUsFormatter.format(
-            calcTotalPlan({ ...mainPlan.value, users: value + sum }) -
+            // calcTotalPlan({ ...mainPlan.value, users: value + sum }) -
+              calcTotalPlan({ ...mainPlan.value, users: higherLicenceValue }) -
               calcTotalPlan({ ...mainPlan.value, users: defaultMain.users }),
           )}`,
           text: '',
@@ -1728,7 +1764,7 @@ export default {
           duration: 3000,
           position: 'bottom-right',
           icon: {
-            name: 'exclamation',
+            name: 'exclamation-circle',
             after: true,
           },
         });

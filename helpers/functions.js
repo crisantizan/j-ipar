@@ -72,3 +72,8 @@ export function getPlanLibraryName(nickname) {
 
   return null;
 }
+
+/** capitalize text */
+export function capitalize(text) {
+  return text.replace(/[a-z]/, letter => letter.toUpperCase());
+}

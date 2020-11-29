@@ -217,10 +217,15 @@ export const actions = {
       }
 
       try {
-        const { data } = await this.$axios.graphql({
+        const { data, errors } = await this.$axios.graphql({
           mutate,
           variables,
         });
+
+        if (!!errors) {
+          reject(errors);
+          return;
+        }
 
         resolve(true);
       } catch (error) {
