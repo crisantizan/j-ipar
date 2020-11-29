@@ -1,6 +1,22 @@
 import path from 'path';
 import fs from 'fs';
 
+const generateServerConfig = () => {
+  const config = {
+    port: 3006, // default: 3000
+    host: '0.0.0.0', // default: localhost,
+  };
+
+  if (process.env.NODE_ENV !== 'production') {
+    config.https = {
+      key: fs.readFileSync(path.resolve(__dirname, 'server/https-certificates/localhost.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'server/https-certificates/localhost.crt')),
+    };
+  }
+
+  return config;
+};
+
 export default {
   /*
    ** Nuxt rendering mode
@@ -12,15 +28,8 @@ export default {
    ** See https://nuxtjs.org/api/configuration-target
    */
   target: 'server',
-  // CHANGE SERVER
-  server: {
-    port: 3006, // default: 3000
-    host: '0.0.0.0', // default: localhost
-    https: {
-      key: fs.readFileSync(path.resolve(__dirname, 'server/https-certificates/localhost.key')),
-      cert: fs.readFileSync(path.resolve(__dirname, 'server/https-certificates/localhost.crt')),
-    },
-  },
+  /** server config **/
+  server: generateServerConfig(),
   /** Environment variables **/
   env: {
     BASE_IMAGE_URL:
