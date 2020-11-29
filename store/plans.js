@@ -53,7 +53,7 @@ export const mutations = {
       }
     }
 
-    if (!found) {
+    if (!found && !!state.all.length) {
       // monthly is default checked period
       const index = state.all.findIndex(plan => {
         return planIsCore(plan.nickname) && plan.interval === 'month';
