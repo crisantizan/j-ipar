@@ -30,7 +30,7 @@
 
     <hr class="mt-1" />
 
-    <div class="row p-2 testing">
+    <div class="row p-2 cards-list">
       <div v-if="!paymentMethods.length">Add Payment Method</div>
       <!-- go to 489 line -->
       <div v-else v-for="paymentMethod in paymentMethods" :key="paymentMethod.id">
@@ -95,37 +95,36 @@ export default {
   },
 
   mounted() {
-    // Create a Stripe client.
-    var stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
+    // create a Stripe client.
+    const stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
 
-    // Create an instance of Elements.
-    var elements = stripe.elements();
+    // create an instance of Elements.
+    const elements = stripe.elements();
 
-    var style = {
+    const style = {
       base: {
         color: '#32325d',
         lineHeight: '1.429',
       },
+
       invalid: {
         color: '#fa755a',
         iconColor: '#fa755a',
       },
     };
 
-    var cardElement = elements.create('card', { style: style });
+    const cardElement = elements.create('card', { style: style });
     cardElement.mount('#card-element');
 
-    cardElement.on('change', showCardError);
-
-    function showCardError(event) {
-      let displayError = document.getElementById('card-errors');
+    cardElement.on('change', e => {
       if (event.error) {
-        displayError.textContent = event.error.message;
-      } else {
-      }
-    }
+        const displayError = document.getElementById('card-errors');
 
-    var form = document.getElementById('subscription-form');
+        displayError.textContent = event.error.message;
+      }
+    });
+
+    const form = document.getElementById('subscription-form');
 
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -268,16 +267,23 @@ export default {
 </script>
 
 <style scoped>
-.testing {
+.cards-list {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   justify-items: center;
   column-gap: 20px;
   row-gap: 10px;
 }
+
+@media (min-width: 992px) {
+  .cards-list {
+    max-height: calc(100vh - 320px);
+    overflow-y: auto;
+  }
+}
+
 .credit-card {
   border: 1px solid rgba(0, 0, 0, 0.15);
-  /* width: 100%; */
   width: 250px;
 }
 
@@ -286,25 +292,25 @@ export default {
 }
 
 @media (min-width: 620px) {
-  .testing {
+  .cards-list {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 900px) {
-  .testing {
+  .cards-list {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (min-width: 992px) {
-  .testing {
+  .cards-list {
     grid-template-columns: repeat(1, 1fr);
   }
 }
 
 @media (min-width: 1790px) {
-  .testing {
+  .cards-list {
     grid-template-columns: repeat(2, 1fr);
   }
 }

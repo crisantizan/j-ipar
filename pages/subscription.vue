@@ -317,11 +317,11 @@ export default {
       'isSubscribed',
       'defaultTotalPaid',
       'planChangesData',
-      'hasPaymentMethods'
+      'hasPaymentMethods',
     ]),
     ...mapGetters('users', ['isUpdate', 'getLibrariesAvailable']),
     ...mapGetters('users', { selectedLibraries: 'selected' }),
-    ...mapGetters(['loaded', 'loading']),
+    ...mapGetters(['loaded', 'loading', 'showWelcomeAlert']),
 
     ...mapGetters('tenant', ['tenant']),
 
@@ -381,12 +381,22 @@ export default {
   },
 
   mounted() {
-    if (!this.customer.subsPrevious) {
+    if (!this.customer.subsPrevious && this.showWelcomeAlert) {
+      this.SHOW_WELCOME_ALERT(false);
+
       Swal.fire({
-        title: 'Welcome!',
-        icon: 'info',
-        text: 'Thank you for your interest in Prima. To take advantage of your free trial, please enter your payment information and select your desired products. You will begin with a free 15-day trial and only charged at expiration of the trial. If you cancel before your trial expires, you will not be charged.'
-      })
+        html: /*html*/ `
+          <div class="card">
+            <div class="welcome-alert-cover"></div>
+            <div class="card-body">
+            <h3 class="mt-1">Welcome to Prima!</h3>
+            <p class="card-text">Thank you for your interest in Prima. To take advantage of your free trial, please enter your payment information and select your desired products. You will begin with a free 15-day trial and only charged at expiration of the trial. If you cancel before your trial expires, you will not be charged.</p>
+          </div>
+        </div>`,
+        customClass: {
+          popup: 'alert-popup',
+        },
+      });
     }
   },
 
@@ -495,13 +505,9 @@ export default {
 
     ...mapMutations('users', ['UPDATE_LIBRARIES_QUANTITY']),
 
-    ...mapActions('plans', [
-      'getPlans',
-      'addSubscription',
-      'cancelSubscriptions',
-    ]),
+    ...mapActions('plans', ['getPlans', 'addSubscription', 'cancelSubscriptions']),
 
-    ...mapMutations(['SET_LOADING']),
+    ...mapMutations(['SET_LOADING', 'SHOW_WELCOME_ALERT']),
 
     refreshPlansData() {
       const { month, year } = this.getFilteredPlans();
@@ -1586,7 +1592,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .package-selected {
   color: green !important;
   font-weight: bold;
@@ -1642,9 +1648,42 @@ export default {
 }
 
 @media (min-width: 992px) {
-.subscription-payment {
-  max-height: calc(100vh - 90px);
-  overflow-y: auto;
-} 
+  .subscription-payment {
+    max-height: calc(100vh - 90px);
+    overflow-y: hidden;
+  }
+}
+
+/** popup styles */
+.alert-popup {
+  padding: 0;
+}
+
+.alert-popup .swal2-content {
+  padding: 0;
+}
+
+.alert-popup .welcome-alert-cover {
+  background-image: url('~assets/svg/welcome.svg');
+  height: 250px;
+  border-top-left-radius: 0.3125em;
+  border-top-right-radius: 0.3125em;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.alert-popup .card {
+  margin-bottom: 0;
+  box-shadow: none;
+}
+
+.alert-popup .card-body {
+  padding: 0.5rem 0.75rem;
+}
+
+.alert-popup .swal2-actions {
+  margin-top: 0;
+  margin-bottom: 10px;
 }
 </style>

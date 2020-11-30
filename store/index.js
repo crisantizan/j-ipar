@@ -7,6 +7,7 @@ export const state = () => ({
   loading: false,
   token: null,
   user: null,
+  showWelcomeAlert: true,
 });
 
 export const mutations = {
@@ -30,6 +31,10 @@ export const mutations = {
   SET_TOKEN(state, token) {
     state.token = token;
   },
+
+  SHOW_WELCOME_ALERT(state, payload) {
+    state.showWelcomeAlert = payload;
+  },
 };
 
 export const getters = {
@@ -37,6 +42,7 @@ export const getters = {
   loading: state => state.loading,
   user: state => state.user,
   token: state => state.token,
+  showWelcomeAlert: state => state.showWelcomeAlert,
 };
 
 export const actions = {
@@ -108,6 +114,7 @@ export const actions = {
             customer: stripeCustomer {
               id
               invoiceSettings
+              subsPrevious
             }
 
             users {
@@ -135,7 +142,7 @@ export const actions = {
       commit('invoices/SET_INVOICES', data.invoices);
       // plans module
       commit('plans/SET_ALL', data.plans);
-      commit('plans/SET_CUSTOMER', { ...data.customer, subsPrevious: false });
+      commit('plans/SET_CUSTOMER', data.customer);
       commit('plans/SET_PAYMENT_METHODS', data.paymentMethods);
 
       // set libraries quantity
