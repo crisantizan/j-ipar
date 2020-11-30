@@ -1,100 +1,10 @@
 <template>
-  <div class="row col-12 mt-2">
-    <div class="col-md-4">
-      <div class="card p-2">
-        <h2 class="mb-0">Card Information</h2>
-
-        <div class="row">
-          <div class="col-md-12">
-            <form id="subscription-form">
-              <!-- v-bind:disabled="isProcesing ? '' : disabled" -->
-              <h4>Enter your payment information here:</h4>
-              <div id="card-element" class="form-control">
-                <!-- Elements will create input elements here -->
-              </div>
-
-              <!-- We'll put the error messages in this element -->
-              <div id="card-errors" role="alert" style="color: red"></div>
-
-              <div class="text-right">
-                <button
-                  type="submit"
-                  class="btn btn-success mt-2"
-                  :class="{ disabled: loading }"
-                  id="add-payment-method"
-                >
-                  Add
-                </button>
-                <div></div>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <hr class="mt-1" />
-
-        <div class="row p-2">
-          <div v-if="!paymentMethods.length">Add Payment Method</div>
-          <!-- go to 489 line -->
-          <div
-            v-else
-            class="col-md-6"
-            v-for="paymentMethod in paymentMethods"
-            :key="paymentMethod.id"
-          >
-            <div
-              v-bind:class="{
-                'credit-card-default':
-                  paymentMethod.id == customer.invoiceSettings.default_payment_method,
-              }"
-              class="card-box ribbon-box"
-            >
-              <div class="ribbon ribbon-primary float-left">
-                <span v-if="paymentMethod.id === customer.invoiceSettings.default_payment_method"
-                  >Active</span
-                >
-                Payment Method
-              </div>
-              <h5 class="text-primary float-right mt-0"></h5>
-              <div class="ribbon-content">
-                <div class="mb-0">
-                  <span class="d-block"
-                    ><i class="fab fa-cc-mastercard fa-2x"></i>
-                    <i class="fa fa-cc-visa fa-2x"></i>
-                  </span>
-                  <span style="font-size: larger"
-                    >**** **** **** {{ paymentMethod.card.last4 }}</span
-                  >
-                  <br />
-                  Valid
-                  <strong>{{ paymentMethod.card.exp_month }}</strong> /
-                  <strong>{{ paymentMethod.card.exp_year }}</strong>
-                  <br />
-
-                  <div class="text-right">
-                    <a
-                      class="btn btn-sm btn-secondary"
-                      href="#"
-                      v-if="paymentMethod.id != customer.invoiceSettings.default_payment_method"
-                      @click="changeDefaultPaymentMethod(paymentMethod.id)"
-                      >Set Default</a
-                    >
-                    <a
-                      class="btn btn-sm btn-danger"
-                      href="#"
-                      v-on:click="deletePaymentMethod(paymentMethod.id)"
-                      >Remove</a
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="row mt-2">
+    <div class="col-12 col-lg-4 subscription-payment">
+      <SubscriptionPayment />
     </div>
 
-    <div class="col-md-8">
+    <div class="col-12 col-lg-8">
       <div class="card">
         <h2 class="mb-0 p-2">Select Plan</h2>
 
@@ -321,7 +231,8 @@
               </table>
             </div>
 
-            <div class="text-right mb-3" v-if="!!paymentMethods.length">
+            <!-- <div class="text-right mb-3" v-if="!!paymentMethods.length"> -->
+            <div class="text-right mb-3" v-if="hasPaymentMethods">
               <button
                 v-if="subscriptionIsCanceled"
                 class="btn btn-warning mr-2"
@@ -401,12 +312,12 @@ export default {
       'mirrorDefaultCheckedPlans',
       'totalPaid',
       'customer',
-      'paymentMethods',
       'mainPlan',
       'subscriptionIsCanceled',
       'isSubscribed',
       'defaultTotalPaid',
       'planChangesData',
+      'hasPaymentMethods'
     ]),
     ...mapGetters('users', ['isUpdate', 'getLibrariesAvailable']),
     ...mapGetters('users', { selectedLibraries: 'selected' }),
@@ -477,44 +388,6 @@ export default {
         text: 'Thank you for your interest in Prima. To take advantage of your free trial, please enter your payment information and select your desired products. You will begin with a free 15-day trial and only charged at expiration of the trial. If you cancel before your trial expires, you will not be charged.'
       })
     }
-    // Create a Stripe client.
-    var stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
-
-    // Create an instance of Elements.
-    var elements = stripe.elements();
-
-    var style = {
-      base: {
-        color: '#32325d',
-        lineHeight: '1.429',
-      },
-      invalid: {
-        color: '#fa755a',
-        iconColor: '#fa755a',
-      },
-    };
-
-    var cardElement = elements.create('card', { style: style });
-    cardElement.mount('#card-element');
-
-    cardElement.on('change', showCardError);
-
-    function showCardError(event) {
-      let displayError = document.getElementById('card-errors');
-      if (event.error) {
-        displayError.textContent = event.error.message;
-      } else {
-      }
-    }
-
-    var form = document.getElementById('subscription-form');
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-
-      // create payment method
-      this.createPaymentMethod(stripe, cardElement);
-    });
   },
 
   watch: {
@@ -608,9 +481,6 @@ export default {
       'SET_DEFAULT_CHECKED_PLANS',
       'SET_CHECKED_OR_USERS',
       'UPDATE_USERS',
-      'CHANGE_DEFAULT_CUSTOMER',
-      'ADD_PAYMENT_METHOD',
-      'REMOVE_PAYMENT_METHOD',
       'SET_FULL_CUPON',
       'SET_CUPON',
       'SET_CUPON_STATE',
@@ -627,7 +497,6 @@ export default {
 
     ...mapActions('plans', [
       'getPlans',
-      'getPaymentMethods',
       'addSubscription',
       'cancelSubscriptions',
     ]),
@@ -664,44 +533,6 @@ export default {
       return plan.cancelAtPeriodEnd
         ? `Will cancel on ${dayjs.unix(plan.cancelAt).format('MM/DD/YYYY')}`
         : `Subscribed <br/> (${dayjs.unix(plan.currentPeriodEnd).format('MM/DD/YYYY')})`;
-    },
-
-    /** create payment method (with apollo) */
-    async createPaymentMethod(stripe, card) {
-      try {
-        // get stripe payment method
-        const { paymentMethod } = await stripe.createPaymentMethod({
-          type: 'card',
-          card,
-        });
-
-        const mutate = gql`
-          mutation($paymentMethodId: String!) {
-            paymentMethodEdit(paymentMethodId: $paymentMethodId) {
-              id
-            }
-          }
-        `;
-
-        // backend result
-        const result = await this.$axios.graphql({
-          mutate,
-          variables: { paymentMethodId: paymentMethod.id },
-        });
-
-        // list in screen
-        this.ADD_PAYMENT_METHOD({
-          id: paymentMethod.id,
-          card: paymentMethod.card,
-        });
-
-        // set as default
-        this.CHANGE_DEFAULT_CUSTOMER(paymentMethod.id);
-
-        card.clear();
-      } catch (error) {
-        console.error(error);
-      }
     },
 
     /** update cupon value on type **/
@@ -1392,89 +1223,6 @@ export default {
       return this.show.filter(plan => plan.checked).map(plan => plan.id);
     },
 
-    /** change default payment method (with apollo) */
-    async changeDefaultPaymentMethod(id) {
-      const { isConfirmed } = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'If you accept this card become your default Payment Method',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, do It!',
-      });
-
-      // aborting
-      if (!isConfirmed) {
-        return;
-      }
-
-      // execute request
-      try {
-        const mutate = gql`
-          mutation($id: String!) {
-            paymentMethodEdit(paymentMethodId: $id) {
-              id
-            }
-          }
-        `;
-
-        // backend result
-        const result = await this.$axios.graphql({
-          mutate,
-          variables: { id },
-        });
-
-        this.CHANGE_DEFAULT_CUSTOMER(id);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
-    async deletePaymentMethod(id) {
-      const { isConfirmed } = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'You want to delete this Payment method',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, do It!',
-      });
-
-      if (!isConfirmed) {
-        return;
-      }
-
-      // execute request
-      try {
-        const mutate = gql`
-          mutation($id: String!) {
-            paymentMethodDelete(paymentMethodId: $id) {
-              id
-            }
-          }
-        `;
-
-        // backend result
-        const result = await this.$axios.graphql({
-          mutate,
-          variables: { id },
-        });
-
-        // only remove on local, server does not have more data
-        if (this.paymentMethods.length < 10) {
-          this.REMOVE_PAYMENT_METHOD(id);
-          return;
-        }
-
-        // fetching data from server
-        await this.getPaymentMethods();
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
     async cancelSubscription() {
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
@@ -1891,5 +1639,12 @@ export default {
 
 .table-plans td {
   vertical-align: bottom;
+}
+
+@media (min-width: 992px) {
+.subscription-payment {
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+} 
 }
 </style>

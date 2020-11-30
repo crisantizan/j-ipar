@@ -366,6 +366,10 @@ export const getters = {
     return state.paymentMethods;
   },
 
+  hasPaymentMethods(state) {
+    return state.paymentMethods.length > 0;
+  },
+
   subscriptionIsCanceled(state, getters) {
     return getters.defaultCheckedPlans.every(val => {
       const plan = state[state.defaultPeriod].find(plan => plan.id === val.id);
