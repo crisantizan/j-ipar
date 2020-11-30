@@ -1724,6 +1724,14 @@ export default {
 
         const librariesQuantity = {};
 
+        this.show.forEach((plan, index) => {
+          for (const prop in libraryKeys) {
+            if (includeValue(plan.nickname, libraryKeys[prop].staticValue)) {
+              librariesQuantity[libraryKeys[prop].key] = plan.users;
+            }
+          }
+        });
+
         // update librariesQuantity
         if (!!Object.keys(librariesQuantity).length) {
           this.UPDATE_LIBRARIES_QUANTITY(librariesQuantity);
