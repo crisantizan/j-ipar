@@ -470,6 +470,13 @@ export default {
   },
 
   mounted() {
+    if (!this.customer.subsPrevious) {
+      Swal.fire({
+        title: 'Welcome!',
+        icon: 'info',
+        text: 'Thank you for your interest in Prima. To take advantage of your free trial, please enter your payment information and select your desired products. You will begin with a free 15-day trial and only charged at expiration of the trial. If you cancel before your trial expires, you will not be charged.'
+      })
+    }
     // Create a Stripe client.
     var stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
 

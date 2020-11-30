@@ -135,7 +135,7 @@ export const actions = {
       commit('invoices/SET_INVOICES', data.invoices);
       // plans module
       commit('plans/SET_ALL', data.plans);
-      commit('plans/SET_CUSTOMER', data.customer);
+      commit('plans/SET_CUSTOMER', { ...data.customer, subsPrevious: false });
       commit('plans/SET_PAYMENT_METHODS', data.paymentMethods);
 
       // set libraries quantity
