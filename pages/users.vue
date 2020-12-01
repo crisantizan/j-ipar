@@ -12,35 +12,28 @@
       :row-style-class="rowStyleClassFn"
     >
       <template slot="second-header">
-        <div class="mb-2 d-flex align-items-end">
-          <div class="custom-control custom-checkbox show-disabled-users-check ml-1">
-            <input
-              type="checkbox"
-              class="custom-control-input show-disabled-users-input"
-              id="showDisabledUsers"
-              v-model="showDisabledUsers"
-            />
-            <label class="custom-control-label" for="showDisabledUsers">
-              Show disabled users
-            </label>
+        <div class="mb-2 d-flex justify-content-end">
+          <div class="btn-group" role="group">
+            <button
+              type="button"
+              class="btn btn-sm btn-info"
+              @click="
+                fromActionsOpenModal({
+                  modal: 'invite-user',
+                })
+              "
+            >
+              Invite new user
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              @click="showDisabledUsers = !showDisabledUsers"
+            >
+              {{ !showDisabledUsers ? 'Show' : 'Hide' }} disabled users
+            </button>
           </div>
         </div>
-
-        <!-- INVITE USER LINK -->
-
-        <span>
-          <a
-            class="text-info mb-5 ml-1"
-            style="cursor:pointer;"
-            @click="
-              fromActionsOpenModal({
-                modal: 'invite-user',
-              })
-            "
-          >
-            Invite New User
-          </a>
-        </span>
 
         <span v-if="isLoginAgain" class="message-re-login">
           <h4 class="text-danger">
