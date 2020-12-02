@@ -232,11 +232,16 @@
                     class="col-lg-4 form-group d-flex flex-column align-items-center justify-content-end"
                   >
                     <div class="d-flex mb-1">
-                      <VRadioGroup name="address" :items="[
-                        { value: 'addressAptCk', label: 'APT' },
-                        { value: 'addressSteCk', label: 'STE' },
-                        { value: 'addressFloork', label: 'FLOOR' },
-                      ]" />
+                      <VRadioGroup
+                        v-model="selectedUser.addressAptSteFloor"
+                        name="address"
+                        :items="[
+                          { value: 'apt', label: 'APT' },
+                          { value: 'ste', label: 'STE' },
+                          { value: 'floor', label: 'FLOOR' },
+                        ]"
+                        @change="onChangeAddressRadioGroup"
+                      />
                     </div>
 
                     <input
@@ -246,6 +251,11 @@
                       placeholder="Address APT STE FLR Number"
                       :required="editUserInputRequired('addressAptSteFlrNumbertxt')"
                     />
+                    <!-- <pre>{{ selectedUser.addressAptSteFloor }}</pre>
+
+                    <pre>{{ selectedUser.addressAptCk }}</pre>
+                    <pre>{{ selectedUser.addressSteCk }}</pre>
+                    <pre>{{ selectedUser.addressFloork }}</pre> -->
                   </div>
 
                   <div class="col-lg-4 form-group">
@@ -389,49 +399,6 @@
                     />
                   </div>
                 </div>
-
-                <!-- <div class="form-group">
-                  <input
-                    v-model="selectedUser.firstName"
-                    type="text"
-                    class="form-control"
-                    placeholder="First name"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <input
-                    v-model="selectedUser.middleName"
-                    type="text"
-                    class="form-control"
-                    placeholder="Middle name"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <input
-                    v-model="selectedUser.lastName"
-                    type="text"
-                    class="form-control"
-                    placeholder="Last name"
-                  />
-                </div> -->
-
-                <!-- <div class="form-group">
-                  <input
-                    id="txtEditEmail"
-                    v-model="selectedUser.email"
-                    type="text"
-                    class="form-control"
-                    placeholder="Email"
-                    @input="removeInvalid"
-                  />
-
-                  <small v-if="validateMessage !== null" class="text-danger">{{
-                    validateMessage
-                  }}</small>
-                </div> -->
               </div>
               <div class="modal-footer">
                 <button type="submit" class="btn btn-primary" :disabled="disabledBtnEditUser">
@@ -668,9 +635,10 @@ export default {
         { field: 'fax', required: false },
         { field: 'address', required: false },
         { field: 'addressAptSteFlrNumbertxt', required: false },
-        // { field: 'addressAptCk', required: false },
-        // { field: 'addressSteCk', required: false },
-        // { field: 'addressFloork', required: false },
+        { field: 'addressAptSteFloor', required: false },
+        { field: 'addressAptCk', required: false, omit: true },
+        { field: 'addressSteCk', required: false, omit: true },
+        { field: 'addressFloork', required: false, omit: true },
         { field: 'city', required: false },
         { field: 'state', required: false },
         { field: 'zipCode', required: false },
@@ -888,12 +856,24 @@ export default {
       return row.active ? '' : 'disabled';
     },
 
+    getUserAddressAptSteFloor(user) {
+      const arrFields = ['addressAptCk', 'addressSteCk', 'addressFloork'];
+
+      for (const field in user) {
+        if (arrFields.some(v => v === field) && user[field] === 'on') {
+          return field;
+        }
+      }
+
+      return null;
+    },
+
     /** open modals from "TheDatatableUsersActions" */
     async fromActionsOpenModal({ modal, data }) {
       switch (modal) {
         // edit user modal
         case 'edit-user':
-          this.selectedUser = data;
+          this.selectedUser = { ...data, addressAptSteFloor: this.getUserAddressAptSteFloor(data) };
           this.modal.editUser = true; // open modal
           break;
 
@@ -920,35 +900,15 @@ export default {
     async onUserEdit() {
       if (this.disabledBtnEditUser) return;
 
-      // validate email
-      // if (!this.validateUserEmail(this.selectedUser.email)) {
-      //   document.getElementById('txtEditEmail').classList.add('is-invalid');
-
-      //   this.validateMessage = 'Invalid Email.';
-
-      //   return;
-      // } else document.getElementById('txtEditEmail').classList.remove('is-invalid');
-
-      // // verify if exist email
-      // if (columnUser.email !== this.selectedUser.email) {
-      //   let existEmail = await this.existUserEmail(this.selectedUser.email);
-
-      //   if (existEmail) {
-      //     document.getElementById('txtEditEmail').classList.add('is-invalid');
-
-      //     this.validateMessage =
-      //       'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
-
-      //     return;
-      //   }
-      // }
-
       const columnUser = this.users[this.selectedUser.index];
 
       // get only changed data
-      const newData = Object.keys(this.selectedUser).reduce((obj, key) => {
-        // current prop is not editable
-        if (this.userEditableProps.every(val => val.field !== key)) {
+      const userData = Object.keys(this.selectedUser).reduce((obj, key) => {
+        // current prop is not editable or is omitted
+        if (
+          this.userEditableProps.every(val => val.field !== key) ||
+          this.userEditableProps.some(val => val.field === key && val.omit)
+        ) {
           return obj;
         }
 
@@ -965,20 +925,36 @@ export default {
         return obj;
       }, {});
 
-      console.log(newData);
-      return;
+      if ('addressAptSteFloor' in userData && userData.addressAptSteFloor === null) {
+        delete userData.addressAptSteFloor;
+      }
+
+      if (this.selectedUser.addressAptSteFloor !== null) {
+        userData.addressAptSteFloor = this.selectedUser.addressAptSteFloor;
+      }
+
+      console.log(userData);
 
       try {
         await this.updateUser({
           index: this.selectedUser.index,
           userId: this.selectedUser.id,
-          userData: newData,
+          userData,
         });
 
         // close modal
         this.modal.editUser = false;
       } catch (err) {
         console.error(err);
+
+        this.$toast.error("Internal server error, we couldn't update the user", {
+          duration: 3000,
+          position: 'bottom-right',
+          icon: {
+            name: 'exclamation-circle',
+            after: true,
+          },
+        });
       }
     },
 
@@ -1024,18 +1000,6 @@ export default {
       );
       return regex.test(email);
     },
-
-    // async existUserEmail(email) {
-    //   // IF EXIST EMAIL
-    //   let existEmail = false;
-
-    //   await this.checkUserEmailExist(email).then(response => {
-    //     if (response === 1) existEmail = true;
-    //     else if (response === 0) existEmail = false;
-    //   });
-
-    //   return existEmail;
-    // },
 
     async inviteUser() {
       // VALIDATE EMAIL
@@ -1093,6 +1057,29 @@ export default {
       const value = this.userEditableProps.find(v => v.field === fieldName);
 
       return !!value && value.required;
+    },
+
+    onChangeAddressRadioGroup(value) {
+      if (!this.selectedUser) return;
+
+      const fields = {
+        addressAptCk: 'apt',
+        addressSteCk: 'ste',
+        addressFloork: 'floor',
+      };
+
+      const field = Object.keys(fields).find(key => fields[key] === value);
+
+      const arrFields = ['addressAptCk', 'addressSteCk', 'addressFloork'];
+
+      for (const currentField of arrFields) {
+        if (currentField === field) {
+          this.selectedUser[currentField] = 'on';
+          continue;
+        }
+
+        this.selectedUser[currentField] = 'off';
+      }
     },
   },
 };

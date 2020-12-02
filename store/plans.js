@@ -427,7 +427,7 @@ export const actions = {
           `,
         });
 
-        if (!!errors) {
+        if (!!errors && errors.length > 0) {
           reject(errors);
           return;
         }
@@ -456,6 +456,11 @@ export const actions = {
           `,
           variables: { plans },
         });
+
+        if (!!errors && errors.length > 0) {
+          reject(errors);
+          return;
+        }
         // array
         resolve(data.stripeSubscriptionCancel);
       } catch (err) {
@@ -503,8 +508,9 @@ export const actions = {
           variables: { plans },
         });
 
-        if (!!errors) {
-          return reject(errors);
+        if (!!errors && errors.length > 0) {
+          reject(errors);
+          return;
         }
 
         resolve(data.stripeSubscripterAdd);

@@ -56,9 +56,7 @@ export const mutations = {
 
   CHECK_RELATION(state, payload) {
     state.usersIntegrations[
-      state.usersIntegrations
-        .map(a => a.userId)
-        .indexOf(payload.userIntegrationId)
+      state.usersIntegrations.map(a => a.userId).indexOf(payload.userIntegrationId)
     ].linked = payload.linked;
   },
 
@@ -111,10 +109,7 @@ export const getters = {
       return {};
     }
 
-    const availables = [
-      ...Object.keys(state.users[0].assignLibraries),
-      libraryKeys.CORE.key,
-    ];
+    const availables = [...Object.keys(state.users[0].assignLibraries), libraryKeys.CORE.key];
 
     return keys.reduce((acc, key) => {
       if (availables.includes(key)) {
@@ -169,7 +164,7 @@ export const actions = {
     // payload: { userId: number, library: Object }
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await this.$axios.graphql({
+        const { data, errors } = await this.$axios.graphql({
           mutate: gql`
             mutation($userId: Int!, $library: JSON!) {
               userEdit(id: $userId, editUser: { assignLibraries: $library }) {
@@ -179,6 +174,11 @@ export const actions = {
           `,
           variables: payload,
         });
+
+        if (!!errors && errors.length > 0) {
+          reject(errors);
+          return;
+        }
 
         resolve(true);
       } catch (error) {
@@ -196,10 +196,7 @@ export const actions = {
       if (libraries) {
         mutate = gql`
           mutation($userId: Int!, $active: Boolean!, $libraries: JSON!) {
-            userEdit(
-              id: $userId
-              editUser: { active: $active, assignLibraries: $libraries }
-            ) {
+            userEdit(id: $userId, editUser: { active: $active, assignLibraries: $libraries }) {
               id
             }
           }
@@ -222,7 +219,7 @@ export const actions = {
           variables,
         });
 
-        if (!!errors) {
+        if (!!errors && errors.length > 0) {
           reject(errors);
           return;
         }
@@ -301,9 +298,7 @@ export const actions = {
           let integrations = [];
 
           data.usersIntegrations.forEach(user => {
-            if (
-              integrations.map(a => a.id).indexOf(user.integrationId) === -1
-            ) {
+            if (integrations.map(a => a.id).indexOf(user.integrationId) === -1) {
               integrations.push({
                 id: user.integrationId,
                 prefix: user.prefix,
@@ -311,9 +306,9 @@ export const actions = {
                 name: user.integration,
               });
             } else {
-              integrations[
-                integrations.map(a => a.id).indexOf(user.integrationId)
-              ].users.push(user);
+              integrations[integrations.map(a => a.id).indexOf(user.integrationId)].users.push(
+                user,
+              );
             }
           });
 
@@ -363,19 +358,54 @@ export const actions = {
   async updateUser({ commit }, { index, userId, userData }) {
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await this.$axios.graphql({
+        const { data, errors } = await this.$axios.graphql({
           mutate: gql`
             mutation($userId: Int!, $userData: editUser!) {
               userEdit(id: $userId, editUser: $userData) {
                 id
+                firstName
+                middleName
+                lastName
+                email
+                tenantCode
+                isAttorney
+                admin
+                tenantCode
+                active
+                assignLibraries
+                librariesQuantity
+                phone
+                mobilePhone
+                fax
+                address
+                addressAptSteFlrNumbertxt
+                addressAptCk
+                addressSteCk
+                addressFloork
+                city
+                state
+                zipCode
+                foreignProvince
+                foreignPostalCode
+                country
+                eoir
+                licensingAuthority
+                barNumber
+                lawFirmName
+                uscisElis
               }
             }
           `,
           variables: { userId, userData },
         });
 
-        commit('UPDATE_USER_DATA', { index, data: userData });
-        resolve(true);
+        if (!!errors && errors.length > 0) {
+          reject(errors);
+          return;
+        }
+
+        commit('UPDATE_USER_DATA', { index, data: data.userEdit });
+        resolve(data.userEdit);
       } catch (error) {
         reject(error);
       }
@@ -406,7 +436,9 @@ export const actions = {
     return new Promise(async (resolve, reject) => {
       try {
         const { data } = await this.$axios({
-          url: process.env.PRIMA_URL + `admin-invite-user-from-admin?email=${payload.email}&firstName=${payload.firstName}&lastName=${payload.lastName}&tenantCode=${payload.tenant.code}&tenantName=${payload.tenant.name}`,
+          url:
+            process.env.PRIMA_URL +
+            `admin-invite-user-from-admin?email=${payload.email}&firstName=${payload.firstName}&lastName=${payload.lastName}&tenantCode=${payload.tenant.code}&tenantName=${payload.tenant.name}`,
           method: 'post',
           data: {
             token: this.getters.token,
