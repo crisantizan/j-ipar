@@ -7,6 +7,9 @@
     <div class="col-12 col-lg-8">
       <div class="card">
         <h2 class="mb-0 p-2">Select Plan</h2>
+        <h4 class="px-2 text-primary cursor-pointer" @click="openPopupAboutLicences">
+          Questions about licences
+        </h4>
 
         <div class="row">
           <div class="col-md-12">
@@ -508,6 +511,14 @@ export default {
     ...mapActions('plans', ['getPlans', 'addSubscription', 'cancelSubscriptions']),
 
     ...mapMutations(['SET_LOADING', 'SHOW_WELCOME_ALERT']),
+
+    openPopupAboutLicences() {
+      Swal.fire({
+        icon: 'info',
+        text:
+          'You will need one Prima.Law "Core" license for each user in your firm. You only need to purchase forms libraries for the users who will be using the forms or questionnaires for those practice areas. Users without a forms library license will not have access to any of the forms for that practice area.',
+      });
+    },
 
     refreshPlansData() {
       const { month, year } = this.getFilteredPlans();
