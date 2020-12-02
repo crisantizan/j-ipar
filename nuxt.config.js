@@ -64,8 +64,6 @@ export default {
 
       { rel: 'stylesheet', href: '/css/ubold/bootstrap-creative.min.css' },
       { rel: 'stylesheet', href: '/css/ubold/app-creative.min.css' },
-      // { rel: 'stylesheet', href: '/css/ubold/bootstrap.min.css' },
-      // { rel: 'stylesheet', href: '/css/ubold/app.min.css' },
 
       {
         href:
