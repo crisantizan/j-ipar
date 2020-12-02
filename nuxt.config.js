@@ -64,6 +64,8 @@ export default {
 
       { rel: 'stylesheet', href: '/css/ubold/bootstrap-creative.min.css' },
       { rel: 'stylesheet', href: '/css/ubold/app-creative.min.css' },
+      // { rel: 'stylesheet', href: '/css/ubold/bootstrap.min.css' },
+      // { rel: 'stylesheet', href: '/css/ubold/app.min.css' },
 
       {
         href:
@@ -86,7 +88,7 @@ export default {
       },
       { src: 'https://js.stripe.com/v3/' },
       { src: 'https://cdn.jsdelivr.net/npm/sweetalert2@9' },
-      { src: 'https://cdn.jsdelivr.net/npm/promise-polyfill' },
+      // { src: 'https://cdn.jsdelivr.net/npm/promise-polyfill' },
       { src: '/js/vendor.min.js' },
     ],
   },

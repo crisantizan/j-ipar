@@ -125,189 +125,432 @@
       </template>
     </datatable>
 
-    <!-- edit user modal -->
-    <VModal v-model="modal.editUser" persistent>
-      <VModalDialog>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Edit user data</h5>
-            <VModalCloseButton />
+    <client-only>
+      <!-- edit user modal -->
+      <VModal v-model="modal.editUser" persistent>
+        <VModalDialog class="modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Edit user data</h3>
+              <VModalCloseButton />
+            </div>
+            <form v-if="selectedUser !== null" @submit.prevent="onUserEdit">
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-lg-4 form-group">
+                    <label for="firstName">First Name</label>
+                    <input
+                      v-model="selectedUser.firstName"
+                      id="firstName"
+                      type="text"
+                      class="form-control"
+                      placeholder="First Name"
+                      :required="editUserInputRequired('firstName')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="lastName">Last Name</label>
+                    <input
+                      v-model="selectedUser.lastName"
+                      id="lastName"
+                      type="text"
+                      class="form-control"
+                      placeholder="Last Name"
+                      :required="editUserInputRequired('lastName')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="middleName">Middle Name</label>
+                    <input
+                      v-model="selectedUser.middleName"
+                      id="middleName"
+                      type="text"
+                      class="form-control"
+                      placeholder="Middle Name"
+                      :required="editUserInputRequired('middleName')"
+                    />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-4 form-group">
+                    <label for="phone">Phone</label>
+                    <input
+                      v-model="selectedUser.phone"
+                      id="phone"
+                      type="text"
+                      class="form-control"
+                      placeholder="Phone"
+                      :required="editUserInputRequired('phone')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="mobilePhone">Mobile Phone</label>
+                    <input
+                      v-model="selectedUser.mobilePhone"
+                      id="mobilePhone"
+                      type="text"
+                      class="form-control"
+                      placeholder="Mobile Phone"
+                      :required="editUserInputRequired('mobilePhone')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="fax">Fax</label>
+                    <input
+                      v-model="selectedUser.fax"
+                      id="fax"
+                      type="text"
+                      class="form-control"
+                      placeholder="Fax"
+                      :required="editUserInputRequired('fax')"
+                    />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-4 form-group">
+                    <label for="address">Address</label>
+                    <input
+                      v-model="selectedUser.address"
+                      id="address"
+                      type="text"
+                      class="form-control"
+                      placeholder="Address"
+                      :required="editUserInputRequired('address')"
+                    />
+                  </div>
+
+                  <!-- TODO:: unknow field name -->
+                  <div
+                    class="col-lg-4 form-group d-flex flex-column align-items-center justify-content-end"
+                  >
+                    <div class="d-flex mb-1">
+                      <VCheckbox label="APT" class="mr-2" id="addressAptCk" />
+                      <VCheckbox label="STE" class="mr-2" id="addressSteCk" />
+                      <VCheckbox label="FLOOR" id="addressFloork" />
+                    </div>
+                    <input type="text" class="form-control" />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="city">City</label>
+                    <input
+                      v-model="selectedUser.city"
+                      id="city"
+                      type="text"
+                      class="form-control"
+                      placeholder="City"
+                      :required="editUserInputRequired('city')"
+                    />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-4 form-group">
+                    <label for="state">State</label>
+                    <input
+                      v-model="selectedUser.state"
+                      id="state"
+                      type="text"
+                      class="form-control"
+                      placeholder="State"
+                      :required="editUserInputRequired('state')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="zipCode">Zip Code</label>
+                    <input
+                      v-model="selectedUser.zipCode"
+                      id="zipCode"
+                      type="text"
+                      class="form-control"
+                      placeholder="Zip Code"
+                      :required="editUserInputRequired('zipCode')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="foreignProvince">Foreign Province</label>
+                    <input
+                      v-model="selectedUser.foreignProvince"
+                      id="foreignProvince"
+                      type="text"
+                      class="form-control"
+                      placeholder="Foreign Province"
+                      :required="editUserInputRequired('foreignProvince')"
+                    />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-4 form-group">
+                    <label for="foreignPostalCode">Foreign Postal Code</label>
+                    <input
+                      v-model="selectedUser.foreignPostalCode"
+                      id="foreignPostalCode"
+                      type="text"
+                      class="form-control"
+                      placeholder="Foreign Postal Code"
+                      :required="editUserInputRequired('foreignPostalCode')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="country">Country</label>
+                    <input
+                      v-model="selectedUser.country"
+                      id="country"
+                      type="text"
+                      class="form-control"
+                      placeholder="Country"
+                      :required="editUserInputRequired('country')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="eoir">EOIR</label>
+                    <input
+                      v-model="selectedUser.eoir"
+                      id="eoir"
+                      type="text"
+                      class="form-control"
+                      placeholder="EOIR"
+                      :required="editUserInputRequired('eoir')"
+                    />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-4 form-group">
+                    <label for="licencingAuthority">Licencing Authority</label>
+                    <input
+                      v-model="selectedUser.licencingAuthority"
+                      id="licencingAuthority"
+                      type="text"
+                      class="form-control"
+                      placeholder="Licencing Authority"
+                      :required="editUserInputRequired('licencingAuthority')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="barNumber">Bar Number</label>
+                    <input
+                      v-model="selectedUser.barNumber"
+                      id="barNumber"
+                      type="text"
+                      class="form-control"
+                      placeholder="Bar Number"
+                      :required="editUserInputRequired('barNumber')"
+                    />
+                  </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="lawFirmName">Law Firm Name</label>
+                    <input
+                      v-model="selectedUser.lawFirmName"
+                      :disabled="!selectedUser.admin"
+                      id="lawFirmName"
+                      type="text"
+                      class="form-control"
+                      placeholder="Law Firm Name"
+                      :required="editUserInputRequired('lawFirmName')"
+                    />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-4 form-group">
+                    <label for="uscisElis">USCIS ELIS</label>
+                    <input
+                      v-model="selectedUser.uscisElis"
+                      id="uscisElis"
+                      type="text"
+                      class="form-control"
+                      placeholder="USCIS ELIS"
+                      :required="editUserInputRequired('uscisElis')"
+                    />
+                  </div>
+                </div>
+
+                <!-- <div class="form-group">
+                  <input
+                    v-model="selectedUser.firstName"
+                    type="text"
+                    class="form-control"
+                    placeholder="First name"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <input
+                    v-model="selectedUser.middleName"
+                    type="text"
+                    class="form-control"
+                    placeholder="Middle name"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <input
+                    v-model="selectedUser.lastName"
+                    type="text"
+                    class="form-control"
+                    placeholder="Last name"
+                  />
+                </div> -->
+
+                <!-- <div class="form-group">
+                  <input
+                    id="txtEditEmail"
+                    v-model="selectedUser.email"
+                    type="text"
+                    class="form-control"
+                    placeholder="Email"
+                    @input="removeInvalid"
+                  />
+
+                  <small v-if="validateMessage !== null" class="text-danger">{{
+                    validateMessage
+                  }}</small>
+                </div> -->
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" :disabled="disabledBtnEditUser">
+                  Save changes
+                </button>
+              </div>
+            </form>
           </div>
-          <form v-if="selectedUser !== null" @submit.prevent="onUserEdit">
+        </VModalDialog>
+      </VModal>
+
+      <!-- relations modal -->
+      <VModal v-model="modal.relations" persistent>
+        <VModalDialog>
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">User Relations</h5>
+              <VModalCloseButton />
+            </div>
+            <div class="modal-body">
+              <!-- message error -->
+              <span v-if="messageErrorUsersIntegrations !== null">{{
+                messageErrorUsersIntegrations
+              }}</span>
+
+              <div
+                v-show="integrations && integrations !== null && integrations.length > 0"
+                v-for="(integration, indexIntegration) in integrations"
+                :key="indexIntegration"
+              >
+                <hr v-if="indexIntegration > 0" />
+
+                <label>{{ integration.name }}</label>
+
+                <!-- clio users -->
+                <div v-for="(user, indexUser) in integration.users" :key="indexUser">
+                  <span>
+                    <input
+                      type="checkbox"
+                      name=""
+                      :id="user.userId"
+                      :checked="user.linked"
+                      @click="
+                        setRelation({
+                          user,
+                        })
+                      "
+                    />
+                    <label :for="user.userId">
+                      <small>{{ user.name }} {{ user.email }}</small>
+                    </label>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="saveRelations"
+                :disabled="disabledBtnSaveRelationUser"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </VModalDialog>
+      </VModal>
+
+      <!-- invite user modal -->
+      <VModal v-model="modal.inviteUser" persistent>
+        <VModalDialog>
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Invite User</h5>
+              <VModalCloseButton />
+            </div>
             <div class="modal-body">
               <div class="form-group">
                 <input
-                  v-model="selectedUser.firstName"
-                  type="text"
+                  id="inviteEmail"
                   class="form-control"
-                  placeholder="First name"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <input
-                  v-model="selectedUser.middleName"
-                  type="text"
-                  class="form-control"
-                  placeholder="Middle name"
-                />
-              </div>
-
-              <div class="form-group">
-                <input
-                  v-model="selectedUser.lastName"
-                  type="text"
-                  class="form-control"
-                  placeholder="Last name"
-                />
-              </div>
-
-              <div class="form-group">
-                <input
-                  id="txtEditEmail"
-                  v-model="selectedUser.email"
-                  type="text"
-                  class="form-control"
+                  v-model="inviteEmail"
                   placeholder="Email"
-                  @input="removeInvalid"
+                  type="text"
                 />
 
                 <small v-if="validateMessage !== null" class="text-danger">{{
                   validateMessage
                 }}</small>
               </div>
-            </div>
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-primary" :disabled="disabledBtnEditUser">
-                Save changes
-              </button>
-            </div>
-          </form>
-        </div>
-      </VModalDialog>
-    </VModal>
 
-    <!-- relations modal -->
-    <VModal v-model="modal.relations" persistent>
-      <VModalDialog>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">User Relations</h5>
-            <VModalCloseButton />
-          </div>
-          <div class="modal-body">
-            <!-- MESSAGE ERROR -->
-            <span v-if="messageErrorUsersIntegrations !== null">{{
-              messageErrorUsersIntegrations
-            }}</span>
+              <div class="form-group">
+                <input
+                  class="form-control"
+                  v-model="inviteFirstName"
+                  placeholder="First Name"
+                  type="text"
+                />
+              </div>
 
-            <div
-              v-show="integrations && integrations !== null && integrations.length > 0"
-              v-for="(integration, indexIntegration) in integrations"
-              :key="indexIntegration"
-            >
-              <hr v-if="indexIntegration > 0" />
-
-              <label>{{ integration.name }}</label>
-
-              <!-- CLIO USERS -->
-
-              <div v-for="(user, indexUser) in integration.users" :key="indexUser">
-                <span>
-                  <input
-                    type="checkbox"
-                    name=""
-                    :id="user.userId"
-                    :checked="user.linked"
-                    @click="
-                      setRelation({
-                        user,
-                      })
-                    "
-                  />
-                  <label :for="user.userId">
-                    <small>{{ user.name }} {{ user.email }}</small>
-                  </label>
-                </span>
+              <div class="form-group">
+                <input
+                  class="form-control"
+                  v-model="inviteLastName"
+                  placeholder="Last Name"
+                  type="text"
+                />
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-              Close
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="saveRelations"
-              :disabled="disabledBtnSaveRelationUser"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      </VModalDialog>
-    </VModal>
-
-    <!-- INVITE USER MODAL -->
-
-    <VModal v-model="modal.inviteUser" persistent>
-      <VModalDialog>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Invite User</h5>
-            <VModalCloseButton />
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <input
-                id="inviteEmail"
-                class="form-control"
-                v-model="inviteEmail"
-                placeholder="Email"
-                type="text"
-              />
-
-              <small v-if="validateMessage !== null" class="text-danger">{{
-                validateMessage
-              }}</small>
-            </div>
-
-            <div class="form-group">
-              <input
-                class="form-control"
-                v-model="inviteFirstName"
-                placeholder="First Name"
-                type="text"
-              />
-            </div>
-
-            <div class="form-group">
-              <input
-                class="form-control"
-                v-model="inviteLastName"
-                placeholder="Last Name"
-                type="text"
-              />
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Close
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="inviteUser"
+                :disabled="disabledBtnInviteUser"
+              >
+                Invite
+              </button>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-              Close
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="inviteUser"
-              :disabled="disabledBtnInviteUser"
-            >
-              Invite
-            </button>
-          </div>
-        </div>
-      </VModalDialog>
-    </VModal>
+        </VModalDialog>
+      </VModal>
+    </client-only>
   </div>
 </template>
 
@@ -406,11 +649,27 @@ export default {
       selectedUser: null,
 
       userEditableProps: [
-        // only firstName field is required
         { field: 'firstName', required: true },
         { field: 'middleName', required: false },
         { field: 'lastName', required: false },
-        { field: 'email', required: true },
+        { field: 'phone', required: false },
+        { field: 'mobilePhone', required: false },
+        { field: 'fax', required: false },
+        { field: 'address', required: false },
+        // { field: 'addressAptCk', required: false },
+        // { field: 'addressSteCk', required: false },
+        // { field: 'addressFloork', required: false },
+        { field: 'city', required: false },
+        { field: 'state', required: false },
+        { field: 'zipCode', required: false },
+        { field: 'foreignProvince', required: false },
+        { field: 'foreignPostalCode', required: false },
+        { field: 'country', required: false },
+        { field: 'eoir', required: false },
+        { field: 'licensingAuthority', required: false },
+        { field: 'barNumber', required: false },
+        { field: 'lawFirmName', required: false },
+        { field: 'uscisElis', required: false },
       ],
 
       userForRelation: null,
@@ -504,7 +763,7 @@ export default {
         // current value is different to datatable
         if (columnPropValue !== propValue) {
           // field is required but his current value is empty
-          if (prop.required && propValue === '') return true;
+          if (prop.required && propValue.trim() === '') return true;
           // field in datatables was empty y is now too
           if (columnPropValue === null && propValue === '') continue;
 
@@ -516,20 +775,20 @@ export default {
     },
 
     disabledBtnInviteUser() {
-      if (
-        this.inviteEmail === null ||
-        this.inviteEmail === '' ||
-        this.inviteFirstName === null ||
-        this.inviteFirstName === '' ||
-        this.inviteLastName === null ||
-        this.inviteLastName === ''
-      )
-        return true;
-      else return false;
+      const values = [
+        this.inviteEmail,
+        this.inviteEmail,
+        this.inviteFirstName,
+        this.inviteFirstName,
+        this.inviteLastName,
+        this.inviteLastName,
+      ];
+
+      return values.some(v => v === '' || v === null);
     },
   },
 
-  mounted() {
+  created() {
     this.getUsers();
   },
 
@@ -541,7 +800,7 @@ export default {
       'updateUser',
       'getUsersIntegrations',
       'updateUserRelations',
-      'checkUserEmailExist',
+      // 'checkUserEmailExist',
       'adminInviteUser',
       'getUsers',
     ]),
@@ -649,32 +908,30 @@ export default {
     async onUserEdit() {
       if (this.disabledBtnEditUser) return;
 
-      // VALIDATE EMAIL
+      // validate email
+      // if (!this.validateUserEmail(this.selectedUser.email)) {
+      //   document.getElementById('txtEditEmail').classList.add('is-invalid');
 
-      if (!this.validateUserEmail(this.selectedUser.email)) {
-        document.getElementById('txtEditEmail').classList.add('is-invalid');
+      //   this.validateMessage = 'Invalid Email.';
 
-        this.validateMessage = 'Invalid Email.';
+      //   return;
+      // } else document.getElementById('txtEditEmail').classList.remove('is-invalid');
 
-        return;
-      } else document.getElementById('txtEditEmail').classList.remove('is-invalid');
+      // // verify if exist email
+      // if (columnUser.email !== this.selectedUser.email) {
+        //   let existEmail = await this.existUserEmail(this.selectedUser.email);
+
+      //   if (existEmail) {
+        //     document.getElementById('txtEditEmail').classList.add('is-invalid');
+
+      //     this.validateMessage =
+      //       'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
+
+      //     return;
+      //   }
+      // }
 
       const columnUser = this.users[this.selectedUser.index];
-
-      // VERIFY IF EXIST EMAIL
-
-      if (columnUser.email !== this.selectedUser.email) {
-        let existEmail = await this.existUserEmail(this.selectedUser.email);
-
-        if (existEmail) {
-          document.getElementById('txtEditEmail').classList.add('is-invalid');
-
-          this.validateMessage =
-            'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
-
-          return;
-        }
-      }
 
       // get only changed data
       const newData = Object.keys(this.selectedUser).reduce((obj, key) => {
@@ -695,6 +952,9 @@ export default {
 
         return obj;
       }, {});
+
+      console.log(newData);
+      return;
 
       try {
         await this.updateUser({
@@ -746,25 +1006,24 @@ export default {
     },
 
     validateUserEmail(email) {
-      // VALIDATE EMAIL
-
-      var regex = new RegExp('^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$');
-
-      if (!regex.test(email)) return false;
-      else return true;
+      // validate email
+      const regex = new RegExp(
+        '^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$',
+      );
+      return regex.test(email);
     },
 
-    async existUserEmail(email) {
-      // IF EXIST EMAIL
-      let existEmail = false;
+    // async existUserEmail(email) {
+    //   // IF EXIST EMAIL
+    //   let existEmail = false;
 
-      await this.checkUserEmailExist(email).then(response => {
-        if (response === 1) existEmail = true;
-        else if (response === 0) existEmail = false;
-      });
+    //   await this.checkUserEmailExist(email).then(response => {
+    //     if (response === 1) existEmail = true;
+    //     else if (response === 0) existEmail = false;
+    //   });
 
-      return existEmail;
-    },
+    //   return existEmail;
+    // },
 
     async inviteUser() {
       // VALIDATE EMAIL
@@ -817,6 +1076,12 @@ export default {
         });
       }
     },
+
+    editUserInputRequired(fieldName) {
+      const value = this.userEditableProps.find(v => v.field === fieldName);
+
+      return !!value && value.required;
+    }
   },
 };
 </script>

@@ -234,7 +234,7 @@ export const actions = {
     });
   },
 
-  // RESEND EMAIL PHP ROUTE
+  /** resend email php route */
   async resendEmail(store, userId) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -253,7 +253,7 @@ export const actions = {
     });
   },
 
-  // RESET PASSWORD PHP ROUTE
+  /** reset password php route */
   async resetPassword(store, userId) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -272,7 +272,7 @@ export const actions = {
     });
   },
 
-  /** GET INTEGRATION USERS FOR RELATIONS USER **/
+  /** get integration users for relations user **/
   getUsersIntegrations({ commit }, payload) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -332,7 +332,7 @@ export const actions = {
     });
   },
 
-  /** UPDATE USER RELATIONS **/
+  /** update user relations **/
   async updateUserRelations({ commit }, payload) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -382,7 +382,7 @@ export const actions = {
     });
   },
 
-  // CHECK USER EMAIL EXIST PRIMA PHP
+  /** check user email exist prima php */
   async checkUserEmailExist(store, email) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -401,7 +401,7 @@ export const actions = {
     });
   },
 
-  // INVITE USER PRIMA PHP
+  /** invite user prima php */
   async adminInviteUser(store, payload) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -420,8 +420,7 @@ export const actions = {
     });
   },
 
-  // GET USERS
-
+  /** get users */
   async getUsers({ commit, state }) {
     // data al ready loaded
     if (state.loaded) {
@@ -445,6 +444,24 @@ export const actions = {
               active
               assignLibraries
               librariesQuantity
+              phone
+              mobilePhone
+              fax
+              address
+              addressAptCk
+              addressSteCk
+              addressFloork
+              city
+              state
+              zipCode
+              foreignProvince
+              foreignPostalCode
+              country
+              eoir
+              licensingAuthority
+              barNumber
+              lawFirmName
+              uscisElis
             }
           }
         `,
@@ -452,7 +469,6 @@ export const actions = {
 
       // set libraries quantity
       if (!!data.users.length) {
-
         // users module
         commit('SET_USERS', data.users);
       }

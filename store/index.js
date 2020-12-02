@@ -130,6 +130,24 @@ export const actions = {
               active
               assignLibraries
               librariesQuantity
+              addressFloork
+              addressAptCk
+              addressSteCk
+              fax
+              phone
+              mobilePhone
+              address
+              city
+              state
+              zipCode
+              foreignProvince
+              foreignPostalCode
+              country
+              eoir
+              licensingAuthority
+              barNumber
+              lawFirmName
+              uscisElis
             }
           }
         `,

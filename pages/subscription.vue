@@ -1023,13 +1023,6 @@ export default {
         // well, it can reduce
         if (available >= toReduce) {
           if (planIsCore(plan.nickname)) {
-            // const sum = this.getCheckedSum({ planMainId: plan.id });
-            // the new value is less than the sum of the another checked plans. Restart it
-            // if (value < sum) {
-            //   event.target.value = defaultPlan.users;
-            //   return;
-            // }
-
             const higherLicenceValue = this.getHigherLicencesValue();
             if (value < higherLicenceValue) {
               event.target.value = higherLicenceValue;
@@ -1108,13 +1101,6 @@ export default {
 
       // update from core plan
       if (planIsCore(plan.nickname)) {
-        // const sum = this.getCheckedSum({ planMainId: plan.id });
-
-        // if (value < sum) {
-        //   value = sum;
-        //   event.target.value = sum;
-        // }
-
         const higherLicenceValue = this.getHigherLicencesValue();
 
         if (value < higherLicenceValue) {
@@ -1153,18 +1139,11 @@ export default {
       const mainPlan = this.mainPlan(this.paymentPeriod);
       let mainValues = null;
 
-      // const sum = this.getCheckedSum({
-      //   planMainId: mainPlan.value.id,
-      //   currentPlanId: plan.id,
-      // });
-
       const higherLicenceValue = this.getHigherLicencesValue(value);
 
       // update main plan
-      // if (value + sum > mainPlan.value.users) {
       if (higherLicenceValue > mainPlan.value.users) {
         mainValues = {
-          // newValue: value + sum,
           newValue: higherLicenceValue,
           index: mainPlan.index,
         };
@@ -1179,10 +1158,8 @@ export default {
           library: libraryKeys.CORE.key,
           nickname: mainPlan.value.nickname,
           from: defaultMain.users,
-          // to: value + sum,
           to: higherLicenceValue,
           cost: `+${enUsFormatter.format(
-            // calcTotalPlan({ ...mainPlan.value, users: value + sum }) -
             calcTotalPlan({ ...mainPlan.value, users: higherLicenceValue }) -
               calcTotalPlan({ ...mainPlan.value, users: defaultMain.users }),
           )}`,
