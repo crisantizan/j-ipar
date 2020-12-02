@@ -232,22 +232,11 @@
                     class="col-lg-4 form-group d-flex flex-column align-items-center justify-content-end"
                   >
                     <div class="d-flex mb-1">
-                      <VCheckbox
-                        label="APT"
-                        class="mr-2"
-                        id="addressAptCk"
-                      />
-
-                      <VCheckbox
-                        label="STE"
-                        class="mr-2"
-                        id="addressSteCk"
-                      />
-
-                      <VCheckbox
-                        label="FLOOR"
-                        id="addressFloork"
-                      />
+                      <VRadioGroup name="address" :items="[
+                        { value: 'addressAptCk', label: 'APT' },
+                        { value: 'addressSteCk', label: 'STE' },
+                        { value: 'addressFloork', label: 'FLOOR' },
+                      ]" />
                     </div>
 
                     <input
