@@ -109,6 +109,7 @@ export default {
     '~/plugins/jquery.client.js',
     '~/plugins/bootstrap-table.client.js',
     '~/plugins/vue-good-table.client.js',
+    '~/plugins/v-mask.client.js',
   ],
   /*
    ** Auto import components

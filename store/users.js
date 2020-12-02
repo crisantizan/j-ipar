@@ -448,6 +448,7 @@ export const actions = {
               mobilePhone
               fax
               address
+              addressAptSteFlrNumbertxt
               addressAptCk
               addressSteCk
               addressFloork

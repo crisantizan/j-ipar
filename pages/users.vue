@@ -179,10 +179,11 @@
                     <label for="phone">Phone</label>
                     <input
                       v-model="selectedUser.phone"
+                      v-mask="'(###) ###-###'"
                       id="phone"
                       type="text"
                       class="form-control"
-                      placeholder="Phone"
+                      placeholder="(###) ###-###"
                       :required="editUserInputRequired('phone')"
                     />
                   </div>
@@ -191,10 +192,11 @@
                     <label for="mobilePhone">Mobile Phone</label>
                     <input
                       v-model="selectedUser.mobilePhone"
+                      v-mask="'(###) ###-###'"
                       id="mobilePhone"
                       type="text"
                       class="form-control"
-                      placeholder="Mobile Phone"
+                      placeholder="(###) ###-###"
                       :required="editUserInputRequired('mobilePhone')"
                     />
                   </div>
@@ -203,10 +205,11 @@
                     <label for="fax">Fax</label>
                     <input
                       v-model="selectedUser.fax"
+                      v-mask="'(###) ###-###'"
                       id="fax"
                       type="text"
                       class="form-control"
-                      placeholder="Fax"
+                      placeholder="(###) ###-###"
                       :required="editUserInputRequired('fax')"
                     />
                   </div>
@@ -225,16 +228,35 @@
                     />
                   </div>
 
-                  <!-- TODO:: unknow field name -->
                   <div
                     class="col-lg-4 form-group d-flex flex-column align-items-center justify-content-end"
                   >
                     <div class="d-flex mb-1">
-                      <VCheckbox label="APT" class="mr-2" id="addressAptCk" />
-                      <VCheckbox label="STE" class="mr-2" id="addressSteCk" />
-                      <VCheckbox label="FLOOR" id="addressFloork" />
+                      <VCheckbox
+                        label="APT"
+                        class="mr-2"
+                        id="addressAptCk"
+                      />
+
+                      <VCheckbox
+                        label="STE"
+                        class="mr-2"
+                        id="addressSteCk"
+                      />
+
+                      <VCheckbox
+                        label="FLOOR"
+                        id="addressFloork"
+                      />
                     </div>
-                    <input type="text" class="form-control" />
+
+                    <input
+                      v-model="selectedUser.addressAptSteFlrNumbertxt"
+                      type="text"
+                      class="form-control"
+                      placeholder="Address APT STE FLR Number"
+                      :required="editUserInputRequired('addressAptSteFlrNumbertxt')"
+                    />
                   </div>
 
                   <div class="col-lg-4 form-group">
@@ -656,6 +678,7 @@ export default {
         { field: 'mobilePhone', required: false },
         { field: 'fax', required: false },
         { field: 'address', required: false },
+        { field: 'addressAptSteFlrNumbertxt', required: false },
         // { field: 'addressAptCk', required: false },
         // { field: 'addressSteCk', required: false },
         // { field: 'addressFloork', required: false },
@@ -919,10 +942,10 @@ export default {
 
       // // verify if exist email
       // if (columnUser.email !== this.selectedUser.email) {
-        //   let existEmail = await this.existUserEmail(this.selectedUser.email);
+      //   let existEmail = await this.existUserEmail(this.selectedUser.email);
 
       //   if (existEmail) {
-        //     document.getElementById('txtEditEmail').classList.add('is-invalid');
+      //     document.getElementById('txtEditEmail').classList.add('is-invalid');
 
       //     this.validateMessage =
       //       'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
@@ -1081,7 +1104,7 @@ export default {
       const value = this.userEditableProps.find(v => v.field === fieldName);
 
       return !!value && value.required;
-    }
+    },
   },
 };
 </script>

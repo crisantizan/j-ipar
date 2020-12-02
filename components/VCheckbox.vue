@@ -25,7 +25,7 @@
 <script>
 export default {
   props: {
-    checked: { type: Boolean, default: false },
+    value: { default: false },
 
     async: {
       type: Boolean,
@@ -47,18 +47,16 @@ export default {
       default: false,
     },
 
+    values: {
+      type: Object,
+      default: () => ({ checked: true, unchecked: false }),
+    },
+
     color: {
       type: String,
       default: 'primary',
       validator(val) {
-        return [
-          'primary',
-          'success',
-          'danger',
-          'warning',
-          'secondary',
-          'dark',
-        ].includes(val);
+        return ['primary', 'success', 'danger', 'warning', 'secondary', 'dark'].includes(val);
       },
     },
 
@@ -66,13 +64,18 @@ export default {
   },
 
   model: {
-    prop: 'checked',
+    prop: 'value',
     event: 'change',
   },
 
   computed: {
+    $_isChecked() {
+      return this.value === this.values.checked;
+    },
+
     isChecked() {
-      return !this.$props.invert ? this.$props.checked : !this.$props.checked;
+      // return !this.invert ? this.value : !this.value;
+      return !this.invert ? this.$_isChecked : !this.$_isChecked;
     },
 
     colorClass() {
@@ -92,10 +95,18 @@ export default {
   methods: {
     onClick() {
       if (this.disabled) return;
-
       const event = !this.async ? 'change' : 'change-async';
 
-      this.$emit(event, !this.$props.checked);
+      let newValue = null;
+
+      if (!this.invert) {
+        newValue = this.isChecked ? this.values.unchecked : this.values.checked;
+      } else {
+        newValue = this.isChecked ? this.values.checked : this.values.unchecked;
+      }
+
+      // const newValue = this.isChecked ? this.values.unchecked : this.values.checked;
+      this.$emit(event, newValue);
     },
   },
 };

@@ -17,6 +17,7 @@
     "graphql-tag": "^2.11.0",
     "jquery": "^3.5.1",
     "nuxt": "^2.14.0",
+    "v-mask": "^2.2.3",
     "vue-good-table": "^2.21.0",
     "vue-infinite-loading": "^2.4.5"
   },

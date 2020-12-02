@@ -137,6 +137,7 @@ export const actions = {
               phone
               mobilePhone
               address
+              addressAptSteFlrNumbertxt
               city
               state
               zipCode
