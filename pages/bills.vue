@@ -80,7 +80,7 @@ export default {
         hidden: false,
         toggle: true,
         type: 'number',
-        formatFn: value => enUsFormatter.format(value),
+        formatFn: value => enUsFormatter.format(value / 100),
       },
     ],
   }),
