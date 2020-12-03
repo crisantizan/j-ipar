@@ -127,7 +127,7 @@
 
     <client-only>
       <!-- edit user modal -->
-      <VModal v-model="modal.editUser" persistent>
+      <VModal v-model="modal.editUser" persistent @change="onChangeEditUserModal">
         <VModalDialog class="modal-xl">
           <div class="modal-content">
             <div class="modal-header">
@@ -255,7 +255,7 @@
 
                     <pre>{{ selectedUser.addressAptCk }}</pre>
                     <pre>{{ selectedUser.addressSteCk }}</pre>
-                    <pre>{{ selectedUser.addressFloork }}</pre> -->
+                    <pre>{{ selectedUser.addressFloorCk }}</pre> -->
                   </div>
 
                   <div class="col-lg-4 form-group">
@@ -536,7 +536,7 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { generateCheckboxHTML } from '@/helpers/generate-html';
 import { cloneObject } from '@/helpers/functions';
-import { libraryKeys } from '@/utils/constants';
+import { libraryKeys, USER_ADDRESS_FIELDS } from '@/utils/constants';
 
 export default {
   components: {
@@ -635,10 +635,10 @@ export default {
         { field: 'fax', required: false },
         { field: 'address', required: false },
         { field: 'addressAptSteFlrNumbertxt', required: false },
-        { field: 'addressAptSteFloor', required: false },
+        // { field: 'addressAptSteFloor', required: false },
         { field: 'addressAptCk', required: false, omit: true },
         { field: 'addressSteCk', required: false, omit: true },
-        { field: 'addressFloork', required: false, omit: true },
+        { field: 'addressFloorCk', required: false, omit: true },
         { field: 'city', required: false },
         { field: 'state', required: false },
         { field: 'zipCode', required: false },
@@ -746,7 +746,6 @@ export default {
           if (prop.required && propValue.trim() === '') return true;
           // field in datatables was empty y is now too
           if (columnPropValue === null && propValue === '') continue;
-
           return false;
         }
       }
@@ -857,15 +856,22 @@ export default {
     },
 
     getUserAddressAptSteFloor(user) {
-      const arrFields = ['addressAptCk', 'addressSteCk', 'addressFloork'];
-
       for (const field in user) {
-        if (arrFields.some(v => v === field) && user[field] === 'on') {
-          return field;
+        const current = USER_ADDRESS_FIELDS.find(v => v.field === field);
+        if (current && user[field] === 'on') {
+          return current.value;
         }
       }
 
       return null;
+    },
+
+    /** show/close edit user modal */
+    onChangeEditUserModal(state) {
+      // reset selected user data on closing
+      if (!state) {
+        this.selectedUser = null;
+      }
     },
 
     /** open modals from "TheDatatableUsersActions" */
@@ -1062,24 +1068,13 @@ export default {
     onChangeAddressRadioGroup(value) {
       if (!this.selectedUser) return;
 
-      const fields = {
-        addressAptCk: 'apt',
-        addressSteCk: 'ste',
-        addressFloork: 'floor',
-      };
-
-      const field = Object.keys(fields).find(key => fields[key] === value);
-
-      const arrFields = ['addressAptCk', 'addressSteCk', 'addressFloork'];
-
-      for (const currentField of arrFields) {
-        if (currentField === field) {
-          this.selectedUser[currentField] = 'on';
-          continue;
+      USER_ADDRESS_FIELDS.forEach(address => {
+        if (address.value === value) {
+          this.selectedUser[address.field] = 'on';
+        } else {
+          this.selectedUser[address.field] = 'off';
         }
-
-        this.selectedUser[currentField] = 'off';
-      }
+      });
     },
   },
 };

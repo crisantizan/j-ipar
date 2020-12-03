@@ -130,7 +130,7 @@ export const actions = {
               active
               assignLibraries
               librariesQuantity
-              addressFloork
+              addressFloorCk
               addressAptCk
               addressSteCk
               fax

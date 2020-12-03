@@ -381,7 +381,7 @@ export const actions = {
                 addressAptSteFlrNumbertxt
                 addressAptCk
                 addressSteCk
-                addressFloork
+                addressFloorCk
                 city
                 state
                 zipCode
@@ -483,7 +483,7 @@ export const actions = {
               addressAptSteFlrNumbertxt
               addressAptCk
               addressSteCk
-              addressFloork
+              addressFloorCk
               city
               state
               zipCode
