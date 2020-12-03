@@ -398,6 +398,22 @@
                       :required="editUserInputRequired('uscisElis')"
                     />
                   </div>
+
+                  <div class="col-lg-4 form-group">
+                    <label for="txtEditEmail">Email</label>
+                    <input
+                      id="txtEditEmail"
+                      v-model="selectedUser.email"
+                      type="text"
+                      class="form-control"
+                      placeholder="Email"
+                      @input="removeInvalid"
+                    />
+
+                    <small v-if="validateMessage !== null" class="text-danger">{{
+                      validateMessage
+                    }}</small>
+                  </div>
                 </div>
               </div>
               <div class="modal-footer">
@@ -650,6 +666,7 @@ export default {
         { field: 'barNumber', required: false },
         { field: 'lawFirmName', required: false },
         { field: 'uscisElis', required: false },
+        { field: 'email', required: true },
       ],
 
       userForRelation: null,
@@ -779,7 +796,7 @@ export default {
       'updateUser',
       'getUsersIntegrations',
       'updateUserRelations',
-      // 'checkUserEmailExist',
+      'checkUserEmailExist',
       'adminInviteUser',
       'getUsers',
     ]),
@@ -906,7 +923,33 @@ export default {
     async onUserEdit() {
       if (this.disabledBtnEditUser) return;
 
+      // const columnUser = this.users[this.selectedUser.index];
+      // VALIDATE EMAIL
+
+      if (!this.validateUserEmail(this.selectedUser.email)) {
+        document.getElementById('txtEditEmail').classList.add('is-invalid');
+
+        this.validateMessage = 'Invalid Email.';
+
+        return;
+      } else document.getElementById('txtEditEmail').classList.remove('is-invalid');
+
       const columnUser = this.users[this.selectedUser.index];
+
+      // VERIFY IF EXIST EMAIL
+
+      if (columnUser.email !== this.selectedUser.email) {
+        let existEmail = await this.existUserEmail(this.selectedUser.email);
+
+        if (existEmail) {
+          document.getElementById('txtEditEmail').classList.add('is-invalid');
+
+          this.validateMessage =
+            'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
+
+          return;
+        }
+      }
 
       // get only changed data
       const userData = Object.keys(this.selectedUser).reduce((obj, key) => {
@@ -938,8 +981,6 @@ export default {
       if (this.selectedUser.addressAptSteFloor !== null) {
         userData.addressAptSteFloor = this.selectedUser.addressAptSteFloor;
       }
-
-      console.log(userData);
 
       try {
         await this.updateUser({
@@ -1005,6 +1046,18 @@ export default {
         '^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$',
       );
       return regex.test(email);
+    },
+
+    async existUserEmail(email) {
+      // IF EXIST EMAIL
+      let existEmail = false;
+
+      await this.checkUserEmailExist(email).then(response => {
+        if (response === 1) existEmail = true;
+        else if (response === 0) existEmail = false;
+      });
+
+      return existEmail;
     },
 
     async inviteUser() {
