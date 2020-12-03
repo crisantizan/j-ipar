@@ -369,7 +369,7 @@ export default {
         return false;
       }
 
-      if (!this.totalPaid || !this.valuesChange || this.yearlyToMonthly) {
+      if ((!this.totalPaid && !this.valuesChange) || !this.valuesChange || this.yearlyToMonthly) {
         return true;
       }
 
@@ -1491,79 +1491,6 @@ export default {
 
         // redirect to login prima
         if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
-
-        // // update last subscription period UI
-        // if (this.isSubscribed && this.paymentPeriod !== this.defaultPeriod) {
-        //   this.mirrorSubscriptionPlans.forEach((plan, index) => {
-        //     if (plan.checked && plan.cancelAtPeriodEnd) {
-        //       // console.log('Actualizando: ', plan.)
-        //       this.SET_CANCELED_STATUS_PLAN({
-        //         cancelAt: null,
-        //         canceledAt: null,
-        //         cancelAtPeriodEnd: false,
-        //         index,
-        //         period: this.mirrorPeriod,
-        //       });
-        //     }
-        //   });
-        // }
-
-        // // first subscription
-        // if (!this.isSubscribed) {
-        //   this.SET_SUBSCRIBED(true);
-        // }
-
-        // // update default payment period
-        // if (this.paymentPeriod !== this.defaultPeriod) {
-        //   this.SET_DEFAULT_PERIOD(this.paymentPeriod);
-        // }
-
-        // // update default total paid
-        // if (updateDefaultTotalPaid) {
-        //   this.SET_DEFAULT_TOTAL_PAID(this.totalPaid);
-        // }
-
-        // // apply changes in template
-        // this.CONFIRM_COUPONS();
-
-        // // update default checked plans
-        // this.SET_DEFAULT_CHECKED_PLANS();
-
-        // if (this.valuesChange) {
-        //   this.valuesChange = false;
-        // }
-
-        // const librariesQuantity = {};
-
-        // // old canceled plans, update
-        // this.show.forEach((plan, index) => {
-        //   if (plan.checked && plan.cancelAtPeriodEnd) {
-        //     this.SET_CANCELED_STATUS_PLAN({
-        //       cancelAt: null,
-        //       canceledAt: null,
-        //       cancelAtPeriodEnd: false,
-        //       index,
-        //     });
-        //   }
-
-        //   for (const prop in libraryKeys) {
-        //     if (includeValue(plan.nickname, libraryKeys[prop].staticValue)) {
-        //       librariesQuantity[libraryKeys[prop].key] = plan.users;
-        //     }
-        //   }
-        // });
-
-        // // update librariesQuantity
-        // if (!!Object.keys(librariesQuantity).length) {
-        //   this.UPDATE_LIBRARIES_QUANTITY(librariesQuantity);
-        // }
-
-        // // reset array
-        // this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
-        // // this.UPDATE_PLAN_CHANGES_DATA({ data: null });
-
-        // // REDIRECT TO LOGIN PRIMA
-        // if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
       } catch (err) {
         console.error(err);
         this.$toast.error('Add/Update subscription error', {
