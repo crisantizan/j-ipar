@@ -21,3 +21,9 @@ export const USER_ADDRESS_FIELDS = [
     field: 'addressFloorCk',
   },
 ];
+
+/** user roles */
+export const userRoles = {
+  ADMIN: 'admin',
+  USER: 'user',
+};

@@ -28,12 +28,16 @@
 
       <!-- submenu -->
       <VDropdownMenuItem submenu tag="div">
-        <VDropdownMenuItem icon="user-tag" arrow-indicator :disabled="!user.active">
+        <VDropdownMenuItem icon="user-tag" arrow-indicator :disabled="!user.active || !user.admin">
           Change Role
         </VDropdownMenuItem>
         <VDropdownMenu class="p-0" pull-left>
-          <VDropdownMenuItem :disabled="!user.admin">To user</VDropdownMenuItem>
-          <VDropdownMenuItem :disabled="user.admin">To admin</VDropdownMenuItem>
+          <VDropdownMenuItem :disabled="!user.admin" @click="onChangeRole(roles.USER)">
+            To user
+          </VDropdownMenuItem>
+          <VDropdownMenuItem :disabled="user.admin">
+            To admin
+          </VDropdownMenuItem>
         </VDropdownMenu>
       </VDropdownMenuItem>
 
@@ -47,6 +51,7 @@
 <script>
 import { mapMutations, mapActions, mapGetters } from 'vuex';
 import { cloneObject, capitalize } from '@/helpers/functions';
+import { userRoles } from '@/utils/constants';
 
 export default {
   props: {
@@ -67,16 +72,20 @@ export default {
   },
 
   computed: {
+    ...mapGetters({ currentUser: 'user' }),
+
     index() {
       return this.rowProps.row.index;
     },
 
-    ...mapGetters({ currentUser: 'user' }),
+    roles() {
+      return userRoles;
+    },
   },
 
   methods: {
     ...mapMutations('users', ['SET_CHECKED', 'SET_ACTIVE']),
-    ...mapActions('users', ['updateState', 'resetPassword', 'resendEmail']),
+    ...mapActions('users', ['updateState', 'resetPassword', 'resendEmail', 'changeRole']),
 
     async onDisableClick() {
       try {
@@ -184,6 +193,30 @@ export default {
         modal: 'relations',
         data: cloneObject(this.user),
       });
+    },
+
+    /** only admin to user for now */
+    async onChangeRole(role) {
+      // only admin users
+      if (!this.user.admin) return;
+
+      try {
+        await this.changeRole({
+          index: this.user.index,
+          userId: this.user.id,
+          role,
+        });
+      } catch (error) {
+        console.error(error);
+        this.$toast.error('Error while we trying update user role', {
+          duration: 3000,
+          position: 'bottom-right',
+          icon: {
+            name: 'exclamation-circle',
+            after: true,
+          },
+        });
+      }
     },
   },
 };

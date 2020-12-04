@@ -159,6 +159,34 @@ export const getters = {
 };
 
 export const actions = {
+  /** change user role */
+  async changeRole({ commit }, { index, userId, role }) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data, errors } = await this.$axios.graphql({
+          mutate: gql`
+            mutation($userId: Int!, $role: rolesUser!) {
+              userEdit(id: $userId, editUser: { role: $role }) {
+                admin
+              }
+            }
+          `,
+          variables: { userId, role },
+        });
+
+        if (!!errors && errors.length > 0) {
+          reject(errors);
+          return;
+        }
+
+        commit('UPDATE_USER_DATA', { index, data: data.userEdit });
+        resolve(data.userEdit);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
   /** assign library to user **/
   assignLibrary(store, payload) {
     // payload: { userId: number, library: Object }
@@ -293,8 +321,7 @@ export const actions = {
         if (data.usersIntegrations && data.usersIntegrations !== null) {
           commit('SET_USERS_INTEGRATIONS', data.usersIntegrations);
 
-          // SET INFO FOR INTEGRATIONS FOR LIST ON USER RELATIONS MODAL
-
+          // set info for integrations for list on user relations modal
           let integrations = [];
 
           data.usersIntegrations.forEach(user => {
@@ -321,7 +348,6 @@ export const actions = {
 
         resolve(true);
       } catch (error) {
-        console.log(error);
         reject(error);
       }
     });
@@ -344,8 +370,6 @@ export const actions = {
           `,
           variables: payload,
         });
-
-        console.log(data);
 
         resolve(true);
       } catch (error) {
