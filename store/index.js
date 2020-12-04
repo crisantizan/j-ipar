@@ -59,6 +59,7 @@ export const actions = {
             tenant {
               id
               name
+              email
               logoUrl
               billingAddress
               billingFirstName
@@ -199,6 +200,7 @@ export const actions = {
                 middleName
                 lastName
                 active
+                admin
               }
             }
           `,

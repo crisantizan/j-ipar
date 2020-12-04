@@ -28,14 +28,18 @@
 
       <!-- submenu -->
       <VDropdownMenuItem submenu tag="div">
-        <VDropdownMenuItem icon="user-tag" arrow-indicator :disabled="!user.active || !user.admin">
+        <VDropdownMenuItem
+          icon="user-tag"
+          arrow-indicator
+          :disabled="!user.active || !currentUser.admin"
+        >
           Change Role
         </VDropdownMenuItem>
         <VDropdownMenu class="p-0" pull-left>
           <VDropdownMenuItem :disabled="!user.admin" @click="onChangeRole(roles.USER)">
             To user
           </VDropdownMenuItem>
-          <VDropdownMenuItem :disabled="user.admin">
+          <VDropdownMenuItem :disabled="user.admin" @click="onChangeRole(roles.ADMIN)">
             To admin
           </VDropdownMenuItem>
         </VDropdownMenu>
@@ -195,10 +199,10 @@ export default {
       });
     },
 
-    /** only admin to user for now */
+    /** change user role */
     async onChangeRole(role) {
       // only admin users
-      if (!this.user.admin) return;
+      if (!this.currentUser.admin) return;
 
       try {
         await this.changeRole({
