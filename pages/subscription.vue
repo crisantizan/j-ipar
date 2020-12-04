@@ -521,9 +521,17 @@ export default {
 
     openPopupAboutLicences() {
       Swal.fire({
-        icon: 'info',
-        text:
-          'You will need one Prima.Law "Core" license for each user in your firm. You only need to purchase forms libraries for the users who will be using the forms or questionnaires for those practice areas. Users without a forms library license will not have access to any of the forms for that practice area.',
+        html: /*html*/ `
+          <div class="card">
+            <div class="alert-popup-cover questions-about-licences-cover"></div>
+            <div class="card-body">
+            <h3 class="mt-1">Questions about licences</h3>
+            <p class="card-text">You will need one Prima.Law "Core" license for each user in your firm. You only need to purchase forms libraries for the users who will be using the forms or questionnaires for those practice areas. Users without a forms library license will not have access to any of the forms for that practice area.</p>
+          </div>
+        </div>`,
+        customClass: {
+          popup: 'alert-popup',
+        },
       });
     },
 
@@ -1591,14 +1599,22 @@ export default {
   padding: 0;
 }
 
-.alert-popup .welcome-alert-cover {
-  background-image: url('~assets/svg/welcome.svg');
+.alert-popup .alert-popup-cover {
   height: 250px;
   border-top-left-radius: 0.3125em;
   border-top-right-radius: 0.3125em;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+.alert-popup .welcome-alert-cover {
+  background-image: url('~assets/svg/welcome.svg');
+}
+
+.alert-popup .questions-about-licences-cover {
+  height: 340px;
+  background-image: url('~assets/svg/questions-about-licences.svg');
 }
 
 .alert-popup .card {
