@@ -37,15 +37,24 @@
         <div
           class="card-box credit-card ribbon-box px-2 m-1"
           :class="{
-            'credit-card-default':
-              paymentMethod.id == customer.invoiceSettings.default_payment_method,
+            'credit-card-default': isDefaultPaymentMethod(paymentMethod),
+            'credit-card-default--expired':
+              isDefaultPaymentMethod(paymentMethod) && defaultPaymentMethodIsExpirated,
           }"
         >
-          <div class="ribbon ribbon-primary float-left">
-            <span v-if="paymentMethod.id === customer.invoiceSettings.default_payment_method"
-              >Active</span
-            >
+          <div
+            class="ribbon float-left"
+            :class="[
+              isDefaultPaymentMethod(paymentMethod) && defaultPaymentMethodIsExpirated
+                ? 'ribbon-danger'
+                : 'ribbon-primary',
+            ]"
+          >
+            <span v-if="isDefaultPaymentMethod(paymentMethod)">Active</span>
             Payment Method
+            <span v-if="isDefaultPaymentMethod(paymentMethod) && defaultPaymentMethodIsExpirated">
+              (EXPIRATED)
+            </span>
           </div>
           <h5 class="text-primary float-right mt-0"></h5>
           <div class="ribbon-content">
@@ -91,10 +100,29 @@ import { mapMutations, mapActions, mapGetters } from 'vuex';
 export default {
   computed: {
     ...mapGetters(['loading']),
-    ...mapGetters('plans', ['customer', 'paymentMethods']),
+    ...mapGetters('plans', [
+      'customer',
+      'paymentMethods',
+      'defaultPaymentMethod',
+      'defaultPaymentMethodIsExpirated',
+    ]),
+  },
+
+  watch: {
+    defaultPaymentMethodIsExpirated: {
+      handler(val) {
+        if (val) {
+          this.showAlertOnExpiratedDefaultPaymentMethod();
+        }
+      },
+    },
   },
 
   mounted() {
+    if (this.defaultPaymentMethodIsExpirated) {
+      this.showAlertOnExpiratedDefaultPaymentMethod();
+    }
+
     // create a Stripe client.
     const stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
 
@@ -141,6 +169,18 @@ export default {
       'REMOVE_PAYMENT_METHOD',
     ]),
     ...mapActions('plan', ['getPaymentMethods']),
+
+    showAlertOnExpiratedDefaultPaymentMethod() {
+      Swal.fire({
+        title: 'Warning!',
+        icon: 'error',
+        text: 'Your default payment method is expirated!',
+      });
+    },
+
+    isDefaultPaymentMethod(paymentMethod) {
+      return this.defaultPaymentMethod.id === paymentMethod.id;
+    },
 
     /** create payment method*/
     async createPaymentMethod(stripe, card) {
@@ -289,6 +329,10 @@ export default {
 
 .credit-card-default {
   border-color: rgba(0, 59, 252, 0.5);
+}
+
+.credit-card-default--expired {
+  border-color: rgba(252, 0, 0, 0.5);
 }
 
 @media (min-width: 620px) {

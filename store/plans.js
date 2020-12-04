@@ -370,6 +370,23 @@ export const getters = {
     return state.paymentMethods.length > 0;
   },
 
+  defaultPaymentMethod(_, getters) {
+    return getters.paymentMethods.find(
+      val => val.id === getters.customer.invoiceSettings.default_payment_method,
+    );
+  },
+
+  defaultPaymentMethodIsExpirated(_, getters) {
+    const date = new Date();
+    const currentYear = date.getFullYear();
+    const currentMonth = date.getMonth() + 1;
+
+    return (
+      getters.defaultPaymentMethod.card.exp_year < currentYear ||
+      getters.defaultPaymentMethod.card.exp_month < currentMonth
+    );
+  },
+
   subscriptionIsCanceled(state, getters) {
     return getters.defaultCheckedPlans.every(val => {
       const plan = state[state.defaultPeriod].find(plan => plan.id === val.id);

@@ -108,7 +108,8 @@
                             class="form-control form-control-sm text-secondary"
                             placeholder="Add Coupon"
                             :disabled="
-                              !plan.checked ||
+                              defaultPaymentMethodIsExpirated ||
+                                !plan.checked ||
                                 subscriptionIsCanceled ||
                                 plan.cancelAtPeriodEnd ||
                                 disabledMirrorPeriod
@@ -179,7 +180,8 @@
                           min="0"
                           size="3"
                           :disabled="
-                            !plan.checked ||
+                            defaultPaymentMethodIsExpirated ||
+                              !plan.checked ||
                               plan.cancelAtPeriodEnd ||
                               subscriptionIsCanceled ||
                               disabledMirrorPeriod
@@ -234,13 +236,14 @@
               </table>
             </div>
 
-            <!-- <div class="text-right mb-3" v-if="!!paymentMethods.length"> -->
             <div class="text-right mb-3" v-if="hasPaymentMethods">
               <button
                 v-if="subscriptionIsCanceled"
                 class="btn btn-warning mr-2"
                 @click="resetSubscription"
-                :disabled="this.paymentPeriod !== this.defaultPeriod"
+                :disabled="
+                  defaultPaymentMethodIsExpirated || this.paymentPeriod !== this.defaultPeriod
+                "
               >
                 Resubscribe
               </button>
@@ -321,6 +324,7 @@ export default {
       'defaultTotalPaid',
       'planChangesData',
       'hasPaymentMethods',
+      'defaultPaymentMethodIsExpirated',
     ]),
     ...mapGetters('users', ['isUpdate', 'getLibrariesAvailable']),
     ...mapGetters('users', { selectedLibraries: 'selected' }),
@@ -340,6 +344,7 @@ export default {
 
     disabledBtnCancel() {
       return (
+        this.defaultPaymentMethodIsExpirated ||
         this.loading ||
         this.paymentPeriod !== this.defaultPeriod ||
         this.subscriptionIsCanceled ||
@@ -365,6 +370,8 @@ export default {
 
     /** disabled button "Subscribe / Update" */
     disabledBtnSubscribeUpdate() {
+      if (this.defaultPaymentMethodIsExpirated) return true;
+
       if (!!this.totalPaid && this.monthlyToYearly) {
         return false;
       }
@@ -535,7 +542,13 @@ export default {
     },
 
     checkboxIsDisabled(active) {
-      return this.loading || !active || this.subscriptionIsCanceled || this.disabledMirrorPeriod;
+      return (
+        this.defaultPaymentMethodIsExpirated ||
+        this.loading ||
+        !active ||
+        this.subscriptionIsCanceled ||
+        this.disabledMirrorPeriod
+      );
     },
 
     printStatusPlan(plan) {
