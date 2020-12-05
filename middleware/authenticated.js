@@ -21,14 +21,11 @@ export default async function({ app, store, redirect, route, $axios }) {
         return;
 
       default:
-        // if (!process.token && !route.query.token) {
-        // 	return redirect('/access-denied');
-        // }
+        if (!process.token && !route.query.token) {
+        	return redirect('/access-denied');
+        }
 
-        // !process.token && (process.token = route.query.token);
-
-        process.token =
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6OTYsInRlbmFudENvZGUiOiJCNkdMVTIxNjA0MTk4MTciLCJlbWFpbCI6Ikp1ZmVvcjkzM0BnbWFpbC5jb20iLCJ1c2VySWQiOjEsInNlc3Npb25JZCI6IjAwNTA4ZDQ0LTJmMTAtNDgxMy1hODk0LTllMzU1OGY4M2U3ZSIsImlhdCI6MTYwNzA5MjM4NSwiZXhwIjoxNjA3Njk3MTg1fQ.IUCOjjtfVT-ZMTWZ9kj-rWTRM6FRD8KtkK3sKpB8UcA';
+        !process.token && (process.token = route.query.token);
 
         if (!process.isAuth) {
           store.commit('SET_TOKEN', process.token);

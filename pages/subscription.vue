@@ -71,6 +71,7 @@
                             value: $event,
                             isCanceled: plan.cancelAtPeriodEnd,
                             index,
+                            users: plan.users,
                           })
                         "
                       />
@@ -110,7 +111,7 @@
                             :disabled="
                               defaultPaymentMethodIsExpirated ||
                                 !plan.checked ||
-                                subscriptionIsCanceled ||
+                                (subscriptionIsCanceled && isSubscribed) ||
                                 plan.cancelAtPeriodEnd ||
                                 disabledMirrorPeriod
                             "
@@ -550,8 +551,7 @@ export default {
         this.defaultPaymentMethodIsExpirated ||
         this.loading ||
         !active ||
-        this.subscriptionIsCanceled ||
-        this.disabledMirrorPeriod
+        ((this.subscriptionIsCanceled || this.disabledMirrorPeriod) && this.isSubscribed)
       );
     },
 
@@ -786,7 +786,9 @@ export default {
               let active = plan.active;
 
               // disabled core
-              if (planIsCore(plan.nickname)) active = false;
+              if (planIsCore(plan.nickname) && plan.checked) {
+                active = false;
+              }
 
               return {
                 ...acc,
@@ -870,12 +872,21 @@ export default {
 
     /** on checked plan handler */
     async onCheckedPlan(data) {
-      // data { planId, nickname, value, isCanceled, index });
+      // data { planId, nickname, value, isCanceled, index, users });
 
-      // canceled or core, stop
-      if (this.subscriptionIsCanceled || this.disabledMirrorPeriod || planIsCore(data.nickname)) {
+      if (this.checkboxIsDisabled(true)) return;
+
+      // stop unchecked
+      if (
+        !this.isSubscribed &&
+        !data.value &&
+        planIsCore(data.nickname) &&
+        this.getHigherLicencesValue() !== 0
+      ) {
         return;
       }
+
+      delete data.users;
 
       // only in active payment period
       if (this.paymentPeriod === this.defaultPeriod) {
@@ -955,12 +966,13 @@ export default {
                 const index = this.planChangesData.findIndex(
                   v => v.library === defaultPlan.library,
                 );
-                // remove from changes data
-                this.UPDATE_PLAN_CHANGES_DATA({ remove: true, index });
 
                 // update default checked plan
                 this.REMOVE_DEFAULT_CHECKED_PLAN(data.index);
               }
+
+              // remove from changes data
+              this.UPDATE_PLAN_CHANGES_DATA({ remove: true, index: data.index });
             } catch (e) {
               console.error(e);
 
@@ -1031,12 +1043,6 @@ export default {
 
     /** on change users handler */
     async onChangeUsers({ event = null, value, plan, index }) {
-      // no negative numbers accepted
-      // if (Number(event.target.value) < 1) {
-      //   value = 1;
-      //   event.target.value = 1;
-      // }
-
       const defaultPlan = this.currentCheckedPlans.find(v => v.id === plan.id);
       const libraryKey = getPlanLibraryName(plan.nickname);
       let isReduce = false;
@@ -1158,7 +1164,7 @@ export default {
             type: 'Increase',
             library: libraryKey,
             nickname: plan.nickname,
-            from: !!defaultPlan ? defaultPlan.users : value,
+            from: !!defaultPlan ? defaultPlan.users : 0,
             to: value,
             cost: `+${enUsFormatter.format(
               calcTotalPlan({ ...plan, users: value }) - substractVal,
@@ -1197,7 +1203,7 @@ export default {
 
         const defaultMain = this.currentCheckedPlans.find(p => planIsCore(p.nickname));
 
-        const substractUsers = !!defaultMain ? defaultMain.users : mainPlan.value.users;
+        const substractUsers = !!defaultMain ? defaultMain.users : 0;
         const cost =
           calcTotalPlan({ ...mainPlan.value, users: higherLicenceValue }) -
           calcTotalPlan({ ...mainPlan.value, users: substractUsers });
@@ -1207,7 +1213,7 @@ export default {
           type: 'Increase',
           library: libraryKeys.CORE.key,
           nickname: mainPlan.value.nickname,
-          from: !!defaultMain ? defaultMain.users : mainPlan.value.users,
+          from: !!defaultMain ? defaultMain.users : 0,
           to: higherLicenceValue,
           cost: `+${enUsFormatter.format(cost)}`,
           text: '',
@@ -1255,10 +1261,17 @@ export default {
         this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
       }
 
-      if (value === 0 && !this.isSubscribed) {
+      if (value !== 0) return;
+
+      if (!this.isSubscribed) {
         this.SET_CHECKED_OR_USERS({
           prop: 'checked',
           value: false,
+          index,
+        });
+      } else {
+        this.UPDATE_USERS({
+          value: 1,
           index,
         });
       }
@@ -1541,7 +1554,7 @@ export default {
         this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
 
         // redirect to login prima
-        if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
+        // if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
       } catch (err) {
         console.error(err);
         this.$toast.error('Add/Update subscription error', {
