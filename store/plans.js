@@ -53,14 +53,14 @@ export const mutations = {
       }
     }
 
-    if (!found && !!state.all.length) {
-      // monthly is default checked period
-      const index = state.all.findIndex(plan => {
-        return planIsCore(plan.nickname) && plan.interval === 'month';
-      });
+    // if (!found && !!state.all.length) {
+    //   // monthly is default checked period
+    //   const index = state.all.findIndex(plan => {
+    //     return planIsCore(plan.nickname) && plan.interval === 'month';
+    //   });
 
-      state.all[index].checked = true;
-    }
+    //   state.all[index].checked = true;
+    // }
   },
 
   SET_MONTHLY(state, plans) {
