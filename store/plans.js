@@ -381,6 +381,10 @@ export const getters = {
     const currentYear = date.getFullYear();
     const currentMonth = date.getMonth() + 1;
 
+    if (typeof getters.defaultPaymentMethod === 'undefined') {
+      return null;
+    }
+
     return (
       getters.defaultPaymentMethod.card.exp_year < currentYear ||
       getters.defaultPaymentMethod.card.exp_month < currentMonth
