@@ -209,7 +209,8 @@
                           <span v-html="printStatusPlan(plan)"></span>
                           <!-- reset plan  -->
                           <a
-                            class="text-primary"
+                            class="text-primary resubscribe-button"
+                            :class="{ disabled: defaultPaymentMethodIsExpirated }"
                             v-if="plan.cancelAtPeriodEnd && !subscriptionIsCanceled"
                             style="cursor: pointer; text-decoration: underline"
                             @click="onResetPlan({ plan, index })"
@@ -1575,6 +1576,11 @@ export default {
 .package-selected {
   color: green !important;
   font-weight: bold;
+}
+
+.resubscribe-button.disabled {
+  pointer-events: none;
+  color: rgba(0,0,0,0.5) !important;
 }
 
 .credit-card {

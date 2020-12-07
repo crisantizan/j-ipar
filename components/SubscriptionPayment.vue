@@ -170,7 +170,7 @@ export default {
       'CHANGE_DEFAULT_CUSTOMER',
       'REMOVE_PAYMENT_METHOD',
     ]),
-    ...mapActions('plan', ['getPaymentMethods']),
+    ...mapActions('plans', ['getPaymentMethods', 'getCustomer']),
 
     showAlertOnExpiratedDefaultPaymentMethod() {
       Swal.fire({
@@ -181,6 +181,10 @@ export default {
     },
 
     isDefaultPaymentMethod(paymentMethod) {
+      if (!this.defaultPaymentMethod) {
+        return null;
+      }
+
       return this.defaultPaymentMethod.id === paymentMethod.id;
     },
 
@@ -212,6 +216,9 @@ export default {
           id: paymentMethod.id,
           card: paymentMethod.card,
         });
+
+        // if there's not a customer data load from server
+        !this.customer && (await this.getCustomer());
 
         // set as default
         this.CHANGE_DEFAULT_CUSTOMER(paymentMethod.id);
