@@ -799,6 +799,7 @@ export default {
       'checkUserEmailExist',
       'adminInviteUser',
       'getUsers',
+      'changeIsAttorney',
     ]),
 
     /** generate custom checkbox id */
@@ -847,9 +848,28 @@ export default {
       }
     },
 
-    onChangeIsAttorney(data) {
-      // data: { index, checked }
-      this.SET_IS_ATTORNEY_CHECKED(data);
+    /** update user is attorney */
+    async onChangeIsAttorney({ index, checked }) {
+      try {
+        const user = this.users[index];
+
+        await this.changeIsAttorney({
+          index,
+          userId: user.id,
+          isAttorney: checked,
+        });
+      } catch (error) {
+        console.error(error);
+
+        this.$toast.error("Internal server error, we couldn't update the user", {
+          duration: 3000,
+          position: 'bottom-right',
+          icon: {
+            name: 'exclamation-circle',
+            after: true,
+          },
+        });
+      }
     },
 
     isChecked(index, key) {
