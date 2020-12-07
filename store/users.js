@@ -24,10 +24,6 @@ export const mutations = {
     state.users[index].assignLibraries[library] = checked;
   },
 
-  SET_IS_ATTORNEY_CHECKED(state, { index, checked }) {
-    state.users[index].isAttorney = checked;
-  },
-
   SET_ACTIVE(state, { index, value }) {
     state.users[index].active = value;
   },
@@ -172,6 +168,34 @@ export const actions = {
             }
           `,
           variables: { userId, role },
+        });
+
+        if (!!errors && errors.length > 0) {
+          reject(errors);
+          return;
+        }
+
+        commit('UPDATE_USER_DATA', { index, data: data.userEdit });
+        resolve(data.userEdit);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  },
+
+  /** change user is attorney */
+  async changeIsAttorney({ commit }, { index, userId, isAttorney }) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data, errors } = await this.$axios.graphql({
+          mutate: gql`
+            mutation($userId: Int!, $isAttorney: Boolean!) {
+              userEdit(id: $userId, editUser: { isAttorney: $isAttorney }) {
+                isAttorney
+              }
+            }
+          `,
+          variables: { userId, isAttorney },
         });
 
         if (!!errors && errors.length > 0) {
