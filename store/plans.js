@@ -371,9 +371,11 @@ export const getters = {
   },
 
   defaultPaymentMethod(_, getters) {
-    return getters.paymentMethods.find(
+    const paymentMethod = getters.paymentMethods.find(
       val => val.id === getters.customer.invoiceSettings.default_payment_method,
     );
+
+    return paymentMethod || null;
   },
 
   defaultPaymentMethodIsExpirated(_, getters) {
@@ -381,7 +383,7 @@ export const getters = {
     const currentYear = date.getFullYear();
     const currentMonth = date.getMonth() + 1;
 
-    if (typeof getters.defaultPaymentMethod === 'undefined') {
+    if (!getters.defaultPaymentMethod) {
       return null;
     }
 
@@ -559,5 +561,34 @@ export const actions = {
     } catch (err) {
       console.error(err);
     }
+  },
+
+  /** get customer data */
+  async getCustomer({ commit, state }) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data, errors } = await this.$axios.graphql({
+          query: gql`
+            query {
+              customer: stripeCustomer {
+                id
+                invoiceSettings
+                subsPrevious
+              }
+            }
+          `,
+        });
+
+        if (!!errors && errors.length > 0) {
+          reject(errors);
+          return;
+        }
+
+        commit('plans/SET_CUSTOMER', data.customer, { root: true });
+        resolve(data.customer);
+      } catch (e) {
+        reject(e);
+      }
+    });
   },
 };
