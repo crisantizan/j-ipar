@@ -43,28 +43,6 @@ export default {
 			return `${process.env.BASE_IMAGE_URL}/${this.tenant.logoUrl}`;
 		},
 	},
-
-	async created() {
-		// try {
-		// 	const { data } = await this.$axios.graphql({
-		// 		query: gql`
-		// 			query {
-		// 				contacts {
-		// 					id
-		// 					firstName
-		// 					middleName
-		// 					lastName
-		// 					email
-		// 					alienNumber
-		// 				}
-		// 			}
-		// 		`,
-		// 	});
-		// 	console.log(data);
-		// } catch (e) {
-		// 	console.log(e);
-		// }
-	},
 };
 </script>
 

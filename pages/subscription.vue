@@ -388,13 +388,13 @@ export default {
   },
 
   mounted() {
-    if (!this.customer.subsPrevious && this.showWelcomeAlert) {
+    if ((!this.customer || !this.customer.subsPrevious) && this.showWelcomeAlert) {
       this.SHOW_WELCOME_ALERT(false);
 
       Swal.fire({
         html: /*html*/ `
           <div class="card">
-            <div class="welcome-alert-cover"></div>
+            <div class="alert-popup-cover welcome-alert-cover"></div>
             <div class="card-body">
             <h3 class="mt-1">Welcome to Prima!</h3>
             <p class="card-text">Thank you for your interest in Prima. To take advantage of your free trial, please enter your payment information and select your desired products. You will begin with a free 15-day trial and only charged at expiration of the trial. If you cancel before your trial expires, you will not be charged.</p>

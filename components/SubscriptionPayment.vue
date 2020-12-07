@@ -31,7 +31,9 @@
     <hr class="mt-1" />
 
     <div class="row p-2 cards-list">
-      <div v-if="!paymentMethods.length">Add Payment Method</div>
+      <div v-if="!paymentMethods.length">
+        <h4 class="text-secondary">Please, add a payment method</h4>
+      </div>
       <!-- go to 489 line -->
       <div v-else v-for="paymentMethod in paymentMethods" :key="paymentMethod.id">
         <div
