@@ -71,7 +71,6 @@
                             value: $event,
                             isCanceled: plan.cancelAtPeriodEnd,
                             index,
-                            users: plan.users,
                           })
                         "
                       />
@@ -111,7 +110,7 @@
                             :disabled="
                               defaultPaymentMethodIsExpirated ||
                                 !plan.checked ||
-                                (subscriptionIsCanceled && isSubscribed) ||
+                                subscriptionIsCanceled ||
                                 plan.cancelAtPeriodEnd ||
                                 disabledMirrorPeriod
                             "
@@ -182,8 +181,10 @@
                           size="3"
                           :disabled="
                             defaultPaymentMethodIsExpirated ||
-                              ((plan.cancelAtPeriodEnd || disabledMirrorPeriod || !plan.checked) &&
-                                isSubscribed)
+                              !plan.checked ||
+                              plan.cancelAtPeriodEnd ||
+                              subscriptionIsCanceled ||
+                              disabledMirrorPeriod
                           "
                           :value="plan.users"
                           @change="
@@ -238,10 +239,12 @@
 
             <div class="text-right mb-3" v-if="hasPaymentMethods">
               <button
-                v-if="isSubscribed && subscriptionIsCanceled"
+                v-if="subscriptionIsCanceled"
                 class="btn btn-warning mr-2"
                 @click="resetSubscription"
-                :disabled="defaultPaymentMethodIsExpirated || paymentPeriod !== defaultPeriod"
+                :disabled="
+                  defaultPaymentMethodIsExpirated || this.paymentPeriod !== this.defaultPeriod
+                "
               >
                 Resubscribe
               </button>
@@ -552,7 +555,8 @@ export default {
         this.defaultPaymentMethodIsExpirated ||
         this.loading ||
         !active ||
-        ((this.subscriptionIsCanceled || this.disabledMirrorPeriod) && this.isSubscribed)
+        this.subscriptionIsCanceled ||
+        this.disabledMirrorPeriod
       );
     },
 
@@ -787,9 +791,7 @@ export default {
               let active = plan.active;
 
               // disabled core
-              if (planIsCore(plan.nickname) && plan.checked) {
-                active = false;
-              }
+              if (planIsCore(plan.nickname)) active = false;
 
               return {
                 ...acc,
@@ -873,21 +875,12 @@ export default {
 
     /** on checked plan handler */
     async onCheckedPlan(data) {
-      // data { planId, nickname, value, isCanceled, index, users });
+      // data { planId, nickname, value, isCanceled, index });
 
-      if (this.checkboxIsDisabled(true)) return;
-
-      // stop unchecked
-      if (
-        !this.isSubscribed &&
-        !data.value &&
-        planIsCore(data.nickname) &&
-        this.getHigherLicencesValue() !== 0
-      ) {
+      // canceled or core, stop
+      if (this.subscriptionIsCanceled || this.disabledMirrorPeriod || planIsCore(data.nickname)) {
         return;
       }
-
-      delete data.users;
 
       // only in active payment period
       if (this.paymentPeriod === this.defaultPeriod) {
@@ -967,13 +960,12 @@ export default {
                 const index = this.planChangesData.findIndex(
                   v => v.library === defaultPlan.library,
                 );
+                // remove from changes data
+                this.UPDATE_PLAN_CHANGES_DATA({ remove: true, index });
 
                 // update default checked plan
                 this.REMOVE_DEFAULT_CHECKED_PLAN(data.index);
               }
-
-              // remove from changes data
-              this.UPDATE_PLAN_CHANGES_DATA({ remove: true, index: data.index });
             } catch (e) {
               console.error(e);
 
@@ -1044,6 +1036,12 @@ export default {
 
     /** on change users handler */
     async onChangeUsers({ event = null, value, plan, index }) {
+      // no negative numbers accepted
+      if (Number(event.target.value) < 1) {
+        value = 1;
+        event.target.value = 1;
+      }
+
       const defaultPlan = this.currentCheckedPlans.find(v => v.id === plan.id);
       const libraryKey = getPlanLibraryName(plan.nickname);
       let isReduce = false;
@@ -1134,14 +1132,6 @@ export default {
         }
       }
 
-      if (value > 0 && !plan.checked) {
-        this.SET_CHECKED_OR_USERS({
-          prop: 'checked',
-          value: true,
-          index,
-        });
-      }
-
       // update from core plan
       if (planIsCore(plan.nickname)) {
         const higherLicenceValue = this.getHigherLicencesValue();
@@ -1158,30 +1148,21 @@ export default {
 
         if (!isReduce) {
           const idx = this.planChangesData.findIndex(v => v.library === libraryKey);
-          const substractVal = !!defaultPlan ? defaultPlan.totalPaid : 0;
 
           const obj = {
             planId: plan.id,
             type: 'Increase',
             library: libraryKey,
             nickname: plan.nickname,
-            from: !!defaultPlan ? defaultPlan.users : 0,
+            from: defaultPlan.users,
             to: value,
             cost: `+${enUsFormatter.format(
-              calcTotalPlan({ ...plan, users: value }) - substractVal,
+              calcTotalPlan({ ...plan, users: value }) - defaultPlan.totalPaid,
             )}`,
             text: '',
           };
 
           this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
-        }
-
-        if (value === 0 && !this.isSubscribed) {
-          this.SET_CHECKED_OR_USERS({
-            prop: 'checked',
-            value: false,
-            index,
-          });
         }
 
         return;
@@ -1204,30 +1185,21 @@ export default {
 
         const defaultMain = this.currentCheckedPlans.find(p => planIsCore(p.nickname));
 
-        const substractUsers = !!defaultMain ? defaultMain.users : 0;
-        const cost =
-          calcTotalPlan({ ...mainPlan.value, users: higherLicenceValue }) -
-          calcTotalPlan({ ...mainPlan.value, users: substractUsers });
-
         const obj = {
           planId: mainPlan.value.id,
           type: 'Increase',
           library: libraryKeys.CORE.key,
           nickname: mainPlan.value.nickname,
-          from: !!defaultMain ? defaultMain.users : 0,
+          from: defaultMain.users,
           to: higherLicenceValue,
-          cost: `+${enUsFormatter.format(cost)}`,
+          cost: `+${enUsFormatter.format(
+            calcTotalPlan({ ...mainPlan.value, users: higherLicenceValue }) -
+              calcTotalPlan({ ...mainPlan.value, users: defaultMain.users }),
+          )}`,
           text: '',
         };
 
         this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
-        if (!mainPlan.value.checked) {
-          this.SET_CHECKED_OR_USERS({
-            prop: 'checked',
-            value: true,
-            index: mainPlan.index,
-          });
-        }
       }
 
       this.UPDATE_USERS({
@@ -1260,21 +1232,6 @@ export default {
         };
 
         this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
-      }
-
-      if (value !== 0) return;
-
-      if (!this.isSubscribed) {
-        this.SET_CHECKED_OR_USERS({
-          prop: 'checked',
-          value: false,
-          index,
-        });
-      } else {
-        this.UPDATE_USERS({
-          value: 1,
-          index,
-        });
       }
     },
 
@@ -1555,7 +1512,7 @@ export default {
         this.UPDATE_PLAN_CHANGES_DATA({ reset: true });
 
         // redirect to login prima
-        // if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
+        if (this.tenant.statusId === 4) window.open(process.env.PRIMA_URL, '_top');
       } catch (err) {
         console.error(err);
         this.$toast.error('Add/Update subscription error', {
@@ -1580,7 +1537,7 @@ export default {
 
 .resubscribe-button.disabled {
   pointer-events: none;
-  color: rgba(0,0,0,0.5) !important;
+  color: rgba(0, 0, 0, 0.5) !important;
 }
 
 .credit-card {
