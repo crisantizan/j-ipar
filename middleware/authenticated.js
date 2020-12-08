@@ -22,7 +22,7 @@ export default async function({ app, store, redirect, route, $axios }) {
 
       default:
         if (!process.token && !route.query.token) {
-        	return redirect('/access-denied');
+          return redirect('/access-denied');
         }
 
         !process.token && (process.token = route.query.token);

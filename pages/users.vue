@@ -251,11 +251,6 @@
                       placeholder="Address APT STE FLR Number"
                       :required="editUserInputRequired('addressAptSteFlrNumbertxt')"
                     />
-                    <!-- <pre>{{ selectedUser.addressAptSteFloor }}</pre>
-
-                    <pre>{{ selectedUser.addressAptCk }}</pre>
-                    <pre>{{ selectedUser.addressSteCk }}</pre>
-                    <pre>{{ selectedUser.addressFloorCk }}</pre> -->
                   </div>
 
                   <div class="col-lg-4 form-group">
@@ -908,6 +903,7 @@ export default {
       // reset selected user data on closing
       if (!state) {
         this.selectedUser = null;
+        this.validateMessage = null;
       }
     },
 
@@ -943,33 +939,7 @@ export default {
     async onUserEdit() {
       if (this.disabledBtnEditUser) return;
 
-      // const columnUser = this.users[this.selectedUser.index];
-      // VALIDATE EMAIL
-
-      if (!this.validateUserEmail(this.selectedUser.email)) {
-        document.getElementById('txtEditEmail').classList.add('is-invalid');
-
-        this.validateMessage = 'Invalid Email.';
-
-        return;
-      } else document.getElementById('txtEditEmail').classList.remove('is-invalid');
-
       const columnUser = this.users[this.selectedUser.index];
-
-      // VERIFY IF EXIST EMAIL
-
-      if (columnUser.email !== this.selectedUser.email) {
-        let existEmail = await this.existUserEmail(this.selectedUser.email);
-
-        if (existEmail) {
-          document.getElementById('txtEditEmail').classList.add('is-invalid');
-
-          this.validateMessage =
-            'This email address is already associated with a PrimaFacie account.  Please contact support at help.primafacienow.com or (616) 298-8695 so we can disable the other account or please choose another email address to use.';
-
-          return;
-        }
-      }
 
       // get only changed data
       const userData = Object.keys(this.selectedUser).reduce((obj, key) => {
@@ -1014,14 +984,24 @@ export default {
       } catch (err) {
         console.error(err);
 
-        this.$toast.error("Internal server error, we couldn't update the user", {
-          duration: 3000,
+        this.$toast.error("Error, we couldn't update the user", {
+          duration: 3500,
           position: 'bottom-right',
           icon: {
             name: 'exclamation-circle',
             after: true,
           },
         });
+
+        if (!Array.isArray(err)) return;
+
+        // email error
+        for (const error of err) {
+          if (!!error.message && error.message.includes('email address you provided')) {
+            this.validateMessage = error.message;
+            break;
+          }
+        }
       }
     },
 
