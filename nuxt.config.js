@@ -36,6 +36,8 @@ export default {
       process.env.BASE_IMAGE_URL || 'https://s3-us-west-2.amazonaws.com/prima-pictures',
     GRAPHQL_URL: process.env.GRAPHQL_URL || 'https://graph-staging.primafacieapp.com/graphql/',
     PRIMA_URL: process.env.PRIMA_URL || 'https://staging.primafacieapp.com/',
+    STRIPE_PUBLISHABLE_KEY:
+      process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_2AcUtig3rQa3DK0LTJQIGTrm',
   },
   /*
    ** Headers of the page
