@@ -55,7 +55,7 @@
             <span v-if="isDefaultPaymentMethod(paymentMethod)">Active</span>
             Payment Method
             <span v-if="isDefaultPaymentMethod(paymentMethod) && defaultPaymentMethodIsExpirated">
-              (EXPIRATED)
+              (EXPIRED)
             </span>
           </div>
           <h5 class="text-primary float-right mt-0"></h5>
@@ -176,7 +176,7 @@ export default {
       Swal.fire({
         title: 'Warning!',
         icon: 'error',
-        text: 'Your default payment method is expirated!',
+        text: 'Your default payment method is expired!',
       });
     },
 
