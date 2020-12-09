@@ -42,6 +42,10 @@ th[class^='vgt'] {
   }
 }
 
+.fade-in {
+  animation: fadeIn ease 250ms;
+}
+
 /* Transitions using the page hook */
 .page-enter-active,
 .page-leave-active {

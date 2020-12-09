@@ -27,3 +27,8 @@ export const userRoles = {
   ADMIN: 'admin',
   USER: 'user',
 };
+
+/** regular expressions */
+export const regex = {
+  EMAIL: /^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$/,
+};

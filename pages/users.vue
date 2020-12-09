@@ -397,17 +397,18 @@
                   <div class="col-lg-4 form-group">
                     <label for="txtEditEmail">Email</label>
                     <input
-                      id="txtEditEmail"
                       v-model="selectedUser.email"
+                      :class="{ 'is-invalid': !!errorMessages.email }"
                       type="text"
                       class="form-control"
+                      id="txtEditEmail"
                       placeholder="Email"
-                      @input="removeInvalid"
+                      autocomplete="off"
                     />
 
-                    <small v-if="validateMessage !== null" class="text-danger">{{
-                      validateMessage
-                    }}</small>
+                    <small v-show="!!errorMessages.email" class="text-danger fade-in">
+                      {{ errorMessages.email }}
+                    </small>
                   </div>
                 </div>
               </div>
@@ -547,7 +548,7 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 import { generateCheckboxHTML } from '@/helpers/generate-html';
 import { cloneObject } from '@/helpers/functions';
-import { libraryKeys, USER_ADDRESS_FIELDS } from '@/utils/constants';
+import { libraryKeys, USER_ADDRESS_FIELDS, regex } from '@/utils/constants';
 
 export default {
   components: {
@@ -681,14 +682,11 @@ export default {
       inviteFirstName: null,
       inviteLastName: null,
       validateMessage: null,
-    };
-  },
 
-  watch: {
-    inviteEmail(val) {
-      this.validateMessage = null;
-      document.getElementById('inviteEmail').classList.remove('is-invalid');
-    },
+      errorMessages: {
+        email: '',
+      },
+    };
   },
 
   computed: {
@@ -742,7 +740,7 @@ export default {
 
     /** disable button in edit user modal **/
     disabledBtnEditUser() {
-      if (!this.selectedUser) {
+      if (!this.selectedUser || this.editUserFormHasError) {
         return true;
       }
 
@@ -776,6 +774,28 @@ export default {
       ];
 
       return values.some(v => v === '' || v === null);
+    },
+
+    editUserFormHasError() {
+      return Object.values(this.errorMessages).some(value => !!value);
+    },
+  },
+
+  watch: {
+    inviteEmail(val) {
+      this.validateMessage = null;
+      document.getElementById('inviteEmail').classList.remove('is-invalid');
+    },
+
+    'selectedUser.email'(val) {
+      if (typeof val === 'undefined') return;
+
+      if (!regex.EMAIL.test(val)) {
+        this.errorMessages.email = 'Invalid format email';
+        return;
+      }
+
+      !!this.errorMessages.email && (this.errorMessages.email = '');
     },
   },
 
@@ -1035,19 +1055,6 @@ export default {
       this.modal.relations = false; // close modal
     },
 
-    removeInvalid() {
-      document.getElementById('txtEditEmail').classList.remove('is-invalid');
-      this.validateMessage = null;
-    },
-
-    validateUserEmail(email) {
-      // validate email
-      const regex = new RegExp(
-        '^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$',
-      );
-      return regex.test(email);
-    },
-
     async existUserEmail(email) {
       // IF EXIST EMAIL
       let existEmail = false;
@@ -1063,7 +1070,7 @@ export default {
     async inviteUser() {
       // VALIDATE EMAIL
 
-      if (!this.validateUserEmail(this.inviteEmail)) {
+      if (!regex.EMAIL.test(this.inviteEmail)) {
         document.getElementById('inviteEmail').classList.add('is-invalid');
 
         this.validateMessage = 'Invalid Email.';
