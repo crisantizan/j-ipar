@@ -182,8 +182,7 @@
                           size="3"
                           :disabled="
                             defaultPaymentMethodIsExpirated ||
-                              ((plan.cancelAtPeriodEnd || disabledMirrorPeriod || !plan.checked) &&
-                                isSubscribed)
+                              ((plan.cancelAtPeriodEnd || disabledMirrorPeriod) && isSubscribed)
                           "
                           :value="plan.users"
                           @change="
