@@ -7,7 +7,11 @@
     <div class="col-12 col-lg-8">
       <div class="card">
         <h2 class="mb-0 p-2">Select Plan</h2>
-        <h4 class="px-2 text-primary cursor-pointer" @click="openPopupAboutLicences">
+        <h4
+          class="px-2 text-primary cursor-pointer"
+          style="max-width: 230px;"
+          @click="openPopupAboutLicences"
+        >
           Questions about licences
         </h4>
 
