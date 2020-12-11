@@ -1260,17 +1260,10 @@ export default {
         this.UPDATE_PLAN_CHANGES_DATA({ data: obj, index: idx });
       }
 
-      if (value !== 0) return;
-
-      if (!this.isSubscribed) {
+      if (value === 0 && !defaultPlan) {
         this.SET_CHECKED_OR_USERS({
           prop: 'checked',
           value: false,
-          index,
-        });
-      } else {
-        this.UPDATE_USERS({
-          value: 1,
           index,
         });
       }
