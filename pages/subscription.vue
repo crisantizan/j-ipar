@@ -1266,6 +1266,13 @@ export default {
           value: false,
           index,
         });
+
+        // remove changes
+        const idx = this.planChangesData.findIndex(v => v.library === libraryKey);
+
+        if (idx !== -1) {
+          this.UPDATE_PLAN_CHANGES_DATA({ index: idx, remove: true });
+        }
       }
     },
 
