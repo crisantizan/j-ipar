@@ -234,35 +234,48 @@
               </table>
             </div>
 
-            <div class="text-right mb-3" v-if="hasPaymentMethods">
+            <div class="d-flex justify-content-between mb-2 px-2">
               <button
-                v-if="isSubscribed && subscriptionIsCanceled"
-                class="btn btn-warning mr-2"
-                @click="resetSubscription"
-                :disabled="defaultPaymentMethodIsExpirated || paymentPeriod !== defaultPeriod"
+                v-if="isSubscribed"
+                :disabled="!valuesChange"
+                class="btn btn-sm btn-outline-secondary"
+                title="Reset your subscription values"
+                @click="onResetSubscriptionValues"
               >
-                Resubscribe
+                <i class="fas fa-undo"></i>
+                Reset
               </button>
 
-              <button
-                v-if="isSubscribed && !subscriptionIsCanceled"
-                type="button"
-                class="btn btn-danger mr-2"
-                :title="disabledBtnCancel ? 'Already canceled' : 'Cancel subscription'"
-                :disabled="disabledBtnCancel"
-                @click="cancelSubscription"
-              >
-                Cancel Subscription
-              </button>
+              <div v-if="hasPaymentMethods">
+                <button
+                  v-if="isSubscribed && subscriptionIsCanceled"
+                  class="btn btn-warning mr-2"
+                  @click="resetSubscription"
+                  :disabled="defaultPaymentMethodIsExpirated || paymentPeriod !== defaultPeriod"
+                >
+                  Resubscribe
+                </button>
 
-              <button
-                type="button"
-                class="btn btn-success"
-                :disabled="loading || disabledBtnSubscribeUpdate"
-                @click="subscribeUpdatePlan"
-              >
-                Subscribe / Update
-              </button>
+                <button
+                  v-if="isSubscribed && !subscriptionIsCanceled"
+                  type="button"
+                  class="btn btn-danger mr-2"
+                  :title="disabledBtnCancel ? 'Already canceled' : 'Cancel subscription'"
+                  :disabled="disabledBtnCancel"
+                  @click="cancelSubscription"
+                >
+                  Cancel Subscription
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  :disabled="loading || disabledBtnSubscribeUpdate"
+                  @click="subscribeUpdatePlan"
+                >
+                  Subscribe / Update
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -514,6 +527,25 @@ export default {
     ...mapActions('plans', ['getPlans', 'addSubscription', 'cancelSubscriptions']),
 
     ...mapMutations(['SET_LOADING', 'SHOW_WELCOME_ALERT']),
+
+    async onResetSubscriptionValues() {
+      const { isConfirmed } = await Swal.fire({
+        title: 'Are you sure?',
+        text:
+          'You will lose current changes',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, do it!',
+      });
+
+      if (!isConfirmed) {
+        return;
+      }
+
+      this.refreshPlansData();
+    },
 
     openPopupAboutLicences() {
       Swal.fire({
