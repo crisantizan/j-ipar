@@ -234,7 +234,10 @@
               </table>
             </div>
 
-            <div class="d-flex justify-content-between mb-2 px-2">
+            <div
+              class="d-flex mb-2 px-2"
+              :class="[isSubscribed ? 'justify-content-between' : 'justify-content-end']"
+            >
               <button
                 v-if="isSubscribed"
                 :disabled="!valuesChange"
@@ -406,7 +409,7 @@ export default {
       Swal.fire({
         html: /*html*/ `
           <div class="card">
-            <div class="welcome-alert-cover"></div>
+            <div class="alert-popup-cover welcome-alert-cover"></div>
             <div class="card-body">
             <h3 class="mt-1">Welcome to Prima!</h3>
             <p class="card-text">Thank you for your interest in Prima. To take advantage of your free trial, please enter your payment information and select your desired products. You will begin with a free 15-day trial and only charged at expiration of the trial. If you cancel before your trial expires, you will not be charged.</p>
@@ -531,8 +534,7 @@ export default {
     async onResetSubscriptionValues() {
       const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
-        text:
-          'You will lose current changes',
+        text: 'You will lose current changes',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
