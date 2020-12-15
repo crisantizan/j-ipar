@@ -388,8 +388,8 @@ export const getters = {
     }
 
     return (
-      getters.defaultPaymentMethod.card.exp_year < currentYear ||
-      getters.defaultPaymentMethod.card.exp_month < currentMonth
+      getters.defaultPaymentMethod.card.exp_month < currentMonth &&
+      getters.defaultPaymentMethod.card.exp_year <= currentYear
     );
   },
 
