@@ -3,6 +3,8 @@ export const libraryKeys = {
   CORE: { key: 'Prima Facie', staticValue: 'core' },
   CALIFORNIA: { key: 'California', staticValue: 'california' },
   IMMIGRATION: { key: 'Immigration', staticValue: 'immigration' },
+  SOCIAL_SECURITY: { key: 'Social Security', staticValue: 'social security' },
+  FEDERAL_COURT: { key: 'Federal Court', staticValue: 'federal court' },
 };
 
 export const USER_ADDRESS_FIELDS = [

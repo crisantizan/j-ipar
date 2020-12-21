@@ -27,7 +27,12 @@ export const state = () => ({
 
 export const mutations = {
   SET_ALL(state, plans) {
-    const displayPlans = [libraryKeys.CALIFORNIA.staticValue, libraryKeys.IMMIGRATION.staticValue];
+    const displayPlans = [
+      libraryKeys.SOCIAL_SECURITY.staticValue,
+      libraryKeys.FEDERAL_COURT.staticValue,
+      libraryKeys.CALIFORNIA.staticValue,
+      libraryKeys.IMMIGRATION.staticValue,
+    ];
 
     state.all = plans.filter(plan => {
       if (!plan || !plan.nickname) return false;
