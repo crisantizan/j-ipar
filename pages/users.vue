@@ -88,20 +88,19 @@
 
         <!-- generate checkboxes in "assignLibraries" field -->
         <template v-else-if="isTheColumn(props.column, 'assignLibraries')">
-          <!-- print only avaibales libraries -->
-          <template v-for="(libraryValue, libraryKey) in props.row.assignLibraries">
+          <template v-for="library in generateAssignedLibraries(props.row.assignLibraries)">
             <VCheckbox
-              v-if="displayLibraryCheckbox(libraryKey)"
-              v-model="users[props.row.index].assignLibraries[libraryKey]"
+              v-if="displayLibraryCheckbox(getLibraryKey(library, 'key'))"
+              v-model="users[props.row.index].assignLibraries[getLibraryKey(library, 'backendKey')]"
               async
-              :id="generateCheckboxId(libraryKey, props.row.id)"
-              :label="libraryKey"
-              :key="libraryKey"
-              :disabled="isDisabled(props.row.index, libraryKey) || !props.row.active"
+              :id="generateCheckboxId(getLibraryKey(library, 'backendKey'), props.row.id)"
+              :label="getLibraryKey(library, 'key')"
+              :key="getLibraryKey(library, 'key')"
+              :disabled="isDisabled(props.row.index, library) || !props.row.active"
               @change-async="
                 onCheckedAsync({
                   checked: $event,
-                  library: libraryKey,
+                  library: getLibraryKey(library, 'backendKey'),
                   index: props.row.index,
                 })
               "
@@ -896,7 +895,29 @@ export default {
     },
 
     isDisabled(index, key) {
-      return this.selected[key] >= this.librariesQuantity[key] && !this.isChecked(index, key);
+      const library = typeof key === 'string' ? { key, backendKey: key } : key;
+
+      return (
+        this.selected[library.key] >= this.librariesQuantity[library.key] &&
+        !this.isChecked(index, library.backendKey)
+      );
+    },
+
+    /** full assigned libraries (including custom) */
+    generateAssignedLibraries(libraries) {
+      return [
+        ...Object.keys(libraries),
+        // custom
+        { key: libraryKeys.FEDERAL_COURT.key, backendKey: libraryKeys.FEDERAL_COURT.backendKey },
+        {
+          key: libraryKeys.SOCIAL_SECURITY.key,
+          backendKey: libraryKeys.SOCIAL_SECURITY.backendKey,
+        },
+      ];
+    },
+
+    getLibraryKey(library, prop) {
+      return typeof library === 'string' ? library : library[prop];
     },
 
     displayLibraryCheckbox(key) {

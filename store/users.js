@@ -105,7 +105,12 @@ export const getters = {
       return {};
     }
 
-    const availables = [...Object.keys(state.users[0].assignLibraries), libraryKeys.CORE.key];
+    const availables = [
+      ...Object.keys(state.users[0].assignLibraries),
+      libraryKeys.CORE.key,
+      libraryKeys.SOCIAL_SECURITY.key,
+      libraryKeys.FEDERAL_COURT.key,
+    ];
 
     return keys.reduce((acc, key) => {
       if (availables.includes(key)) {
@@ -137,6 +142,18 @@ export const getters = {
       (acc, user) => (user.active ? acc + 1 : acc),
       0,
     );
+
+    obj[libraryKeys.FEDERAL_COURT.key] = getters.users.reduce((acc, user) => {
+      const isChecked = user.assignLibraries[libraryKeys.FEDERAL_COURT.backendKey];
+
+      return isChecked ? acc + 1 : acc;
+    }, 0);
+
+    obj[libraryKeys.SOCIAL_SECURITY.key] = getters.users.reduce((acc, user) => {
+      const isChecked = user.assignLibraries[libraryKeys.SOCIAL_SECURITY.backendKey];
+
+      return isChecked ? acc + 1 : acc;
+    }, 0);
 
     return obj;
   },

@@ -170,12 +170,19 @@ export const actions = {
         const libraries = data.users[0].librariesQuantity;
 
         const obj = Object.keys(libraries).reduce((acc, key) => {
-          if (key !== 'Core') {
-            return { ...acc, [key]: libraries[key] };
-          }
+          switch (key) {
+            case libraryKeys.CORE.backendKey:
+              return { ...acc, [libraryKeys.CORE.key]: libraries[key] };
 
-          // change "Core" key to "Prima Facie"
-          return { ...acc, [libraryKeys.CORE.key]: libraries[key] };
+            case libraryKeys.SOCIAL_SECURITY.backendKey:
+              return { ...acc, [libraryKeys.SOCIAL_SECURITY.key]: libraries[key] };
+
+            case libraryKeys.FEDERAL_COURT.backendKey:
+              return { ...acc, [libraryKeys.FEDERAL_COURT.key]: libraries[key] };
+
+            default:
+              return { ...acc, [key]: libraries[key] };
+          }
         }, {});
 
         commit('users/SET_LIBRARIES_QUANTITY', obj);
